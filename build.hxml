@@ -1,0 +1,4 @@
+-main Exposer
+-js ../lib/tannus.raw.js
+-D dump
+-dce std
