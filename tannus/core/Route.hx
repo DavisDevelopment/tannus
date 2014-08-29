@@ -7,15 +7,18 @@ package tannus.core;
 */
 
 import tannus.utils.RegEx;
+import tannus.core.EventDispatcher;
+import tannus.core.Page;
 
 using tannus.utils.PathTools;
 using StringTools;
-class Route {
+class Route extends EventDispatcher {
 	public var uri_parameters:Map<String, String>;
 	public var descriptor:String;
 	public var on_take:Null<Dynamic>;
 
 	public function new(descriptor):Void {
+		super();
 		this.uri_parameters = new Map();
 		this.descriptor = descriptor;
 		this.on_take = null;
@@ -92,5 +95,10 @@ class Route {
 		}
 		trace([possible.simplify(), descriptor.simplify()]);
 		return true;
+	}
+
+	public function take():Void {
+		var this_page:Page = new Page(this);
+		this.emit('take', this_page);
 	}
 }

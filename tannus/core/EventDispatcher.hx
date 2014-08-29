@@ -78,11 +78,6 @@ class EventDispatcher {
 		this.listen( channel, handler, once );
 	}
 
-	public function once(channel:String, handler:Dynamic):Void {
-		handler = gryffin.Utils.invokeOnce(handler);
-		this.on(channel, handler, true);
-	}
-
 	public function broadcast( channel : String, data : Dynamic ):Void {
 		var receivingChannels:Array<String> = [];
 		for ( key in this.handlers.keys() ) {
