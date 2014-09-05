@@ -2,6 +2,7 @@ package ;
 
 import tannus.core.Object;
 import tannus.core.Route;
+import tannus.Application;
 
 class Exposer {
 	private static var env(get, never):Object;
@@ -9,12 +10,8 @@ class Exposer {
 		env[name.toString()] = value;
 	}
 	public static function main():Void {
-		var route = new Route('/pages/written_by/:user_id/([0-9]+)');
-
-		var url:String = 'pages/written_by/423942/22';
-
-		trace(route.check(url));
-		trace(route);
+		if (env["tannus"] == null) env["tannus"] = {};
+		env["tannus"]["Application"] = Application;
 	}
 
 	private static function get_env():Object {

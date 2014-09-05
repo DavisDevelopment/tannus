@@ -1,4 +1,4 @@
 -main Exposer
--js ../lib/tannus.raw.js
--D dump
+-js tannus.raw.js
 -dce std
+-D tojs

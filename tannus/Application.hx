@@ -5,6 +5,7 @@ import tannus.core.Router;
 import tannus.core.Page;
 import tannus.core.EventDispatcher;
 
+@:e
 class Application extends EventDispatcher {
 	public var router:Router;
 
@@ -13,8 +14,11 @@ class Application extends EventDispatcher {
 
 		this.router = new Router();
 	}
-	public function route(url : String, func:Dynamic):Void {
+	public function route(url : String, func:Dynamic, ?pageClass:Class<Page>):Void {
 		var rout:Route = new Route(url);
+		if (pageClass != null) {
+			rout.page_class = pageClass;
+		}
 		rout.on('take', function(pg:Page) {
 			func(pg);
 		});

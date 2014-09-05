@@ -12,13 +12,16 @@ import tannus.core.Page;
 
 using tannus.utils.PathTools;
 using StringTools;
+
 class Route extends EventDispatcher {
+	public var page_class:Class<Page>;
 	public var uri_parameters:Map<String, String>;
 	public var descriptor:String;
 	public var on_take:Null<Dynamic>;
 
 	public function new(descriptor):Void {
 		super();
+		this.page_class = Page;
 		this.uri_parameters = new Map();
 		this.descriptor = descriptor;
 		this.on_take = null;
@@ -32,8 +35,8 @@ class Route extends EventDispatcher {
 		var possiblea:Array<String> = possible.split('/');
 		var descripta:Array<String> = descript.split('/');
 
-		trace(possiblea);
-		trace(descripta);
+		// trace(possiblea);
+		// trace(descripta);
 		var failed:Bool = false;
 
 		if (possiblea.length != descripta.length) {
@@ -47,7 +50,7 @@ class Route extends EventDispatcher {
 			var mypiece:String = descripta[i];
 			if (mypiece == null) mypiece = '';
 
-			trace([piece, mypiece]);
+			//trace([piece, mypiece]);
 
 			if (mypiece == '') {
 				if (descriptor.endsWith('/')) return true;
@@ -98,7 +101,7 @@ class Route extends EventDispatcher {
 	}
 
 	public function take():Void {
-		var this_page:Page = new Page(this);
+		var this_page:Page = Type.createInstance(page_class, [this]);
 		this.emit('take', this_page);
 	}
 }

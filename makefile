@@ -1,4 +1,4 @@
-all: haxe compress
+all: haxe
 
 haxe:
 	haxe build.hxml

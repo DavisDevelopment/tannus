@@ -2,6 +2,7 @@ package tannus.core;
 
 private typedef Handler = { channel:String, func:Dynamic, once:Bool };
 
+@:expose
 class EventDispatcher {
 	public var handlers : Map<String, Array<Handler>>;
 	public var emitted : Map<String, Dynamic>;

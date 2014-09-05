@@ -4,9 +4,14 @@ import tannus.core.EventDispatcher;
 import tannus.core.Route;
 import tannus.core.Object;
 
+@:expose
 class Page extends EventDispatcher {
 	private var route:Route;
-	public var parameters:Object;
+	#if tojs
+		public var parameters:Object;
+	#else
+		public var parameters:Map<String, String>;
+	#end
 	public var root:String;
 
 	public function new(taken_route:Route):Void {
@@ -14,6 +19,10 @@ class Page extends EventDispatcher {
 
 		this.route = taken_route;
 		this.root = js.Browser.window.location.host;
-		this.parameters = Object.fromStringMap(cast this.route.uri_parameters);
+		#if tojs
+			this.parameters = Object.fromStringMap(cast this.route.uri_parameters);
+		#else
+			this.parameters = this.route.uri_parameters;
+		#end
 	}
 }
