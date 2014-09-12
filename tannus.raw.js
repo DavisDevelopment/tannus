@@ -522,6 +522,32 @@ tannus.core.EventDispatcher.prototype = {
 	,ignore: function(channel,handler) {
 		if(handler != null) this.removeHandler(channel,handler); else this.handlers.remove(channel);
 	}
+	,forward: function(target,events) {
+		var _g = 0;
+		while(_g < events.length) {
+			var eventName = [events[_g]];
+			++_g;
+			this.on(eventName[0],(function(eventName) {
+				return function(data) {
+					target.emit(eventName[0],data);
+				};
+			})(eventName));
+		}
+		return;
+	}
+	,forwardFrom: function(target,events) {
+		var _g1 = this;
+		var _g = 0;
+		while(_g < events.length) {
+			var eventName = [events[_g]];
+			++_g;
+			target.on(eventName[0],(function(eventName) {
+				return function(data) {
+					_g1.emit(eventName[0],data);
+				};
+			})(eventName));
+		}
+	}
 	,pause: function(channel) {
 		var handlerSet = this.handlers.get(channel);
 		if(handlerSet != null) this.handlers.remove(channel);

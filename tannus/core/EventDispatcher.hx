@@ -109,6 +109,21 @@ class EventDispatcher {
 			this.handlers.remove(channel);
 		}
 	}
+	public function forward(target : EventDispatcher, events:Array<String>):Void {
+		for (eventName in events) {
+			this.on(eventName, function(data : Dynamic):Void {
+				target.emit(eventName, data);
+			});
+		}
+		return;
+	}
+	public function forwardFrom(target : EventDispatcher, events:Array<String>):Void {
+		for (eventName in events) {
+			target.on(eventName, function(data : Dynamic):Void {
+				this.emit(eventName, data);
+			});	
+		}
+	}
 	public function pause( channel:String ):Void {
 		var handlerSet:Array<Handler> = this.handlers.get(channel);
 		if (handlerSet != null) {
