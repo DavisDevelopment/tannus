@@ -1,4 +1,8 @@
+
 -main Exposer
--js tannus.raw.js
+-js testing/tannus.raw.js
+-cp hscript
 -dce std
+-D rtti
 -D tojs
+-D client

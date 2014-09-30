@@ -1,0 +1,14 @@
+<div class='row'>
+	<h2 class='user-name'><%= context.user.full_name %></h2>
+	<div class='row user-tests'>
+		<% if ( context.assignments != null ) { %>
+			
+			
+
+		<% } else { %>
+			
+			<h4>You currently have no tests assigned to you.</h4>
+
+		<% } %>
+	</div>
+</div>

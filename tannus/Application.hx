@@ -4,14 +4,16 @@ import tannus.core.Route;
 import tannus.core.Router;
 import tannus.core.Page;
 import tannus.core.EventDispatcher;
+import tannus.utils.CompileTime;
 
-@:e
+@:expose
 class Application extends EventDispatcher {
 	public var router:Router;
 
 	public function new():Void {
 		super();
-
+		var subs = CompileTime.getAllClasses(tannus.core.promises.Promise);
+		trace(subs);
 		this.router = new Router();
 	}
 	public function route(url : String, func:Dynamic, ?pageClass:Class<Page>):Void {
