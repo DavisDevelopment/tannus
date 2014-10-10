@@ -3,6 +3,8 @@ package ;
 import tannus.core.Object;
 import tannus.core.Route;
 import tannus.Application;
+import tannus.utils.RegEx;
+import tannus.utils.DomParser;
 
 class Exposer {
 	private static var env(get, never):Object;
@@ -12,6 +14,11 @@ class Exposer {
 	public static function main():Void {
 		if (env["tannus"] == null) env["tannus"] = {};
 		env["tannus"]["Application"] = Application;
+
+		env['tannus']['utils'] = {};
+
+		env['tannus']['utils']['RegEx'] = RegEx;
+		env['tannus']['utils']['DomParser'] = DomParser;
 	}
 
 	private static function get_env():Object {
