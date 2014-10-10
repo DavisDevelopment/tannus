@@ -16,13 +16,18 @@ package tannus.core;
 import tannus.utils.MapTools;
 import tannus.utils.Types;
 import tannus.utils.RegEx;
+import tannus.ore.ObjectRegEx;
 
 abstract Object (Dynamic) {
 	private var self(get, never):Object;
 	private var type(get, never):String;
 
 	public inline function new(obj:Dynamic):Void {
-		this = obj;
+		if (Types.basictype(obj) == "StringMap") {
+			this = MapTools.toDynamic(cast obj);
+		} else {
+			this = obj;
+		}
 	}
 
 //=====================================//
@@ -48,6 +53,20 @@ abstract Object (Dynamic) {
 	public inline function exists(key : String):Bool {
 		var prop:Dynamic = untyped this[key];
 		return (prop != (untyped __js__('void(0)')));
+	}
+
+	//- Merge two objects together, returning the product
+	public inline function merge(other : Object):Void {
+		for (key in other.keys()) {
+			if (!self.exists(key)) {
+				self[key] = other[key];
+			}
+		}
+	}
+
+	//- Test Whether the given object is matched by the given OReg expression
+	public inline function is(description : String):Bool {
+		return ObjectRegEx.compile(description).test(this);
 	}
 
 //========================================//

@@ -66,7 +66,7 @@ class EventDispatcher {
 	?@param once ( Bool ) = false
 */
 
-	public function listen( channel : String, handler : Dynamic, once:Bool = false ):Void {
+	public function lissen( channel : String, handler : Dynamic, once:Bool = false ):Void {
 		var channelHandlers : Array<Handler> = this.handlers.get( channel );
 		if ( channelHandlers == null ) {
 			channelHandlers = new Array();
@@ -76,7 +76,7 @@ class EventDispatcher {
 	}
 
 	public function on( channel : String, handler : Dynamic, ?once:Bool = false ):Void {
-		this.listen( channel, handler, once );
+		this.lissen( channel, handler, once );
 	}
 
 	public function broadcast( channel : String, data : Dynamic ):Void {
