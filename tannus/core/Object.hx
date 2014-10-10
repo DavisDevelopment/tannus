@@ -131,6 +131,30 @@ abstract Object (Dynamic) {
 		return MapTools.fromDynamic(this);
 	}
 
+//====================================//
+//== Primitive-Type Casting-Methods ==//
+//====================================//
+	
+	@:to 
+	public inline function asBoolean():Bool {
+		return (this == true);
+	}
+
+	@:to 
+	public inline function asInteger():Int {
+		return (Std.int(Std.parseFloat(Std.string(this))));
+	}
+
+	@:to 
+	public inline function asFloat():Float {
+		return (Std.parseFloat(Std.string(this)));
+	}
+
+	@:to 
+	public inline function asArray():Array<Object> {
+		return [for (item in cast(this, Array<Dynamic>)) new Object(item)];
+	}
+
 //==================================//
 //== Class-Level Implicit Casting ==//
 //==================================//

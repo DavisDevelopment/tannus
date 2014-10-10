@@ -1,0 +1,9 @@
+{
+	"name" : "tannus",
+	"description" : "Highly robust web-development toolkit",
+	"version" : "0.0.2",
+	"license" : "MIT",
+	"contributors" : ["DavisDevelopment"],
+	"tags" : ["tannus", "tools", "toolkit", "web", "javascript", "nodejs", "node", "php", "server-side", "client-side"],
+	"releasenote": "Initial release.  Most components are stable, but there is still a lot to be desired"
+}

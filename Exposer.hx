@@ -9,6 +9,7 @@ import tannus.io.Byte;
 import tannus.io.ByteArray;
 import tannus.utils.Buffer;
 import tannus.ore.ObjectRegEx;
+import tannus.utils.SearchEngine;
 
 class Exposer {
 	private static var env(get, never):Object;
@@ -30,15 +31,6 @@ class Exposer {
 		envir['ore'] = ObjectRegEx;
 
 		initHelpers();
-
-		var bitlist:ByteArray = "Hello, World!";
-		bitlist.shift();
-		trace(bitlist);
-
-		for (bit in bitlist) {
-			trace(cast(bit, Int));
-			trace(bit);
-		}
 	}
 
 	public static function initHelpers():Void {

@@ -1,6 +1,7 @@
 (function ($hx_exports) { "use strict";
 $hx_exports.tannus = $hx_exports.tannus || {};
-$hx_exports.tannus.core = $hx_exports.tannus.core || {};
+$hx_exports.tannus.utils = $hx_exports.tannus.utils || {};
+;$hx_exports.tannus.core = $hx_exports.tannus.core || {};
 var $hxClasses = {},$estr = function() { return js.Boot.__string_rec(this,''); };
 function $extend(from, fields) {
 	function Inherit() {} Inherit.prototype = from; var proto = new Inherit();
@@ -161,51 +162,6 @@ Exposer.main = function() {
 	value3 = this15;
 	Reflect.setProperty(envir,name3,value3);
 	Exposer.initHelpers();
-	var bitlist;
-	var buf;
-	var bytes = haxe.io.Bytes.ofString("Hello, World!");
-	buf = bytes;
-	var ba = new tannus.io.IByteArray(buf.length);
-	var chars = buf.toString();
-	var bytes1 = haxe.io.Bytes.ofString(chars);
-	ba.buffer = bytes1;
-	bitlist = ba;
-	bitlist.shift();
-	console.log(bitlist.buffer.toString());
-	var $it0 = (function($this) {
-		var $r;
-		var buf1 = bitlist.buffer;
-		var i = -1;
-		var iter = { next : function() {
-			i++;
-			try {
-				return buf1.b[i];
-			} catch( err ) {
-				if( js.Boot.__instanceof(err,String) ) {
-					return null;
-				} else throw(err);
-			}
-		}, hasNext : function() {
-			return i <= buf1.length - 1 && (function($this) {
-				var $r;
-				try {
-					$r = buf1.b[i + 1];
-				} catch( err1 ) {
-					if( js.Boot.__instanceof(err1,String) ) {
-						$r = null;
-					} else throw(err1);
-				}
-				return $r;
-			}(this)) != null;
-		}};
-		$r = iter;
-		return $r;
-	}(this));
-	while( $it0.hasNext() ) {
-		var bit = $it0.next();
-		console.log(js.Boot.__cast(bit , Int));
-		console.log(String.fromCharCode(bit));
-	}
 };
 Exposer.initHelpers = function() {
 	var ore = tannus.ore.ObjectRegEx;
@@ -342,6 +298,9 @@ Std.__name__ = ["Std"];
 Std.string = function(s) {
 	return js.Boot.__string_rec(s,"");
 };
+Std["int"] = function(x) {
+	return x | 0;
+};
 Std.parseFloat = function(x) {
 	return parseFloat(x);
 };
@@ -428,6 +387,116 @@ Type.createInstance = function(cl,args) {
 };
 var haxe = {};
 haxe.ds = {};
+haxe.ds.ArraySort = function() { };
+$hxClasses["haxe.ds.ArraySort"] = haxe.ds.ArraySort;
+haxe.ds.ArraySort.__name__ = ["haxe","ds","ArraySort"];
+haxe.ds.ArraySort.sort = function(a,cmp) {
+	haxe.ds.ArraySort.rec(a,cmp,0,a.length);
+};
+haxe.ds.ArraySort.rec = function(a,cmp,from,to) {
+	var middle = from + to >> 1;
+	if(to - from < 12) {
+		if(to <= from) return;
+		var _g = from + 1;
+		while(_g < to) {
+			var i = _g++;
+			var j = i;
+			while(j > from) {
+				if(cmp(a[j],a[j - 1]) < 0) haxe.ds.ArraySort.swap(a,j - 1,j); else break;
+				j--;
+			}
+		}
+		return;
+	}
+	haxe.ds.ArraySort.rec(a,cmp,from,middle);
+	haxe.ds.ArraySort.rec(a,cmp,middle,to);
+	haxe.ds.ArraySort.doMerge(a,cmp,from,middle,to,middle - from,to - middle);
+};
+haxe.ds.ArraySort.doMerge = function(a,cmp,from,pivot,to,len1,len2) {
+	var first_cut;
+	var second_cut;
+	var len11;
+	var len22;
+	var new_mid;
+	if(len1 == 0 || len2 == 0) return;
+	if(len1 + len2 == 2) {
+		if(cmp(a[pivot],a[from]) < 0) haxe.ds.ArraySort.swap(a,pivot,from);
+		return;
+	}
+	if(len1 > len2) {
+		len11 = len1 >> 1;
+		first_cut = from + len11;
+		second_cut = haxe.ds.ArraySort.lower(a,cmp,pivot,to,first_cut);
+		len22 = second_cut - pivot;
+	} else {
+		len22 = len2 >> 1;
+		second_cut = pivot + len22;
+		first_cut = haxe.ds.ArraySort.upper(a,cmp,from,pivot,second_cut);
+		len11 = first_cut - from;
+	}
+	haxe.ds.ArraySort.rotate(a,cmp,first_cut,pivot,second_cut);
+	new_mid = first_cut + len22;
+	haxe.ds.ArraySort.doMerge(a,cmp,from,first_cut,new_mid,len11,len22);
+	haxe.ds.ArraySort.doMerge(a,cmp,new_mid,second_cut,to,len1 - len11,len2 - len22);
+};
+haxe.ds.ArraySort.rotate = function(a,cmp,from,mid,to) {
+	var n;
+	if(from == mid || mid == to) return;
+	n = haxe.ds.ArraySort.gcd(to - from,mid - from);
+	while(n-- != 0) {
+		var val = a[from + n];
+		var shift = mid - from;
+		var p1 = from + n;
+		var p2 = from + n + shift;
+		while(p2 != from + n) {
+			a[p1] = a[p2];
+			p1 = p2;
+			if(to - p2 > shift) p2 += shift; else p2 = from + (shift - (to - p2));
+		}
+		a[p1] = val;
+	}
+};
+haxe.ds.ArraySort.gcd = function(m,n) {
+	while(n != 0) {
+		var t = m % n;
+		m = n;
+		n = t;
+	}
+	return m;
+};
+haxe.ds.ArraySort.upper = function(a,cmp,from,to,val) {
+	var len = to - from;
+	var half;
+	var mid;
+	while(len > 0) {
+		half = len >> 1;
+		mid = from + half;
+		if(cmp(a[val],a[mid]) < 0) len = half; else {
+			from = mid + 1;
+			len = len - half - 1;
+		}
+	}
+	return from;
+};
+haxe.ds.ArraySort.lower = function(a,cmp,from,to,val) {
+	var len = to - from;
+	var half;
+	var mid;
+	while(len > 0) {
+		half = len >> 1;
+		mid = from + half;
+		if(cmp(a[mid],a[val]) < 0) {
+			from = mid + 1;
+			len = len - half - 1;
+		} else len = half;
+	}
+	return from;
+};
+haxe.ds.ArraySort.swap = function(a,i,j) {
+	var tmp = a[i];
+	a[i] = a[j];
+	a[j] = tmp;
+};
 haxe.ds.StringMap = function() {
 	this.h = { };
 };
@@ -940,6 +1009,33 @@ tannus.core._Object.Object_Impl_.toString = function(this1) {
 };
 tannus.core._Object.Object_Impl_.toStringMap = function(this1) {
 	return tannus.utils.MapTools.fromDynamic(this1);
+};
+tannus.core._Object.Object_Impl_.asBoolean = function(this1) {
+	return this1 == true;
+};
+tannus.core._Object.Object_Impl_.asInteger = function(this1) {
+	return Std["int"](Std.parseFloat(Std.string(this1)));
+};
+tannus.core._Object.Object_Impl_.asFloat = function(this1) {
+	return Std.parseFloat(Std.string(this1));
+};
+tannus.core._Object.Object_Impl_.asArray = function(this1) {
+	var _g = [];
+	var _g1 = 0;
+	var _g2;
+	_g2 = js.Boot.__cast(this1 , Array);
+	while(_g1 < _g2.length) {
+		var item = _g2[_g1];
+		++_g1;
+		_g.push((function($this) {
+			var $r;
+			var this2;
+			if(tannus.utils.Types.basictype(item) == "StringMap") this2 = tannus.utils.MapTools.toDynamic(item); else this2 = item;
+			$r = this2;
+			return $r;
+		}(this)));
+	}
+	return _g;
 };
 tannus.core._Object.Object_Impl_.fromDynamic = function(obj) {
 	var this1;
@@ -2460,6 +2556,19 @@ tannus.serverside.socks.Utils.mapFromPairs = function(pairs) {
 	return mp;
 };
 tannus.utils = {};
+tannus.utils.ArrayTools = function() { };
+$hxClasses["tannus.utils.ArrayTools"] = tannus.utils.ArrayTools;
+tannus.utils.ArrayTools.__name__ = ["tannus","utils","ArrayTools"];
+tannus.utils.ArrayTools.times = function(list,num) {
+	var results = list.slice();
+	var _g1 = 0;
+	var _g = num - 1;
+	while(_g1 < _g) {
+		var i = _g1++;
+		results = results.concat(list.slice());
+	}
+	return results;
+};
 tannus.utils._Buffer = {};
 tannus.utils._Buffer.Buffer_Impl_ = function() { };
 $hxClasses["tannus.utils._Buffer.Buffer_Impl_"] = tannus.utils._Buffer.Buffer_Impl_;
@@ -3132,6 +3241,210 @@ tannus.utils.Reg.prototype = {
 	}
 	,__class__: tannus.utils.Reg
 };
+tannus.utils.SearchEngine = $hx_exports.tannus.utils.SearchEngine = function(settings) {
+	var this1;
+	var key;
+	var this2;
+	if(tannus.utils.Types.basictype("items") == "StringMap") this2 = tannus.utils.MapTools.toDynamic("items"); else this2 = "items";
+	key = this2;
+	var obj = Reflect.getProperty(settings,key);
+	var this3;
+	if(tannus.utils.Types.basictype(obj) == "StringMap") this3 = tannus.utils.MapTools.toDynamic(obj); else this3 = obj;
+	this1 = this3;
+	var _g = [];
+	var _g1 = 0;
+	var _g2;
+	_g2 = js.Boot.__cast(this1 , Array);
+	while(_g1 < _g2.length) {
+		var item = _g2[_g1];
+		++_g1;
+		_g.push((function($this) {
+			var $r;
+			var this4;
+			if(tannus.utils.Types.basictype(item) == "StringMap") this4 = tannus.utils.MapTools.toDynamic(item); else this4 = item;
+			$r = this4;
+			return $r;
+		}(this)));
+	}
+	this.index = _g;
+	var this5;
+	var key1;
+	var this6;
+	if(tannus.utils.Types.basictype("threshold") == "StringMap") this6 = tannus.utils.MapTools.toDynamic("threshold"); else this6 = "threshold";
+	key1 = this6;
+	var obj1 = Reflect.getProperty(settings,key1);
+	var this7;
+	if(tannus.utils.Types.basictype(obj1) == "StringMap") this7 = tannus.utils.MapTools.toDynamic(obj1); else this7 = obj1;
+	this5 = this7;
+	this.threshold = Std["int"](Std.parseFloat(Std.string(this5)));
+	var _g3 = [];
+	var _g11 = 0;
+	var _g21;
+	var this8;
+	var key2;
+	var this9;
+	if(tannus.utils.Types.basictype("searchableFields") == "StringMap") this9 = tannus.utils.MapTools.toDynamic("searchableFields"); else this9 = "searchableFields";
+	key2 = this9;
+	var obj2 = Reflect.getProperty(settings,key2);
+	var this10;
+	if(tannus.utils.Types.basictype(obj2) == "StringMap") this10 = tannus.utils.MapTools.toDynamic(obj2); else this10 = obj2;
+	this8 = this10;
+	var _g4 = [];
+	var _g12 = 0;
+	var _g22;
+	_g22 = js.Boot.__cast(this8 , Array);
+	while(_g12 < _g22.length) {
+		var item1 = _g22[_g12];
+		++_g12;
+		_g4.push((function($this) {
+			var $r;
+			var this11;
+			if(tannus.utils.Types.basictype(item1) == "StringMap") this11 = tannus.utils.MapTools.toDynamic(item1); else this11 = item1;
+			$r = this11;
+			return $r;
+		}(this)));
+	}
+	_g21 = _g4;
+	while(_g11 < _g21.length) {
+		var field = _g21[_g11];
+		++_g11;
+		_g3.push(Std.string(field));
+	}
+	this.searchableFields = _g3;
+	var key3;
+	var this12;
+	if(tannus.utils.Types.basictype("computed") == "StringMap") this12 = tannus.utils.MapTools.toDynamic("computed"); else this12 = "computed";
+	key3 = this12;
+	var obj3 = Reflect.getProperty(settings,key3);
+	var this13;
+	if(tannus.utils.Types.basictype(obj3) == "StringMap") this13 = tannus.utils.MapTools.toDynamic(obj3); else this13 = obj3;
+	this.computedFields = this13;
+};
+$hxClasses["tannus.utils.SearchEngine"] = tannus.utils.SearchEngine;
+tannus.utils.SearchEngine.__name__ = ["tannus","utils","SearchEngine"];
+tannus.utils.SearchEngine.levenshtein = function(a,b) {
+	var len_a = a.length;
+	var len_b = b.length;
+	if(len_a > len_b) {
+		var _ref = a;
+		a = b;
+		b = _ref;
+		var _reflen = len_a;
+		len_a = len_b;
+		len_b = _reflen;
+	}
+	var current;
+	var _g = [];
+	var _g2 = 0;
+	var _g1 = len_a + 1;
+	while(_g2 < _g1) {
+		var i = _g2++;
+		_g.push(i);
+	}
+	current = _g;
+	var previous;
+	var i1 = 1;
+	while(i1 < len_b + 1) {
+		var _ref1 = current;
+		previous = _ref1;
+		var start = [i1,0];
+		current = tannus.utils.ArrayTools.times(start,len_a);
+		var _g21 = 1;
+		var _g11 = len_a + 1;
+		while(_g21 < _g11) {
+			var j = _g21++;
+			var add = previous[j] + 1;
+			var remove = current[j - 1] + 1;
+			var change = previous[j - 1];
+			if(a.substring(j - 1,j) != b.substring(i1 - 1,i1)) change++;
+			current[j] = Math.min(add,remove);
+			current[j] = Math.min(current[j],change);
+		}
+		i1++;
+	}
+	return current[len_a];
+};
+tannus.utils.SearchEngine.prototype = {
+	query: function(searchTerm) {
+		var i = 0;
+		var results = new Array();
+		while(i < this.index.length) {
+			var item = this.index[i];
+			var fi = 0;
+			var item_rating = 0;
+			var terms = searchTerm.split(" ");
+			while(fi < this.searchableFields.length) {
+				var field = this.searchableFields[fi];
+				var fieldValue = null;
+				if((function($this) {
+					var $r;
+					var prop = $this.computedFields[field];
+					$r = prop != void(0);
+					return $r;
+				}(this))) {
+					var getter;
+					var this1;
+					var key;
+					var this2;
+					if(tannus.utils.Types.basictype(field) == "StringMap") this2 = tannus.utils.MapTools.toDynamic(field); else this2 = field;
+					key = this2;
+					var obj = Reflect.getProperty(this.computedFields,key);
+					var this3;
+					if(tannus.utils.Types.basictype(obj) == "StringMap") this3 = tannus.utils.MapTools.toDynamic(obj); else this3 = obj;
+					this1 = this3;
+					getter = this1;
+					var obj1 = getter(item);
+					var this4;
+					if(tannus.utils.Types.basictype(obj1) == "StringMap") this4 = tannus.utils.MapTools.toDynamic(obj1); else this4 = obj1;
+					fieldValue = this4;
+				} else {
+					var key1;
+					var this5;
+					if(tannus.utils.Types.basictype(field) == "StringMap") this5 = tannus.utils.MapTools.toDynamic(field); else this5 = field;
+					key1 = this5;
+					var obj2 = Reflect.getProperty(item,key1);
+					var this6;
+					if(tannus.utils.Types.basictype(obj2) == "StringMap") this6 = tannus.utils.MapTools.toDynamic(obj2); else this6 = obj2;
+					fieldValue = this6;
+				}
+				var base_rating = (this.searchableFields.length - fi) * 3.2;
+				var distance = tannus.utils.SearchEngine.levenshtein(Std.string(fieldValue).toLowerCase(),searchTerm.toLowerCase());
+				item_rating += (this.threshold - distance) * 2.5;
+				var _g = 0;
+				while(_g < terms.length) {
+					var term = terms[_g];
+					++_g;
+					if((function($this) {
+						var $r;
+						var this7;
+						if(tannus.utils.Types.basictype(term) == "StringMap") this7 = tannus.utils.MapTools.toDynamic(term); else this7 = term;
+						$r = this7;
+						return $r;
+					}(this)) == fieldValue) item_rating += base_rating * 2.5; else {
+						var fv = Std.string(fieldValue).toLowerCase();
+						var st = term.toLowerCase();
+						if(fv == st) item_rating += base_rating * tannus.utils.SearchEngine.CASE_OFFSET; else if(fv.indexOf(st) != -1) item_rating += base_rating * tannus.utils.SearchEngine.CONTAINS_OFFSET; else {
+							var distance1 = tannus.utils.SearchEngine.levenshtein(fv,st);
+							if(distance1 <= this.threshold) {
+								var rating_increase = this.threshold - distance1;
+								item_rating += rating_increase * tannus.utils.SearchEngine.LEVEN_OFFSET;
+							}
+						}
+					}
+				}
+				fi++;
+			}
+			if(item_rating > 0) results.push({ rating : item_rating, value : item});
+			i++;
+		}
+		haxe.ds.ArraySort.sort(results,function(a,b) {
+			return Math.round(a.rating - b.rating);
+		});
+		results.reverse();
+		return results;
+	}
+	,__class__: tannus.utils.SearchEngine
+};
 tannus.utils.Types = function() { };
 $hxClasses["tannus.utils.Types"] = tannus.utils.Types;
 tannus.utils.Types.__name__ = ["tannus","utils","Types"];
@@ -3311,5 +3624,8 @@ tannus.serverside.socks.Utils.current_unid = 0;
 tannus.utils._Buffer.Buffer_Impl_.__meta__ = { statics : { fromFloatArray : { from : null}}};
 tannus.utils.CompileTimeClassList.__meta__ = { obj : { classLists : [["null,true,tannus.core.promises.Promise",""]]}};
 tannus.utils.PathTools.PATH_DELIMITER = "/";
+tannus.utils.SearchEngine.CASE_OFFSET = 1.5;
+tannus.utils.SearchEngine.CONTAINS_OFFSET = 0.8;
+tannus.utils.SearchEngine.LEVEN_OFFSET = 1.2;
 Exposer.main();
 })(typeof window != "undefined" ? window : exports);
