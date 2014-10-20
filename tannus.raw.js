@@ -151,6 +151,15 @@ Exposer.main = function() {
 	if(tannus.utils.Types.basictype(obj4) == "StringMap") this13 = tannus.utils.MapTools.toDynamic(obj4); else this13 = obj4;
 	value2 = this13;
 	Reflect.setProperty(envir,name2,value2);
+	var testing = new tannus.utils.Folder("testing");
+	console.log(testing.childNames());
+	var me = testing.file("tannus.raw.js");
+	console.log((function($this) {
+		var $r;
+		var this14 = tannus.serverside.NodeFileSystem.read(me.name);
+		$r = this14.toString();
+		return $r;
+	}(this)));
 	Exposer.initHelpers();
 };
 Exposer.initHelpers = function() {
@@ -2482,7 +2491,7 @@ tannus.serverside.NodeFileSystem.readDirectory = function(path) {
 	var _g = [];
 	var _g1 = 0;
 	var _g2;
-	_g2 = js.Boot.__cast(tannus.serverside.NodeFileSystem.fs.readdirSync(path) , Array);
+	_g2 = js.Boot.__cast(tannus.serverside.NodeFileSystem.fs.readdirSync(tannus.utils.PathTools.simplify(path)) , Array);
 	while(_g1 < _g2.length) {
 		var item = _g2[_g1];
 		++_g1;
@@ -3166,7 +3175,8 @@ tannus.utils.Folder.prototype = {
 		return tannus.serverside.NodeFileSystem.readDirectory(tannus.utils.PathTools.normalize(this.location));
 	}
 	,file: function(filename) {
-		return new tannus.utils.File(tannus.utils.PathTools.normalize(this.location + "/" + filename));
+		var path = tannus.utils.PathTools.simplify(tannus.utils.PathTools.joinWith(this.location,[filename]));
+		return new tannus.utils.File(path);
 	}
 	,get_parent: function() {
 		return new tannus.utils.Folder(tannus.utils.PathTools.dirname(this.location));

@@ -2,6 +2,7 @@ package tannus.serverside;
 
 import tannus.utils.Buffer;
 
+using tannus.utils.PathTools;
 class NodeFileSystem {
 	public static function exists(path : String):Bool {
 		return (fs.existsSync(path) == true);
@@ -20,6 +21,18 @@ class NodeFileSystem {
 	}
 	public static function removeDirectory(path : String):Void {
 		fs.rmdirSync(path);
+	}
+	public static function readDirectory(path : String):Array<String> {
+		return [for (item in cast(fs.readdirSync(path.simplify()), Array<Dynamic>)) cast(item, String)];
+	}
+	public static function rename(oldPath:String, newPath:String):Bool {
+		try {
+			fs.renameSync(oldPath, newPath);
+
+			return true;
+		} catch (err : String) {
+			return false;
+		}
 	}
 	public static function read(path:String):Buffer {
 		var nodebuffer:Dynamic = fs.readFileSync(path);

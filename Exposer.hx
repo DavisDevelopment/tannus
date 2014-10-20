@@ -11,6 +11,8 @@ import tannus.utils.Buffer;
 import tannus.ore.ObjectRegEx;
 import tannus.utils.SearchEngine;
 
+import tannus.utils.Folder;
+
 class Exposer {
 	private static var env(get, never):Object;
 	public static function expose(name:Object, value:Object):Void {
@@ -29,6 +31,13 @@ class Exposer {
 
 		envir['Utils'] = tannus.serverside.socks.Utils;
 		envir['ore'] = ObjectRegEx;
+
+		var testing:Folder = new Folder('testing');
+
+		trace(testing.childNames());
+
+		var me = testing.file('tannus.raw.js');
+		trace(me.content);
 
 		initHelpers();
 	}

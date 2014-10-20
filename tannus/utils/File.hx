@@ -33,6 +33,6 @@ class File {
 	}
 }
 
-#if server
+#if (server || node)
 private typedef FS = tannus.serverside.NodeFileSystem;
 #end

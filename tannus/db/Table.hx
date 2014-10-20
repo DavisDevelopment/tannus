@@ -1,5 +1,5 @@
 package tannus.db;
 
 class Table {
-	public var reference:String;
+	public var name : String;
 }
