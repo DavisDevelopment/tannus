@@ -16,6 +16,7 @@ class CSSRuleSet {
 		this.selector += sel;
 		return this;
 	}
+	
 	public function hasRule(name:String):Bool {
 		for (rule in rules) {
 			if (rule.name == name) return true;
