@@ -20,7 +20,18 @@ class NodeFileSystem {
 		fs.mkdirSync(path);
 	}
 	public static function removeDirectory(path : String):Void {
-		fs.rmdirSync(path);
+		try {
+			fs.rmdirSync(path);
+		} catch (err : String) {
+			trace(err);
+		}
+	}
+	public static function removeFile(path : String):Void {
+		try {
+			fs.unlinkSync(path);
+		} catch (err : String) {
+			trace(err);
+		}
 	}
 	public static function readDirectory(path : String):Array<String> {
 		return [for (item in cast(fs.readdirSync(path.simplify()), Array<Dynamic>)) cast(item, String)];

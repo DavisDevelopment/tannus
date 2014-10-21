@@ -151,15 +151,15 @@ Exposer.main = function() {
 	if(tannus.utils.Types.basictype(obj4) == "StringMap") this13 = tannus.utils.MapTools.toDynamic(obj4); else this13 = obj4;
 	value2 = this13;
 	Reflect.setProperty(envir,name2,value2);
-	var testing = new tannus.utils.Folder("testing");
-	console.log(testing.childNames());
-	var me = testing.file("tannus.raw.js");
-	console.log((function($this) {
-		var $r;
-		var this14 = tannus.serverside.NodeFileSystem.read(me.name);
-		$r = this14.toString();
-		return $r;
-	}(this)));
+	var buf;
+	var bytes = haxe.io.Bytes.ofString("Hello, World!");
+	buf = bytes;
+	console.log(tannus.utils._Buffer.Buffer_Impl_.toNodeBuffer(buf));
+	var db = new tannus.db.tandb.DatabaseConnection("testing/data",{ username : "root", password : "jeb"});
+	db.setUserPermissions("rdavis",[0,1,2]);
+	db.createSchema("fewp");
+	console.log("Cheeks");
+	var fewp = db.schema("fewp");
 	Exposer.initHelpers();
 };
 Exposer.initHelpers = function() {
@@ -391,6 +391,180 @@ Type.createInstance = function(cl,args) {
 	return null;
 };
 var haxe = {};
+haxe.crypto = {};
+haxe.crypto.Md5 = function() {
+};
+$hxClasses["haxe.crypto.Md5"] = haxe.crypto.Md5;
+haxe.crypto.Md5.__name__ = ["haxe","crypto","Md5"];
+haxe.crypto.Md5.encode = function(s) {
+	var m = new haxe.crypto.Md5();
+	var h = m.doEncode(haxe.crypto.Md5.str2blks(s));
+	return m.hex(h);
+};
+haxe.crypto.Md5.str2blks = function(str) {
+	var nblk = (str.length + 8 >> 6) + 1;
+	var blks = new Array();
+	var blksSize = nblk * 16;
+	var _g = 0;
+	while(_g < blksSize) {
+		var i = _g++;
+		blks[i] = 0;
+	}
+	var i1 = 0;
+	while(i1 < str.length) {
+		blks[i1 >> 2] |= HxOverrides.cca(str,i1) << (str.length * 8 + i1) % 4 * 8;
+		i1++;
+	}
+	blks[i1 >> 2] |= 128 << (str.length * 8 + i1) % 4 * 8;
+	var l = str.length * 8;
+	var k = nblk * 16 - 2;
+	blks[k] = l & 255;
+	blks[k] |= (l >>> 8 & 255) << 8;
+	blks[k] |= (l >>> 16 & 255) << 16;
+	blks[k] |= (l >>> 24 & 255) << 24;
+	return blks;
+};
+haxe.crypto.Md5.prototype = {
+	bitOR: function(a,b) {
+		var lsb = a & 1 | b & 1;
+		var msb31 = a >>> 1 | b >>> 1;
+		return msb31 << 1 | lsb;
+	}
+	,bitXOR: function(a,b) {
+		var lsb = a & 1 ^ b & 1;
+		var msb31 = a >>> 1 ^ b >>> 1;
+		return msb31 << 1 | lsb;
+	}
+	,bitAND: function(a,b) {
+		var lsb = a & 1 & (b & 1);
+		var msb31 = a >>> 1 & b >>> 1;
+		return msb31 << 1 | lsb;
+	}
+	,addme: function(x,y) {
+		var lsw = (x & 65535) + (y & 65535);
+		var msw = (x >> 16) + (y >> 16) + (lsw >> 16);
+		return msw << 16 | lsw & 65535;
+	}
+	,hex: function(a) {
+		var str = "";
+		var hex_chr = "0123456789abcdef";
+		var _g = 0;
+		while(_g < a.length) {
+			var num = a[_g];
+			++_g;
+			var _g1 = 0;
+			while(_g1 < 4) {
+				var j = _g1++;
+				str += hex_chr.charAt(num >> j * 8 + 4 & 15) + hex_chr.charAt(num >> j * 8 & 15);
+			}
+		}
+		return str;
+	}
+	,rol: function(num,cnt) {
+		return num << cnt | num >>> 32 - cnt;
+	}
+	,cmn: function(q,a,b,x,s,t) {
+		return this.addme(this.rol(this.addme(this.addme(a,q),this.addme(x,t)),s),b);
+	}
+	,ff: function(a,b,c,d,x,s,t) {
+		return this.cmn(this.bitOR(this.bitAND(b,c),this.bitAND(~b,d)),a,b,x,s,t);
+	}
+	,gg: function(a,b,c,d,x,s,t) {
+		return this.cmn(this.bitOR(this.bitAND(b,d),this.bitAND(c,~d)),a,b,x,s,t);
+	}
+	,hh: function(a,b,c,d,x,s,t) {
+		return this.cmn(this.bitXOR(this.bitXOR(b,c),d),a,b,x,s,t);
+	}
+	,ii: function(a,b,c,d,x,s,t) {
+		return this.cmn(this.bitXOR(c,this.bitOR(b,~d)),a,b,x,s,t);
+	}
+	,doEncode: function(x) {
+		var a = 1732584193;
+		var b = -271733879;
+		var c = -1732584194;
+		var d = 271733878;
+		var step;
+		var i = 0;
+		while(i < x.length) {
+			var olda = a;
+			var oldb = b;
+			var oldc = c;
+			var oldd = d;
+			step = 0;
+			a = this.ff(a,b,c,d,x[i],7,-680876936);
+			d = this.ff(d,a,b,c,x[i + 1],12,-389564586);
+			c = this.ff(c,d,a,b,x[i + 2],17,606105819);
+			b = this.ff(b,c,d,a,x[i + 3],22,-1044525330);
+			a = this.ff(a,b,c,d,x[i + 4],7,-176418897);
+			d = this.ff(d,a,b,c,x[i + 5],12,1200080426);
+			c = this.ff(c,d,a,b,x[i + 6],17,-1473231341);
+			b = this.ff(b,c,d,a,x[i + 7],22,-45705983);
+			a = this.ff(a,b,c,d,x[i + 8],7,1770035416);
+			d = this.ff(d,a,b,c,x[i + 9],12,-1958414417);
+			c = this.ff(c,d,a,b,x[i + 10],17,-42063);
+			b = this.ff(b,c,d,a,x[i + 11],22,-1990404162);
+			a = this.ff(a,b,c,d,x[i + 12],7,1804603682);
+			d = this.ff(d,a,b,c,x[i + 13],12,-40341101);
+			c = this.ff(c,d,a,b,x[i + 14],17,-1502002290);
+			b = this.ff(b,c,d,a,x[i + 15],22,1236535329);
+			a = this.gg(a,b,c,d,x[i + 1],5,-165796510);
+			d = this.gg(d,a,b,c,x[i + 6],9,-1069501632);
+			c = this.gg(c,d,a,b,x[i + 11],14,643717713);
+			b = this.gg(b,c,d,a,x[i],20,-373897302);
+			a = this.gg(a,b,c,d,x[i + 5],5,-701558691);
+			d = this.gg(d,a,b,c,x[i + 10],9,38016083);
+			c = this.gg(c,d,a,b,x[i + 15],14,-660478335);
+			b = this.gg(b,c,d,a,x[i + 4],20,-405537848);
+			a = this.gg(a,b,c,d,x[i + 9],5,568446438);
+			d = this.gg(d,a,b,c,x[i + 14],9,-1019803690);
+			c = this.gg(c,d,a,b,x[i + 3],14,-187363961);
+			b = this.gg(b,c,d,a,x[i + 8],20,1163531501);
+			a = this.gg(a,b,c,d,x[i + 13],5,-1444681467);
+			d = this.gg(d,a,b,c,x[i + 2],9,-51403784);
+			c = this.gg(c,d,a,b,x[i + 7],14,1735328473);
+			b = this.gg(b,c,d,a,x[i + 12],20,-1926607734);
+			a = this.hh(a,b,c,d,x[i + 5],4,-378558);
+			d = this.hh(d,a,b,c,x[i + 8],11,-2022574463);
+			c = this.hh(c,d,a,b,x[i + 11],16,1839030562);
+			b = this.hh(b,c,d,a,x[i + 14],23,-35309556);
+			a = this.hh(a,b,c,d,x[i + 1],4,-1530992060);
+			d = this.hh(d,a,b,c,x[i + 4],11,1272893353);
+			c = this.hh(c,d,a,b,x[i + 7],16,-155497632);
+			b = this.hh(b,c,d,a,x[i + 10],23,-1094730640);
+			a = this.hh(a,b,c,d,x[i + 13],4,681279174);
+			d = this.hh(d,a,b,c,x[i],11,-358537222);
+			c = this.hh(c,d,a,b,x[i + 3],16,-722521979);
+			b = this.hh(b,c,d,a,x[i + 6],23,76029189);
+			a = this.hh(a,b,c,d,x[i + 9],4,-640364487);
+			d = this.hh(d,a,b,c,x[i + 12],11,-421815835);
+			c = this.hh(c,d,a,b,x[i + 15],16,530742520);
+			b = this.hh(b,c,d,a,x[i + 2],23,-995338651);
+			a = this.ii(a,b,c,d,x[i],6,-198630844);
+			d = this.ii(d,a,b,c,x[i + 7],10,1126891415);
+			c = this.ii(c,d,a,b,x[i + 14],15,-1416354905);
+			b = this.ii(b,c,d,a,x[i + 5],21,-57434055);
+			a = this.ii(a,b,c,d,x[i + 12],6,1700485571);
+			d = this.ii(d,a,b,c,x[i + 3],10,-1894986606);
+			c = this.ii(c,d,a,b,x[i + 10],15,-1051523);
+			b = this.ii(b,c,d,a,x[i + 1],21,-2054922799);
+			a = this.ii(a,b,c,d,x[i + 8],6,1873313359);
+			d = this.ii(d,a,b,c,x[i + 15],10,-30611744);
+			c = this.ii(c,d,a,b,x[i + 6],15,-1560198380);
+			b = this.ii(b,c,d,a,x[i + 13],21,1309151649);
+			a = this.ii(a,b,c,d,x[i + 4],6,-145523070);
+			d = this.ii(d,a,b,c,x[i + 11],10,-1120210379);
+			c = this.ii(c,d,a,b,x[i + 2],15,718787259);
+			b = this.ii(b,c,d,a,x[i + 9],21,-343485551);
+			a = this.addme(a,olda);
+			b = this.addme(b,oldb);
+			c = this.addme(c,oldc);
+			d = this.addme(d,oldd);
+			i += 16;
+		}
+		return [a,b,c,d];
+	}
+	,__class__: haxe.crypto.Md5
+};
 haxe.ds = {};
 haxe.ds.ArraySort = function() { };
 $hxClasses["haxe.ds.ArraySort"] = haxe.ds.ArraySort;
@@ -1012,6 +1186,17 @@ tannus.core._Object.Object_Impl_.toDynamic = function(this1) {
 tannus.core._Object.Object_Impl_.toString = function(this1) {
 	return Std.string(this1);
 };
+tannus.core._Object.Object_Impl_.toJSON = function(this1,prettyPrint) {
+	if(prettyPrint != null) {
+		var spaces = "";
+		var _g = 0;
+		while(_g < prettyPrint) {
+			var i = _g++;
+			spaces += " ";
+		}
+		return JSON.stringify(this1,null,spaces);
+	} else return JSON.stringify(this1);
+};
 tannus.core._Object.Object_Impl_.toStringMap = function(this1) {
 	return tannus.utils.MapTools.fromDynamic(this1);
 };
@@ -1212,6 +1397,362 @@ tannus.core.promises.Promise.prototype = $extend(tannus.core.EventDispatcher.pro
 	}
 	,__class__: tannus.core.promises.Promise
 });
+tannus.db = {};
+tannus.db.tandb = {};
+tannus.db.tandb.Database = function(location) {
+	this.location = location;
+	this.validate();
+};
+$hxClasses["tannus.db.tandb.Database"] = tannus.db.tandb.Database;
+tannus.db.tandb.Database.__name__ = ["tannus","db","tandb","Database"];
+tannus.db.tandb.Database.prototype = {
+	validate: function() {
+		if(tannus.io.FileSystem.exists(this.location) && tannus.io.FileSystem.isDirectory(this.location)) {
+			var db_dir = new tannus.utils.Folder(this.location);
+			if(db_dir.hasChild(".__tandbconf__")) {
+				var db_config = db_dir.file(".__tandbconf__");
+				try {
+					var config_data = JSON.parse(tannus.io.FileSystem.read(db_config.name));
+					this.meta = config_data;
+				} catch( err ) {
+					if( js.Boot.__instanceof(err,String) ) {
+						throw "Database configuration improperly formatted at \"" + this.location + "\"";
+					} else throw(err);
+				}
+			} else throw "Database configuration could not be found at \"" + this.location + "\"";
+		} else throw "Cannot initialize Database instance at \"" + this.location + "\"";
+	}
+	,validateCredentials: function(username,password) {
+		if(username == "root") return haxe.crypto.Md5.encode(password) == this.meta.root; else {
+			var user = null;
+			var _g = 0;
+			var _g1 = this.meta.users;
+			while(_g < _g1.length) {
+				var reg_user = _g1[_g];
+				++_g;
+				if(reg_user.username == username) {
+					user = reg_user;
+					break;
+				}
+			}
+			if(user != null) return haxe.crypto.Md5.encode(password) == user.password; else return false;
+		}
+	}
+	,getUserData: function(info) {
+		if(info.username == "root" && haxe.crypto.Md5.encode(info.password) == this.meta.root) return { username : "root", password : this.meta.root, permissions : []}; else {
+			var _g = 0;
+			var _g1 = this.meta.users;
+			while(_g < _g1.length) {
+				var entry = _g1[_g];
+				++_g;
+				if(entry.username == info.username && haxe.crypto.Md5.encode(info.password) == entry.password) return entry;
+			}
+			return null;
+		}
+	}
+	,getUserByName: function(username) {
+		if(username == "root") return { username : "root", password : this.meta.root, permissions : new tannus.db.tandb.Permissions({ username : "root", password : this.meta.root, permissions : []}).pids}; else {
+			var _g = 0;
+			var _g1 = this.meta.users;
+			while(_g < _g1.length) {
+				var entry = _g1[_g];
+				++_g;
+				if(entry.username == username) return entry;
+			}
+			return null;
+		}
+	}
+	,sendAction: function(act,conn) {
+		var perm = conn.permissions;
+		switch(act[1]) {
+		case 0:
+			var pw = act[3];
+			var un = act[2];
+			var _g = 0;
+			var _g1 = this.meta.users;
+			while(_g < _g1.length) {
+				var entry = _g1[_g];
+				++_g;
+				if(entry.username == un) throw "TypeError: user \"" + un + "\" already exists";
+			}
+			if(Lambda.has(perm.pids,0)) {
+				this.meta.users.push({ username : un, password : haxe.crypto.Md5.encode(pw), permissions : []});
+				this.commit();
+			}
+			break;
+		case 2:
+			var schema_name = act[2];
+			if(Lambda.has(perm.pids,3)) {
+				if(!Lambda.has(this.meta.schemas,schema_name)) tannus.db.tandb.schemas.Schema.create(schema_name,this); else throw "PreExistingSchemaError: Cannot re-create schema \"" + this.meta.name + "\".\"" + schema_name + "\"";
+			} else null;
+			break;
+		case 1:
+			var user_permissions = act[3];
+			var un1 = act[2];
+			if(Lambda.has(perm.pids,2)) {
+				var udata = this.getUserByName(un1);
+				if(udata != null) {
+					udata.permissions = user_permissions;
+					this.commit();
+				} else throw "NoSuchUserError: no user with username \"" + un1 + "\" could be accessed";
+			}
+			break;
+		}
+	}
+	,schema: function(name,conn) {
+		if(Lambda.has(this.meta.schemas,name)) return new tannus.db.tandb.schemas.Schema(this,conn,name); else throw "NoSuchSchemaError: schema \"" + this.meta.name + "\".\"" + name + "\" could not be read";
+	}
+	,commit: function() {
+		var config_file = new tannus.utils.File(tannus.utils.PathTools.simplify(tannus.utils.PathTools.joinWith(this.location,[".__tandbconf__"])));
+		config_file.set_content((function($this) {
+			var $r;
+			var chars = JSON.stringify($this.meta,null,"    ");
+			$r = (function($this) {
+				var $r;
+				var bytes = haxe.io.Bytes.ofString(chars);
+				$r = bytes;
+				return $r;
+			}($this));
+			return $r;
+		}(this)));
+	}
+	,__class__: tannus.db.tandb.Database
+};
+tannus.db.tandb.DatabaseConnection = function(ref,info) {
+	this.primed = false;
+	this.db = new tannus.db.tandb.Database(ref);
+	this.credentials = info;
+	var logged_in = this.db.validateCredentials(this.credentials.username,this.credentials.password);
+	if(logged_in) {
+		this.primed = true;
+		this.permissions = new tannus.db.tandb.Permissions(this.db.getUserData(this.credentials));
+	} else this.permissions = new tannus.db.tandb.Permissions({ username : "[rejected]", password : "", permissions : []});
+};
+$hxClasses["tannus.db.tandb.DatabaseConnection"] = tannus.db.tandb.DatabaseConnection;
+tannus.db.tandb.DatabaseConnection.__name__ = ["tannus","db","tandb","DatabaseConnection"];
+tannus.db.tandb.DatabaseConnection.permission_denied = function() {
+	throw "DataBaseError: Permission denied";
+};
+tannus.db.tandb.DatabaseConnection.prototype = {
+	createUser: function(username,password) {
+		if(Lambda.has(this.permissions.pids,0)) this.db.sendAction(tannus.db.tandb.actions.DatabaseAction.DBCreateUser(username,password),this); else throw "DataBaseError: Permission denied";
+	}
+	,setUserPermissions: function(username,usr_perms) {
+		if(Lambda.has(this.permissions.pids,2)) this.db.sendAction(tannus.db.tandb.actions.DatabaseAction.DBSetUserPermissions(username,usr_perms),this); else throw "DataBaseError: Permission denied";
+	}
+	,createSchema: function(name) {
+		if(Lambda.has(this.permissions.pids,3)) this.db.sendAction(tannus.db.tandb.actions.DatabaseAction.DBCreateSchema(name),this); else throw "DataBaseError: Permission denied";
+	}
+	,schema: function(name) {
+		return this.db.schema(name,this);
+	}
+	,__class__: tannus.db.tandb.DatabaseConnection
+};
+tannus.db.tandb.Permissions = function(meta) {
+	this.user = meta;
+	var _g = [];
+	var _g1 = 0;
+	var _g2 = meta.permissions;
+	while(_g1 < _g2.length) {
+		var pid = _g2[_g1];
+		++_g1;
+		_g.push((function($this) {
+			var $r;
+			var i = Std.parseInt(pid == null?"null":"" + pid);
+			$r = i;
+			return $r;
+		}(this)));
+	}
+	this.pids = _g;
+	if(this.user.username == "root") this.pids = [0,1,2,3,4];
+};
+$hxClasses["tannus.db.tandb.Permissions"] = tannus.db.tandb.Permissions;
+tannus.db.tandb.Permissions.__name__ = ["tannus","db","tandb","Permissions"];
+tannus.db.tandb.Permissions.prototype = {
+	hasPid: function(pid) {
+		return Lambda.has(this.pids,pid);
+	}
+	,get_create_user: function() {
+		return Lambda.has(this.pids,0);
+	}
+	,get_remove_user: function() {
+		return Lambda.has(this.pids,1);
+	}
+	,get_update_user: function() {
+		return Lambda.has(this.pids,2);
+	}
+	,get_create_schema: function() {
+		return Lambda.has(this.pids,3);
+	}
+	,get_remove_schema: function() {
+		return Lambda.has(this.pids,4);
+	}
+	,__class__: tannus.db.tandb.Permissions
+	,__properties__: {get_remove_schema:"get_remove_schema",get_create_schema:"get_create_schema",get_update_user:"get_update_user",get_remove_user:"get_remove_user",get_create_user:"get_create_user"}
+};
+tannus.db.tandb.actions = {};
+tannus.db.tandb.actions.DatabaseAction = { __ename__ : ["tannus","db","tandb","actions","DatabaseAction"], __constructs__ : ["DBCreateUser","DBSetUserPermissions","DBCreateSchema"] };
+tannus.db.tandb.actions.DatabaseAction.DBCreateUser = function(username,password) { var $x = ["DBCreateUser",0,username,password]; $x.__enum__ = tannus.db.tandb.actions.DatabaseAction; $x.toString = $estr; return $x; };
+tannus.db.tandb.actions.DatabaseAction.DBSetUserPermissions = function(username,permissions) { var $x = ["DBSetUserPermissions",1,username,permissions]; $x.__enum__ = tannus.db.tandb.actions.DatabaseAction; $x.toString = $estr; return $x; };
+tannus.db.tandb.actions.DatabaseAction.DBCreateSchema = function(name) { var $x = ["DBCreateSchema",2,name]; $x.__enum__ = tannus.db.tandb.actions.DatabaseAction; $x.toString = $estr; return $x; };
+tannus.db.tandb.schemas = {};
+tannus.db.tandb.schemas.Schema = function(db,conn,name) {
+	this.database = db;
+	this.db_connection = conn;
+	this.location = tannus.utils.PathTools.simplify(tannus.utils.PathTools.joinWith(tannus.utils.PathTools.normalize(this.database.location),["schema_" + name]));
+	this.meta = new tannus.db.tandb.schemas.SchemaMetaData(this.location);
+};
+$hxClasses["tannus.db.tandb.schemas.Schema"] = tannus.db.tandb.schemas.Schema;
+tannus.db.tandb.schemas.Schema.__name__ = ["tannus","db","tandb","schemas","Schema"];
+tannus.db.tandb.schemas.Schema.create = function(name,parent) {
+	var schemaDirectory = tannus.utils.PathTools.simplify(tannus.utils.PathTools.joinWith(tannus.utils.PathTools.normalize(parent.location),["schema_" + name]));
+	if(tannus.io.FileSystem.exists(schemaDirectory) && tannus.io.FileSystem.isDirectory(schemaDirectory)) new tannus.utils.Folder(schemaDirectory).remove();
+	tannus.io.FileSystem.createDirectory(schemaDirectory);
+	var config_file_loc = tannus.utils.PathTools.simplify(tannus.utils.PathTools.joinWith(schemaDirectory,[".__tandb_schemaconf__"]));
+	tannus.io.FileSystem.write(config_file_loc,(function($this) {
+		var $r;
+		var chars = JSON.stringify((function($this) {
+			var $r;
+			var this1 = tannus.db.tandb.schemas.SchemaMetaData.defaults();
+			$r = this1;
+			return $r;
+		}($this)),null,"    ");
+		$r = (function($this) {
+			var $r;
+			var bytes = haxe.io.Bytes.ofString(chars);
+			$r = bytes;
+			return $r;
+		}($this));
+		return $r;
+	}(this)));
+	var schema_meta = new tannus.db.tandb.schemas.SchemaMetaData(schemaDirectory);
+	schema_meta.set_name(name);
+};
+tannus.db.tandb.schemas.Schema.prototype = {
+	__class__: tannus.db.tandb.schemas.Schema
+};
+tannus.db.tandb.schemas.SchemaMetaData = function(ref) {
+	var _g = this;
+	this.location = ref;
+	this.config_file = new tannus.utils.File(tannus.utils.PathTools.simplify(tannus.utils.PathTools.joinWith(this.location,[".__tandb_schemaconf__"])));
+	if(tannus.io.FileSystem.exists(this.config_file.name)) {
+		this.config_data = new tannus.utils.CPointer(function() {
+			return tannus.io.FileSystem.read(_g.config_file.name);
+		});
+		this.raw_meta = new tannus.utils.CPointer(function() {
+			return JSON.parse(_g.config_data.getValue());
+		});
+	} else {
+		this.raw_meta = new tannus.utils.CPointer(function() {
+			return { name : "[un-named]", tables : []};
+		});
+		this.config_data = new tannus.utils.CPointer(function() {
+			var this1 = _g.raw_meta.getValue();
+			return JSON.stringify(this1);
+		});
+	}
+};
+$hxClasses["tannus.db.tandb.schemas.SchemaMetaData"] = tannus.db.tandb.schemas.SchemaMetaData;
+tannus.db.tandb.schemas.SchemaMetaData.__name__ = ["tannus","db","tandb","schemas","SchemaMetaData"];
+tannus.db.tandb.schemas.SchemaMetaData.defaults = function() {
+	return { name : "[un-named]", tables : []};
+};
+tannus.db.tandb.schemas.SchemaMetaData.prototype = {
+	get_name: function() {
+		var this1 = tannus.core._Object.Object_Impl_.add_to_dynamic((function($this) {
+			var $r;
+			var this2 = $this.raw_meta.getValue();
+			var key;
+			{
+				var this3;
+				if(tannus.utils.Types.basictype("name") == "StringMap") this3 = tannus.utils.MapTools.toDynamic("name"); else this3 = "name";
+				key = this3;
+			}
+			$r = (function($this) {
+				var $r;
+				var obj = Reflect.getProperty(this2,key);
+				$r = (function($this) {
+					var $r;
+					var this4;
+					if(tannus.utils.Types.basictype(obj) == "StringMap") this4 = tannus.utils.MapTools.toDynamic(obj); else this4 = obj;
+					$r = this4;
+					return $r;
+				}($this));
+				return $r;
+			}($this));
+			return $r;
+		}(this)),"");
+		return this1;
+	}
+	,set_name: function(newname) {
+		var raw = this.raw_meta.getValue();
+		var name;
+		var this1;
+		if(tannus.utils.Types.basictype("name") == "StringMap") this1 = tannus.utils.MapTools.toDynamic("name"); else this1 = "name";
+		name = this1;
+		var value;
+		var this2;
+		if(tannus.utils.Types.basictype(newname) == "StringMap") this2 = tannus.utils.MapTools.toDynamic(newname); else this2 = newname;
+		value = this2;
+		Reflect.setProperty(raw,name,value);
+		this.config_file.set_content((function($this) {
+			var $r;
+			var chars = JSON.stringify(raw,null,"    ");
+			$r = (function($this) {
+				var $r;
+				var bytes = haxe.io.Bytes.ofString(chars);
+				$r = bytes;
+				return $r;
+			}($this));
+			return $r;
+		}(this)));
+		return this.get_name();
+	}
+	,get_tables: function() {
+		var _g = [];
+		var _g1 = 0;
+		var _g2;
+		var this1;
+		var this2 = this.raw_meta.getValue();
+		var key;
+		var this3;
+		if(tannus.utils.Types.basictype("tables") == "StringMap") this3 = tannus.utils.MapTools.toDynamic("tables"); else this3 = "tables";
+		key = this3;
+		var obj = Reflect.getProperty(this2,key);
+		var this4;
+		if(tannus.utils.Types.basictype(obj) == "StringMap") this4 = tannus.utils.MapTools.toDynamic(obj); else this4 = obj;
+		this1 = this4;
+		var _g3 = [];
+		var _g11 = 0;
+		var _g21;
+		_g21 = js.Boot.__cast(this1 , Array);
+		while(_g11 < _g21.length) {
+			var item = _g21[_g11];
+			++_g11;
+			_g3.push((function($this) {
+				var $r;
+				var this5;
+				if(tannus.utils.Types.basictype(item) == "StringMap") this5 = tannus.utils.MapTools.toDynamic(item); else this5 = item;
+				$r = this5;
+				return $r;
+			}(this)));
+		}
+		_g2 = _g3;
+		while(_g1 < _g2.length) {
+			var tn = _g2[_g1];
+			++_g1;
+			_g.push((function($this) {
+				var $r;
+				var this6 = tannus.core._Object.Object_Impl_.add_to_dynamic(tn,"");
+				$r = this6;
+				return $r;
+			}(this)));
+		}
+		return _g;
+	}
+	,__class__: tannus.db.tandb.schemas.SchemaMetaData
+	,__properties__: {get_tables:"get_tables",set_name:"set_name",get_name:"get_name"}
+};
 tannus.io = {};
 tannus.io._Byte = {};
 tannus.io._Byte.Byte_Impl_ = function() { };
@@ -1481,6 +2022,39 @@ tannus.io.IByteArray.prototype = {
 	}
 	,__class__: tannus.io.IByteArray
 	,__properties__: {get_length:"get_length"}
+};
+tannus.io.FileSystem = function() { };
+$hxClasses["tannus.io.FileSystem"] = tannus.io.FileSystem;
+tannus.io.FileSystem.__name__ = ["tannus","io","FileSystem"];
+tannus.io.FileSystem.exists = function(path) {
+	return tannus.serverside.NodeFileSystem.exists(path);
+};
+tannus.io.FileSystem.isFile = function(path) {
+	return tannus.serverside.NodeFileSystem.isFile(path);
+};
+tannus.io.FileSystem.isDirectory = function(path) {
+	return tannus.serverside.NodeFileSystem.isDirectory(path);
+};
+tannus.io.FileSystem.createDirectory = function(path) {
+	tannus.serverside.NodeFileSystem.createDirectory(path);
+};
+tannus.io.FileSystem.removeDirectory = function(path) {
+	tannus.serverside.NodeFileSystem.removeDirectory(path);
+};
+tannus.io.FileSystem.removeFile = function(path) {
+	tannus.serverside.NodeFileSystem.removeFile(path);
+};
+tannus.io.FileSystem.readDirectory = function(path) {
+	return tannus.serverside.NodeFileSystem.readDirectory(path);
+};
+tannus.io.FileSystem.rename = function(oldPath,newPath) {
+	return tannus.serverside.NodeFileSystem.rename(oldPath,newPath);
+};
+tannus.io.FileSystem.read = function(path) {
+	return tannus.serverside.NodeFileSystem.read(path);
+};
+tannus.io.FileSystem.write = function(path,content) {
+	tannus.serverside.NodeFileSystem.write(path,content);
 };
 tannus.mvc = {};
 tannus.mvc.Controller = function(app) {
@@ -2485,7 +3059,22 @@ tannus.serverside.NodeFileSystem.createDirectory = function(path) {
 	tannus.serverside.NodeFileSystem.fs.mkdirSync(path);
 };
 tannus.serverside.NodeFileSystem.removeDirectory = function(path) {
-	tannus.serverside.NodeFileSystem.fs.rmdirSync(path);
+	try {
+		tannus.serverside.NodeFileSystem.fs.rmdirSync(path);
+	} catch( err ) {
+		if( js.Boot.__instanceof(err,String) ) {
+			console.log(err);
+		} else throw(err);
+	}
+};
+tannus.serverside.NodeFileSystem.removeFile = function(path) {
+	try {
+		tannus.serverside.NodeFileSystem.fs.unlinkSync(path);
+	} catch( err ) {
+		if( js.Boot.__instanceof(err,String) ) {
+			console.log(err);
+		} else throw(err);
+	}
 };
 tannus.serverside.NodeFileSystem.readDirectory = function(path) {
 	var _g = [];
@@ -2616,8 +3205,12 @@ tannus.utils._Buffer = {};
 tannus.utils._Buffer.Buffer_Impl_ = function() { };
 $hxClasses["tannus.utils._Buffer.Buffer_Impl_"] = tannus.utils._Buffer.Buffer_Impl_;
 tannus.utils._Buffer.Buffer_Impl_.__name__ = ["tannus","utils","_Buffer","Buffer_Impl_"];
+tannus.utils._Buffer.Buffer_Impl_.__properties__ = {get_self:"get_self"}
 tannus.utils._Buffer.Buffer_Impl_._new = function(bytes) {
 	return bytes;
+};
+tannus.utils._Buffer.Buffer_Impl_.get_self = function(this1) {
+	return this1;
 };
 tannus.utils._Buffer.Buffer_Impl_.slice = function(this1,start,end) {
 	if(end == null) end = this1.length;
@@ -3038,12 +3631,19 @@ tannus.utils._Buffer.Buffer_Impl_.toArray = function(this1) {
 };
 tannus.utils._Buffer.Buffer_Impl_.toNodeBuffer = function(this1) {
 	var len = this1.length;
-	var buf = new Buffer(len || 0);
-	var _g = 0;
-	while(_g < len) {
-		var index = _g++;
-		buf[index] = this1.b[index];
-	}
+	var cl = Buffer;
+	var buf = Type.createInstance(cl,[(function($this) {
+		var $r;
+		var this2 = this1;
+		var set = new Array();
+		var i = 0;
+		while(i < this2.length) {
+			set.push(this2.b[i]);
+			i++;
+		}
+		$r = set;
+		return $r;
+	}(this))]);
 	return buf;
 };
 tannus.utils._Buffer.Buffer_Impl_.fromBytes = function(bits) {
@@ -3137,11 +3737,14 @@ tannus.utils.File = function(ref) {
 $hxClasses["tannus.utils.File"] = tannus.utils.File;
 tannus.utils.File.__name__ = ["tannus","utils","File"];
 tannus.utils.File.prototype = {
-	toJSON: function() {
+	remove: function() {
+		tannus.io.FileSystem.removeFile(this.name);
+	}
+	,toJSON: function() {
 		try {
 			return JSON.parse((function($this) {
 				var $r;
-				var this1 = tannus.serverside.NodeFileSystem.read($this.name);
+				var this1 = tannus.io.FileSystem.read($this.name);
 				$r = this1.toString();
 				return $r;
 			}(this)));
@@ -3152,16 +3755,23 @@ tannus.utils.File.prototype = {
 		}
 	}
 	,get_content: function() {
-		return tannus.serverside.NodeFileSystem.read(this.name);
+		return tannus.io.FileSystem.read(this.name);
+	}
+	,set_content: function(newContent) {
+		tannus.io.FileSystem.write(this.name,newContent);
+		return newContent;
 	}
 	,get_type: function() {
 		return tannus.utils.MimeTypes.getMimeType(tannus.utils.PathTools.extname(tannus.utils.PathTools.simplify(this.name)));
 	}
 	,get_size: function() {
-		return tannus.serverside.NodeFileSystem.read(this.name).length;
+		return tannus.io.FileSystem.read(this.name).length;
+	}
+	,get_exists: function() {
+		return tannus.io.FileSystem.exists(this.name);
 	}
 	,__class__: tannus.utils.File
-	,__properties__: {get_size:"get_size",get_content:"get_content",get_type:"get_type"}
+	,__properties__: {get_exists:"get_exists",get_size:"get_size",set_content:"set_content",get_content:"get_content",get_type:"get_type"}
 };
 tannus.utils.Folder = function(path) {
 	if(!tannus.serverside.NodeFileSystem.exists(path) || !tannus.serverside.NodeFileSystem.isDirectory(path)) tannus.serverside.NodeFileSystem.createDirectory(path);
@@ -3171,12 +3781,30 @@ tannus.utils.Folder = function(path) {
 $hxClasses["tannus.utils.Folder"] = tannus.utils.Folder;
 tannus.utils.Folder.__name__ = ["tannus","utils","Folder"];
 tannus.utils.Folder.prototype = {
-	childNames: function() {
+	remove: function() {
+		var entries = this.childNames();
+		var _g = 0;
+		while(_g < entries.length) {
+			var child = entries[_g];
+			++_g;
+			var full = tannus.utils.PathTools.normalize(tannus.utils.PathTools.joinWith(this.location,[child]));
+			if(tannus.serverside.NodeFileSystem.isDirectory(full)) this.subdir(child).remove(); else this.file(child).remove();
+		}
+		tannus.serverside.NodeFileSystem.removeDirectory(this.location);
+	}
+	,childNames: function() {
 		return tannus.serverside.NodeFileSystem.readDirectory(tannus.utils.PathTools.normalize(this.location));
+	}
+	,hasChild: function(path) {
+		return tannus.serverside.NodeFileSystem.exists(tannus.utils.PathTools.simplify(tannus.utils.PathTools.joinWith(this.location,[path])));
 	}
 	,file: function(filename) {
 		var path = tannus.utils.PathTools.simplify(tannus.utils.PathTools.joinWith(this.location,[filename]));
 		return new tannus.utils.File(path);
+	}
+	,subdir: function(dirname) {
+		var path = tannus.utils.PathTools.simplify(tannus.utils.PathTools.joinWith(this.location,[dirname]));
+		return new tannus.utils.Folder(path);
 	}
 	,get_parent: function() {
 		return new tannus.utils.Folder(tannus.utils.PathTools.dirname(this.location));
@@ -3373,6 +4001,46 @@ tannus.utils.PathTools.extname = function(path) {
 		var bits = base.split(".");
 		return bits.pop();
 	} else return "";
+};
+tannus.utils._Pointer = {};
+tannus.utils._Pointer.Pointer_Impl_ = function() { };
+$hxClasses["tannus.utils._Pointer.Pointer_Impl_"] = tannus.utils._Pointer.Pointer_Impl_;
+tannus.utils._Pointer.Pointer_Impl_.__name__ = ["tannus","utils","_Pointer","Pointer_Impl_"];
+tannus.utils._Pointer.Pointer_Impl_._new = function(getter) {
+	return new tannus.utils.CPointer(getter);
+};
+tannus.utils._Pointer.Pointer_Impl_.get = function(this1) {
+	return this1.getValue();
+};
+tannus.utils._Pointer.Pointer_Impl_.reassignToValue = function(this1,other) {
+	this1.getter = function() {
+		return other;
+	};
+};
+tannus.utils._Pointer.Pointer_Impl_.getter = function(gtr) {
+	return new tannus.utils.CPointer(gtr);
+};
+tannus.utils.CPointer = function(gtr) {
+	this.getter = gtr;
+};
+$hxClasses["tannus.utils.CPointer"] = tannus.utils.CPointer;
+tannus.utils.CPointer.__name__ = ["tannus","utils","CPointer"];
+tannus.utils.CPointer.prototype = {
+	rerouteToGetter: function(ngtr) {
+		this.getter = ngtr;
+	}
+	,rerouteToPointer: function(ptr) {
+		this.getter = ptr.getter;
+	}
+	,rerouteToValue: function(val) {
+		this.getter = function() {
+			return val;
+		};
+	}
+	,getValue: function() {
+		return this.getter();
+	}
+	,__class__: tannus.utils.CPointer
 };
 tannus.utils._RegEx = {};
 tannus.utils._RegEx.RegEx_Impl_ = function() { };
@@ -3830,6 +4498,14 @@ while(_g < all_mimes.length) {
 	tannus.utils.MimeTypes.known_types.set(mime,extensions);
 	extensions;
 }
+tannus.db.tandb.Database.DB_CONFIG_FILE = ".__tandbconf__";
+tannus.db.tandb.Permissions.CREATE_USER = 0;
+tannus.db.tandb.Permissions.REMOVE_USER = 1;
+tannus.db.tandb.Permissions.UPDATE_USER = 2;
+tannus.db.tandb.Permissions.CREATE_SCHEMA = 3;
+tannus.db.tandb.Permissions.REMOVE_SCHEMA = 4;
+tannus.db.tandb.schemas.Schema.SCHEMA_CONFIG_FILE = ".__tandb_schemaconf__";
+tannus.db.tandb.schemas.SchemaMetaData.SCHEMA_CONFIG_FILE = ".__tandb_schemaconf__";
 tannus.ore.ObjectRegEx.selectors = new haxe.ds.StringMap();
 tannus.ore.ObjectRegEx.helpers = new haxe.ds.StringMap();
 tannus.ore.ObjectRegEx.memoize = true;

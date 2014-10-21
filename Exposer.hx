@@ -11,8 +11,6 @@ import tannus.utils.Buffer;
 import tannus.ore.ObjectRegEx;
 import tannus.utils.SearchEngine;
 
-import tannus.utils.Folder;
-
 class Exposer {
 	private static var env(get, never):Object;
 	public static function expose(name:Object, value:Object):Void {
@@ -32,12 +30,25 @@ class Exposer {
 		envir['Utils'] = tannus.serverside.socks.Utils;
 		envir['ore'] = ObjectRegEx;
 
-		var testing:Folder = new Folder('testing');
+		var buf = Buffer.fromString('Hello, World!');
+		trace(buf.toNodeBuffer());
 
-		trace(testing.childNames());
+		var db = new tannus.db.tandb.DatabaseConnection('testing/data', {
+			'username' : 'root',
+			'password' : 'jeb'
+		});
 
-		var me = testing.file('tannus.raw.js');
-		trace(me.content);
+		db.setUserPermissions('rdavis', [
+			0, 1, 2
+		]);
+
+		db.createSchema( 'fewp' );
+
+		trace('Cheeks');
+
+		var fewp = db.schema('fewp');
+
+		//fox.kill();
 
 		initHelpers();
 	}

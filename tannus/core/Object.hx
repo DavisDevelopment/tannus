@@ -125,6 +125,17 @@ abstract Object (Dynamic) {
 		return (Std.string(this));
 	}
 
+	//- Encode Object as JSON-string
+	public inline function toJSON(?prettyPrint:Null<Int>):String {
+		if (prettyPrint != null) {
+			var spaces:String = '';
+			for (i in 0...prettyPrint) spaces += (' ');
+			return (haxe.Json.stringify(this, null, spaces));
+		} else {
+			return (haxe.Json.stringify(this));
+		}
+	}
+
 	//- cast Object to Map<String, Object>
 	@:to 
 	public inline function toStringMap():Map<String, Object> {

@@ -33,11 +33,39 @@ class Folder {
 	}
 
 	/**
+	 * deletes [this] folder recursively
+	 */
+	public function remove():Void {
+		var entries:Array<String> = this.childNames();
+
+		for (child in entries) {
+			var full:String = (location.joinWith([child]).normalize());
+
+			if (FS.isDirectory(full)) {
+				this.subdir(child).remove();
+			} else {
+				this.file(child).remove();
+			}
+		}
+
+		FS.removeDirectory(location);
+	}
+
+	/**
 	 * get a list of all files/directories under [this] Folder
 	 * @return Array<String>
 	 */
 	public function childNames():Array<String> {
 		return FS.readDirectory(this.location.normalize());
+	}
+
+	/**
+	 * Query whether [this] Folder has a child-entry by the given name
+	 * @param  path <String> - name to check for
+	 * @return Bool
+	 */
+	public function hasChild(path : String):Bool {
+		return FS.exists(this.location.joinWith([path]).simplify());
 	}
 
 	/**
@@ -48,6 +76,16 @@ class Folder {
 	public function file(filename : String):File {
 		var path:String = this.location.joinWith([filename]).simplify();
 		return new File(path);
+	}
+
+	/**
+	 * get a Folder object by name from [this] Folder
+	 * @param  dirname <String> - name of Folder to retrieve
+	 * @return Folder
+	 */
+	public function subdir(dirname : String):Folder {
+		var path:String = this.location.joinWith([dirname]).simplify();
+		return new Folder(path);
 	}
 
 	/**

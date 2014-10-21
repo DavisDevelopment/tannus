@@ -13,8 +13,14 @@ import js.html.Blob;
 
 @:forward(length)
 abstract Buffer(Bytes) {
+	private var self(get, never):Buffer;
+
 	public inline function new(bytes : Bytes):Void {
 		this = bytes;
+	}
+
+	private inline function get_self():Buffer {
+		return cast this;
 	}
 
 	public inline function slice(start:Int, ?end:Null<Int>):Buffer {
@@ -228,14 +234,13 @@ abstract Buffer(Bytes) {
 	}
 #end
 
-#if server
+#if (server || node)
 	@:to
 	public function toNodeBuffer():Dynamic {
 		var len:Int = this.length;
-		var buf:Dynamic = untyped __js__('new Buffer(len || 0)');
-		for (index in 0...len) {
-			buf[index] = this.get(index);
-		}
+		var cl:Class<Dynamic> = untyped __js__('Buffer');
+		var buf:Dynamic = Type.createInstance(cl, [self.toArray()]);
+
 		return buf;
 	}
 #end
