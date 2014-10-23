@@ -11,6 +11,8 @@ import tannus.utils.Buffer;
 import tannus.ore.ObjectRegEx;
 import tannus.utils.SearchEngine;
 
+import tannus.crypto.Tea;
+
 class Exposer {
 	private static var env(get, never):Object;
 	public static function expose(name:Object, value:Object):Void {
@@ -30,8 +32,10 @@ class Exposer {
 		envir['Utils'] = tannus.serverside.socks.Utils;
 		envir['ore'] = ObjectRegEx;
 
-		var buf = Buffer.fromString('Hello, World!');
-		trace(buf.toNodeBuffer());
+		var enc = Tea.strToLongs('Hello, World');
+		trace( enc );
+
+		trace(Tea.longsToStr(enc).toArray());
 
 		var db = new tannus.db.tandb.DatabaseConnection('testing/data', {
 			'username' : 'root',
@@ -44,11 +48,7 @@ class Exposer {
 
 		db.createSchema( 'fewp' );
 
-		trace('Cheeks');
-
 		var fewp = db.schema('fewp');
-
-		//fox.kill();
 
 		initHelpers();
 	}

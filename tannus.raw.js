@@ -151,14 +151,23 @@ Exposer.main = function() {
 	if(tannus.utils.Types.basictype(obj4) == "StringMap") this13 = tannus.utils.MapTools.toDynamic(obj4); else this13 = obj4;
 	value2 = this13;
 	Reflect.setProperty(envir,name2,value2);
-	var buf;
-	var bytes = haxe.io.Bytes.ofString("Hello, World!");
-	buf = bytes;
-	console.log(tannus.utils._Buffer.Buffer_Impl_.toNodeBuffer(buf));
+	var enc = tannus.crypto.Tea.strToLongs("Hello, World");
+	console.log(enc);
+	console.log((function($this) {
+		var $r;
+		var this14 = tannus.crypto.Tea.longsToStr(enc);
+		var set = new Array();
+		var i = 0;
+		while(i < this14.length) {
+			set.push(this14.b[i]);
+			i++;
+		}
+		$r = set;
+		return $r;
+	}(this)));
 	var db = new tannus.db.tandb.DatabaseConnection("testing/data",{ username : "root", password : "jeb"});
 	db.setUserPermissions("rdavis",[0,1,2]);
 	db.createSchema("fewp");
-	console.log("Cheeks");
 	var fewp = db.schema("fewp");
 	Exposer.initHelpers();
 };
@@ -1397,6 +1406,77 @@ tannus.core.promises.Promise.prototype = $extend(tannus.core.EventDispatcher.pro
 	}
 	,__class__: tannus.core.promises.Promise
 });
+tannus.crypto = {};
+tannus.crypto.Tea = function() { };
+$hxClasses["tannus.crypto.Tea"] = tannus.crypto.Tea;
+tannus.crypto.Tea.__name__ = ["tannus","crypto","Tea"];
+tannus.crypto.Tea.strToLongs = function(s) {
+	var longs = new Array();
+	var len = Math.ceil(s.length / 4);
+	var _g = 0;
+	while(_g < len) {
+		var i = _g++;
+		var i1 = HxOverrides.cca(s,i * 4) + (HxOverrides.cca(s,i * 4 + 1) << 8) + (HxOverrides.cca(s,i * 4 + 2) << 16) + (HxOverrides.cca(s,i * 4 + 3) << 24);
+		longs[i] = i1;
+	}
+	return longs;
+};
+tannus.crypto.Tea.longsToStr = function(longs) {
+	var a;
+	var bytes = haxe.io.Bytes.alloc(longs.length);
+	a = bytes;
+	var _g1 = 0;
+	var _g = longs.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		var other;
+		var set = [longs[i] & 255,longs[i] >>> 8 & 255,longs[i] >>> 16 & 255,longs[i] >>> 24 & 255];
+		var bytes1 = haxe.io.Bytes.alloc(set.length);
+		var _g11 = 0;
+		var _g2 = set.length;
+		while(_g11 < _g2) {
+			var i1 = _g11++;
+			bytes1.b[i1] = set[i1] & 255;
+		}
+		other = bytes1;
+		var one = a;
+		var other1 = other;
+		other1 = js.Boot.__cast(other1 , haxe.io.Bytes);
+		one = js.Boot.__cast(one , haxe.io.Bytes);
+		var sum;
+		var bits = haxe.io.Bytes.alloc(one.length + other1.length);
+		sum = bits;
+		var i2 = 0;
+		while(i2 < one.length) {
+			var val;
+			try {
+				val = one.b[i2];
+			} catch( err ) {
+				if( js.Boot.__instanceof(err,String) ) {
+					val = null;
+				} else throw(err);
+			}
+			sum.b[i2] = val & 255;
+			val;
+			i2++;
+		}
+		while(i2 < one.length + other1.length) {
+			var val1;
+			try {
+				val1 = other1.b[i2 - one.length];
+			} catch( err1 ) {
+				if( js.Boot.__instanceof(err1,String) ) {
+					val1 = null;
+				} else throw(err1);
+			}
+			sum.b[i2] = val1 & 255;
+			val1;
+			i2++;
+		}
+		a = sum;
+	}
+	return a;
+};
 tannus.db = {};
 tannus.db.tandb = {};
 tannus.db.tandb.Database = function(location) {
