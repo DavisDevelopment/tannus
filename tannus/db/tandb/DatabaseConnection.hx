@@ -6,6 +6,8 @@ import tannus.db.tandb.Permissions;
 import tannus.db.tandb.actions.DatabaseAction;
 
 import tannus.db.tandb.schemas.Schema;
+import tannus.db.tandb.schemas.SchemaConnection;
+
 
 class DatabaseConnection {
 	//- whether [this] connection has been initialized
@@ -109,8 +111,8 @@ class DatabaseConnection {
 	 * @param  name <String> - the name of the schema to connect to
 	 * @return Schema
 	 */
-	public function schema(name : String):Schema {
-		return (this.db.schema(name, this));
+	public function schema(name : String):SchemaConnection {
+		return new SchemaConnection(this.db.schema(name, this));
 	}
 
 

@@ -37,7 +37,7 @@ class File {
 	 * deletes [this] file
 	 */
 	public function remove():Void {
-		FileSystem.removeFile(this.name);
+		FileSystem.remove(this.name);
 	}
 
 	/**

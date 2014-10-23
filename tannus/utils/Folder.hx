@@ -1,6 +1,7 @@
 package tannus.utils;
 
 import tannus.utils.File;
+import tannus.io.FileSystem;
 // import tannus.utils.PathTools;
 
 using tannus.utils.PathTools;
@@ -47,8 +48,8 @@ class Folder {
 				this.file(child).remove();
 			}
 		}
-
-		FS.removeDirectory(location);
+		
+		FileSystem.remove(location);
 	}
 
 	/**
@@ -127,5 +128,5 @@ class Folder {
 //- Reference to the FileSystem class to be used on this platform
 
 #if (server || node)
-private typedef FS = tannus.serverside.NodeFileSystem;
+private typedef FS = tannus.io.FileSystem;
 #end

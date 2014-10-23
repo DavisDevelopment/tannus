@@ -6,6 +6,10 @@ import tannus.db.tandb.DatabaseMetaData;
 import tannus.db.tandb.DatabaseConnection;
 
 import tannus.db.tandb.schemas.SchemaMetaData;
+import tannus.db.tandb.schemas.SchemaAction;
+import tannus.db.tandb.schemas.SchemaConnection;
+
+import tannus.db.tandb.tables.Table;
 
 import tannus.io.FileSystem;
 
@@ -32,6 +36,17 @@ class Schema {
 		this.meta = new SchemaMetaData(this.location);
 	}
 
+	public function sendAction(act : SchemaAction, conn:SchemaConnection):Void {
+		switch (act) {
+			case SchemaAction.SCCreateTable( tablename, primary_key ):
+				Table.create(tablename, primary_key);
+
+
+			default:
+				throw 'Unsupported';
+		}
+	}
+
 	public static function create(name:String, parent:Database):Void {
 		var schemaDirectory:String = (parent.location.normalize().joinWith(['schema_$name']).simplify());
 
@@ -43,6 +58,9 @@ class Schema {
 		//- Create new directory at path [schemaDirectory]
 		FileSystem.createDirectory(schemaDirectory);
 
+		//- Create 'tables' directory
+		FileSystem.createDirectory('.'+schemaDirectory.joinWith(['tables']).normalize());
+
 		//- Location of Schema's config-file
 		var config_file_loc:String = (schemaDirectory.joinWith([SCHEMA_CONFIG_FILE]).simplify());
 
@@ -52,6 +70,14 @@ class Schema {
 		//- Assign Schema's proper meta-data
 		var schema_meta:SchemaMetaData = new SchemaMetaData(schemaDirectory);
 		schema_meta.name = name;
+	}
+
+	public inline function nosuchtable(name : String):Void {
+		var full_path:String = (location.normalize().joinWith([
+			'tables',
+			name
+		]) + '/');
+		throw 'NoSuchTableError: "${this.meta.name}"."$name" ($full_path) does not exist';
 	}
 
 	private static inline var SCHEMA_CONFIG_FILE:String = '.__tandb_schemaconf__';

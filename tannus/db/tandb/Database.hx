@@ -179,8 +179,6 @@ class Database {
 						'password' : Md5.encode(pw),
 						'permissions' : []
 					});
-
-					commit();
 				}
 
 			//- Schema-Creation
@@ -191,6 +189,7 @@ class Database {
 					if (!Lambda.has(meta.schemas, schema_name)) {
 
 						Schema.create(schema_name, this);
+						meta.schemas.push(schema_name);
 
 					} else {
 						throw 'PreExistingSchemaError: Cannot re-create schema "${meta.name}"."$schema_name"';
@@ -257,6 +256,48 @@ class Database {
 		var config_file:File = new File(location.joinWith([DB_CONFIG_FILE]).simplify());
 
 		config_file.content = (Json.stringify(this.meta, null, '    '));
+	}
+
+	/**
+	  * create a 'blank' metadata object
+	  */
+	private static inline function defaultMetaData():DatabaseMetaData {
+		return {
+			'name' : '',
+			'root' : '',
+			'schemas' : [],
+			'users': []
+		};
+	}
+
+	/**
+	 * actually create a Database
+	*/
+	public static function create(dirname:String, dbname:String, rootpw:String):Database {
+		//- if [dirname] already exists, delete it
+		if (FileSystem.exists(dirname)) {
+			(new tannus.utils.Folder(dirname)).remove();
+		}
+		
+		//- create a fresh new directory
+		FileSystem.createDirectory( dirname );
+
+		//- Location of Database's config-file
+		var cfg_file_path:String = (dirname.joinWith([DB_CONFIG_FILE]).simplify());
+		
+		var new_db_meta:DatabaseMetaData = defaultMetaData();
+
+		new_db_meta.name = dbname;
+		new_db_meta.root = Md5.encode(rootpw);
+		
+		FileSystem.write(cfg_file_path, Json.stringify(
+			new_db_meta,
+			null,
+			'    '
+		));
+		
+		return new Database( dirname );
+
 	}
 
 	//- Static variable to store the filename that Database configuration data is stored in

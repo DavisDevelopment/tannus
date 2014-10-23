@@ -53,6 +53,13 @@ class SchemaMetaData {
 		// this.tables = [for (tn in data['tables'].asArray()) (tn + '')];
 	}
 
+	public function addTable(name : String):Void {
+		var self = raw_meta.get();
+		self['tables']['push'].toDynamic()(name);
+
+		config_file.content = config_data.get();
+	}
+
 	private inline function get_name():String {
 		return (raw_meta.get()['name'] + '');
 	}

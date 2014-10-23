@@ -11,6 +11,7 @@ import tannus.utils.Buffer;
 import tannus.ore.ObjectRegEx;
 import tannus.utils.SearchEngine;
 
+import tannus.db.tandb.*;
 import tannus.crypto.Tea;
 
 class Exposer {
@@ -36,19 +37,28 @@ class Exposer {
 		trace( enc );
 
 		trace(Tea.longsToStr(enc).toArray());
-
-		var db = new tannus.db.tandb.DatabaseConnection('testing/data', {
+		
+		var newdb = Database.create(
+			'testing/data',
+			'mydb',
+			'cheeks'
+		);
+		var db = new DatabaseConnection('testing/data', {
 			'username' : 'root',
-			'password' : 'jeb'
+			'password' : 'cheeks'
 		});
+		
+		db.createUser('rdavis', 'cheeks');
 
 		db.setUserPermissions('rdavis', [
 			0, 1, 2
 		]);
-
-		db.createSchema( 'fewp' );
+		
+		db.createSchema('fewp');
 
 		var fewp = db.schema('fewp');
+
+		fewp.createTable('users', 'id');
 
 		initHelpers();
 	}

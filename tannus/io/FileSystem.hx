@@ -1,6 +1,7 @@
 package tannus.io;
 
 import tannus.utils.Buffer;
+import tannus.utils.Folder;
 
 using tannus.utils.PathTools;
 class FileSystem {
@@ -17,15 +18,32 @@ class FileSystem {
 	}
 
 	public static function createDirectory(path : String):Void {
+		trace(path);
 		FS.createDirectory(path);
 	}
 
 	public static function removeDirectory(path : String):Void {
-		FS.removeDirectory(path);
+		if (readDirectory(path).length == 0) {
+			FS.removeDirectory(path);
+		} else {
+			(new Folder(path).remove());
+		}
 	}
 
 	public static function removeFile(path : String):Void {
 		FS.removeFile(path);
+	}
+
+	public static function remove(path : String):Void {
+		try {
+			if (isDirectory(path)) {
+				removeDirectory(path);
+			} else {
+				removeFile(path);
+			}
+		} catch (err : String) {
+			removeDirectory(path);
+		}
 	}
 
 	public static function readDirectory(path : String):Array<String> {
