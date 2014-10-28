@@ -37,28 +37,48 @@ class Exposer {
 		trace( enc );
 
 		trace(Tea.longsToStr(enc).toArray());
-		
-		var newdb = Database.create(
-			'testing/data',
-			'mydb',
-			'cheeks'
-		);
 		var db = new DatabaseConnection('testing/data', {
 			'username' : 'root',
-			'password' : 'cheeks'
+		    	'password' : 'cheeks'
 		});
-		
-		db.createUser('rdavis', 'cheeks');
-
-		db.setUserPermissions('rdavis', [
-			0, 1, 2
-		]);
-		
-		db.createSchema('fewp');
-
 		var fewp = db.schema('fewp');
+		var users = fewp.table( 'users' );
+		
+		trace(users.select('[id=0]'));
 
-		fewp.createTable('users', 'id');
+	//	var newdb = Database.create(
+	//		'testing/data',
+	//		'mydb',
+	//		'cheeks'
+	//	);
+	//	var db = new DatabaseConnection('testing/data', {
+	//		'username' : 'root',
+	//		'password' : 'cheeks'
+	//	});
+		
+	//	db.createUser('rdavis', 'cheeks');
+
+	//	db.setUserPermissions('rdavis', [
+	//		0, 1, 2
+	//	]);
+		
+	//	db.createSchema('fewp');
+
+	//	var fewp = db.schema('fewp');
+
+	//	fewp.createTable('users', 'id');
+
+	//	var users = fewp.table( 'users' );
+
+	//	users.addColumn('id', 'Int');
+	//	users.addColumn('first_name', 'Bytes');
+	//	users.addColumn('last_name', 'Bytes');
+
+	//	users.insert({
+	//		'id' : 0,
+	//		'first_name' : 'Ryan',
+	//		'last_name' : 'Davis'
+	//	});
 
 		initHelpers();
 	}

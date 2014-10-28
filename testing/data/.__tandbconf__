@@ -1,7 +1,7 @@
 {
     "name": "mydb",
     "root": "62e0cb62a930a7635a19838fb227d90b",
-    "schemas": [],
+    "schemas": ["fewp"],
     "users": [
         {
             "username": "rdavis",

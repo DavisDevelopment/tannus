@@ -2,10 +2,10 @@ package tannus.db.tandb.tables;
 
 import tannus.db.tandb.tables.TableMetaData;
 
-class ColumnMetaData {
+typedef ColumnMetaData = {
 	
-	public var name : String;
+	var name : String;
 
-	public var constraints : Dynamic;
+	var type : String; 
 
 }

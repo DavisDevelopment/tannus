@@ -15,18 +15,12 @@ class SchemaMetaData {
 
 	//- File object for schema's config-file
 	private var config_file:File;
-
-	//- Pointer to contents of schema's config-file
-	private var config_data:Pointer<Buffer>;
-
-	//- Pointer to raw metadata object
-	private var raw_meta:Pointer<Object>;
-
+	
 	//- Name of schema
-	public var name(get, set):String;
+	public var name:String;
 
 	//- List of schema's tables
-	public var tables(get, never):Array<String>;
+	public var tables : Array<String>;
 
 	public function new(ref : String):Void {
 		this.location = ref;
@@ -36,50 +30,33 @@ class SchemaMetaData {
 		);
 
 		if (config_file.exists) {
-			this.config_data = Pointer.literal( config_file.content );
+			var raw = Json.parse(cast config_file.content);
 
-			this.raw_meta = Pointer.literal(cast Json.parse(cast config_data.get()));
+			this.name = raw.name;
+
+			this.tables = raw.tables;
 		} else {
-			this.raw_meta = Pointer.literal(cast {
-				'name' : '[un-named]',
-				'tables' : []
-			});
+			
+			this.name = '[un-named]';
 
-			this.config_data = Pointer.literal(cast raw_meta.get().toJSON());
+			this.tables = new Array();
+
 		}
 
-		// this.name = (data['name'] + '');
+	}
 
-		// this.tables = [for (tn in data['tables'].asArray()) (tn + '')];
+	private function sync():Void {
+		this.config_file.content = Json.stringify({
+			'name' : this.name,
+			'tables' : this.tables
+		});
 	}
 
 	public function addTable(name : String):Void {
-		var self = raw_meta.get();
-		self['tables']['push'].toDynamic()(name);
-
-		config_file.content = config_data.get();
+		this.tables.push(name);
+		this.sync();
 	}
-
-	private inline function get_name():String {
-		return (raw_meta.get()['name'] + '');
-	}
-
-	private inline function set_name( newname:String ):String {
-		var raw:Object = raw_meta.get();
-		raw['name'] = newname;
-		config_file.content = haxe.Json.stringify(raw, null, '    ');
-
-		return this.name;
-	}
-
-	/**
-	 * private getter method for list of Schema's tables
-	 * @return [description]
-	 */
-	private inline function get_tables():Array<String> {
-		return ([for (tn in raw_meta.get()['tables'].asArray()) (tn + '')]);
-	}
-
+	
 	/**
 	 * Object with default SchemaMetaData field-values
 	 * @return Object

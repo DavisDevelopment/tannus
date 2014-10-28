@@ -39,7 +39,8 @@ class Schema {
 	public function sendAction(act : SchemaAction, conn:SchemaConnection):Void {
 		switch (act) {
 			case SchemaAction.SCCreateTable( tablename, primary_key ):
-				Table.create(tablename, primary_key);
+				Table.create(tablename, primary_key, conn);
+				this.meta.addTable(tablename);
 
 
 			default:
