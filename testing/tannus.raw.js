@@ -1,6 +1,9 @@
 (function ($hx_exports) { "use strict";
 $hx_exports.tannus = $hx_exports.tannus || {};
 $hx_exports.tannus.utils = $hx_exports.tannus.utils || {};
+;$hx_exports.tannus.io = $hx_exports.tannus.io || {};
+;$hx_exports.tannus.geom = $hx_exports.tannus.geom || {};
+;$hx_exports.tannus.display = $hx_exports.tannus.display || {};
 ;$hx_exports.tannus.core = $hx_exports.tannus.core || {};
 var $hxClasses = {},$estr = function() { return js.Boot.__string_rec(this,''); };
 function $extend(from, fields) {
@@ -133,24 +136,57 @@ Exposer.main = function() {
 	}
 	var name1;
 	var this10;
-	if(tannus.utils.Types.basictype("Utils") == "StringMap") this10 = tannus.utils.MapTools.toDynamic("Utils"); else this10 = "Utils";
+	if(tannus.utils.Types.basictype("Application") == "StringMap") this10 = tannus.utils.MapTools.toDynamic("Application"); else this10 = "Application";
 	name1 = this10;
 	var value1;
-	var obj3 = tannus.serverside.socks.Utils;
+	var obj3 = tannus.Application;
 	var this11;
 	if(tannus.utils.Types.basictype(obj3) == "StringMap") this11 = tannus.utils.MapTools.toDynamic(obj3); else this11 = obj3;
 	value1 = this11;
 	Reflect.setProperty(envir,name1,value1);
 	var name2;
 	var this12;
-	if(tannus.utils.Types.basictype("ore") == "StringMap") this12 = tannus.utils.MapTools.toDynamic("ore"); else this12 = "ore";
+	if(tannus.utils.Types.basictype("Utils") == "StringMap") this12 = tannus.utils.MapTools.toDynamic("Utils"); else this12 = "Utils";
 	name2 = this12;
 	var value2;
-	var obj4 = tannus.ore.ObjectRegEx;
+	var obj4 = tannus.serverside.socks.Utils;
 	var this13;
 	if(tannus.utils.Types.basictype(obj4) == "StringMap") this13 = tannus.utils.MapTools.toDynamic(obj4); else this13 = obj4;
 	value2 = this13;
 	Reflect.setProperty(envir,name2,value2);
+	var name3;
+	var this14;
+	if(tannus.utils.Types.basictype("ore") == "StringMap") this14 = tannus.utils.MapTools.toDynamic("ore"); else this14 = "ore";
+	name3 = this14;
+	var value3;
+	var obj5 = tannus.ore.ObjectRegEx;
+	var this15;
+	if(tannus.utils.Types.basictype(obj5) == "StringMap") this15 = tannus.utils.MapTools.toDynamic(obj5); else this15 = obj5;
+	value3 = this15;
+	Reflect.setProperty(envir,name3,value3);
+	var name4;
+	var this16;
+	if(tannus.utils.Types.basictype("ui") == "StringMap") this16 = tannus.utils.MapTools.toDynamic("ui"); else this16 = "ui";
+	name4 = this16;
+	var value4;
+	var obj6 = { Canvas : tannus.ui.Canvas, Stage : tannus.display.Stage};
+	var this17;
+	if(tannus.utils.Types.basictype(obj6) == "StringMap") this17 = tannus.utils.MapTools.toDynamic(obj6); else this17 = obj6;
+	value4 = this17;
+	Reflect.setProperty(envir,name4,value4);
+	tannus.display.CropWidget;
+	var canvas = tannus.ui.JQuery.select("#stage").at(0);
+	var stage = new tannus.display.Stage(canvas);
+	stage.width = 640;
+	stage.height = 480;
+	var ent = new tannus.display.CropWidget("#img");
+	stage.add(ent);
+	ent.on("ready",function(e) {
+		ent.width = stage.width;
+		ent.height = stage.height;
+		console.log(Std.string(ent.rect()) + "");
+	});
+	ent.bindToInput("#file");
 	Exposer.initHelpers();
 };
 Exposer.initHelpers = function() {
@@ -291,12 +327,6 @@ Std.string = function(s) {
 Std["int"] = function(x) {
 	return x | 0;
 };
-Std.parseInt = function(x) {
-	var v = parseInt(x,10);
-	if(v == 0 && (HxOverrides.cca(x,1) == 120 || HxOverrides.cca(x,1) == 88)) v = parseInt(x);
-	if(isNaN(v)) return null;
-	return v;
-};
 Std.parseFloat = function(x) {
 	return parseFloat(x);
 };
@@ -324,6 +354,16 @@ StringTools.endsWith = function(s,end) {
 };
 StringTools.replace = function(s,sub,by) {
 	return s.split(sub).join(by);
+};
+StringTools.hex = function(n,digits) {
+	var s = "";
+	var hexChars = "0123456789ABCDEF";
+	do {
+		s = hexChars.charAt(n & 15) + s;
+		n >>>= 4;
+	} while(n > 0);
+	if(digits != null) while(s.length < digits) s = "0" + s;
+	return s;
 };
 StringTools.fastCodeAt = function(s,index) {
 	return s.charCodeAt(index);
@@ -382,6 +422,184 @@ Type.createInstance = function(cl,args) {
 	return null;
 };
 var haxe = {};
+haxe.io = {};
+haxe.io.Bytes = function(length,b) {
+	this.length = length;
+	this.b = b;
+};
+$hxClasses["haxe.io.Bytes"] = haxe.io.Bytes;
+haxe.io.Bytes.__name__ = ["haxe","io","Bytes"];
+haxe.io.Bytes.alloc = function(length) {
+	var a = new Array();
+	var _g = 0;
+	while(_g < length) {
+		var i = _g++;
+		a.push(0);
+	}
+	return new haxe.io.Bytes(length,a);
+};
+haxe.io.Bytes.ofString = function(s) {
+	var a = new Array();
+	var i = 0;
+	while(i < s.length) {
+		var c = StringTools.fastCodeAt(s,i++);
+		if(55296 <= c && c <= 56319) c = c - 55232 << 10 | StringTools.fastCodeAt(s,i++) & 1023;
+		if(c <= 127) a.push(c); else if(c <= 2047) {
+			a.push(192 | c >> 6);
+			a.push(128 | c & 63);
+		} else if(c <= 65535) {
+			a.push(224 | c >> 12);
+			a.push(128 | c >> 6 & 63);
+			a.push(128 | c & 63);
+		} else {
+			a.push(240 | c >> 18);
+			a.push(128 | c >> 12 & 63);
+			a.push(128 | c >> 6 & 63);
+			a.push(128 | c & 63);
+		}
+	}
+	return new haxe.io.Bytes(a.length,a);
+};
+haxe.io.Bytes.prototype = {
+	get: function(pos) {
+		return this.b[pos];
+	}
+	,set: function(pos,v) {
+		this.b[pos] = v & 255;
+	}
+	,sub: function(pos,len) {
+		if(pos < 0 || len < 0 || pos + len > this.length) throw haxe.io.Error.OutsideBounds;
+		return new haxe.io.Bytes(len,this.b.slice(pos,pos + len));
+	}
+	,setFloat: function(pos,v) {
+		throw "Not supported";
+	}
+	,getString: function(pos,len) {
+		if(pos < 0 || len < 0 || pos + len > this.length) throw haxe.io.Error.OutsideBounds;
+		var s = "";
+		var b = this.b;
+		var fcc = String.fromCharCode;
+		var i = pos;
+		var max = pos + len;
+		while(i < max) {
+			var c = b[i++];
+			if(c < 128) {
+				if(c == 0) break;
+				s += fcc(c);
+			} else if(c < 224) s += fcc((c & 63) << 6 | b[i++] & 127); else if(c < 240) {
+				var c2 = b[i++];
+				s += fcc((c & 31) << 12 | (c2 & 127) << 6 | b[i++] & 127);
+			} else {
+				var c21 = b[i++];
+				var c3 = b[i++];
+				var u = (c & 15) << 18 | (c21 & 127) << 12 | (c3 & 127) << 6 | b[i++] & 127;
+				s += fcc((u >> 10) + 55232);
+				s += fcc(u & 1023 | 56320);
+			}
+		}
+		return s;
+	}
+	,toString: function() {
+		return this.getString(0,this.length);
+	}
+	,__class__: haxe.io.Bytes
+};
+haxe.crypto = {};
+haxe.crypto.Base64 = function() { };
+$hxClasses["haxe.crypto.Base64"] = haxe.crypto.Base64;
+haxe.crypto.Base64.__name__ = ["haxe","crypto","Base64"];
+haxe.crypto.Base64.encode = function(bytes,complement) {
+	if(complement == null) complement = true;
+	var str = new haxe.crypto.BaseCode(haxe.crypto.Base64.BYTES).encodeBytes(bytes).toString();
+	if(complement) {
+		var _g1 = 0;
+		var _g = (3 - bytes.length * 4 % 3) % 3;
+		while(_g1 < _g) {
+			var i = _g1++;
+			str += "=";
+		}
+	}
+	return str;
+};
+haxe.crypto.Base64.decode = function(str,complement) {
+	if(complement == null) complement = true;
+	if(complement) while(HxOverrides.cca(str,str.length - 1) == 61) str = HxOverrides.substr(str,0,-1);
+	return new haxe.crypto.BaseCode(haxe.crypto.Base64.BYTES).decodeBytes(haxe.io.Bytes.ofString(str));
+};
+haxe.crypto.BaseCode = function(base) {
+	var len = base.length;
+	var nbits = 1;
+	while(len > 1 << nbits) nbits++;
+	if(nbits > 8 || len != 1 << nbits) throw "BaseCode : base length must be a power of two.";
+	this.base = base;
+	this.nbits = nbits;
+};
+$hxClasses["haxe.crypto.BaseCode"] = haxe.crypto.BaseCode;
+haxe.crypto.BaseCode.__name__ = ["haxe","crypto","BaseCode"];
+haxe.crypto.BaseCode.prototype = {
+	encodeBytes: function(b) {
+		var nbits = this.nbits;
+		var base = this.base;
+		var size = b.length * 8 / nbits | 0;
+		var out = haxe.io.Bytes.alloc(size + (b.length * 8 % nbits == 0?0:1));
+		var buf = 0;
+		var curbits = 0;
+		var mask = (1 << nbits) - 1;
+		var pin = 0;
+		var pout = 0;
+		while(pout < size) {
+			while(curbits < nbits) {
+				curbits += 8;
+				buf <<= 8;
+				buf |= b.get(pin++);
+			}
+			curbits -= nbits;
+			out.set(pout++,base.b[buf >> curbits & mask]);
+		}
+		if(curbits > 0) out.set(pout++,base.b[buf << nbits - curbits & mask]);
+		return out;
+	}
+	,initTable: function() {
+		var tbl = new Array();
+		var _g = 0;
+		while(_g < 256) {
+			var i = _g++;
+			tbl[i] = -1;
+		}
+		var _g1 = 0;
+		var _g2 = this.base.length;
+		while(_g1 < _g2) {
+			var i1 = _g1++;
+			tbl[this.base.b[i1]] = i1;
+		}
+		this.tbl = tbl;
+	}
+	,decodeBytes: function(b) {
+		var nbits = this.nbits;
+		var base = this.base;
+		if(this.tbl == null) this.initTable();
+		var tbl = this.tbl;
+		var size = b.length * nbits >> 3;
+		var out = haxe.io.Bytes.alloc(size);
+		var buf = 0;
+		var curbits = 0;
+		var pin = 0;
+		var pout = 0;
+		while(pout < size) {
+			while(curbits < 8) {
+				curbits += nbits;
+				buf <<= nbits;
+				var i = tbl[b.get(pin++)];
+				if(i == -1) throw "BaseCode : invalid encoded char";
+				buf |= i;
+			}
+			curbits -= 8;
+			out.set(pout++,buf >> curbits & 255);
+		}
+		return out;
+	}
+	,__class__: haxe.crypto.BaseCode
+};
 haxe.ds = {};
 haxe.ds.ArraySort = function() { };
 $hxClasses["haxe.ds.ArraySort"] = haxe.ds.ArraySort;
@@ -523,82 +741,6 @@ haxe.ds.StringMap.prototype = {
 		return HxOverrides.iter(a);
 	}
 	,__class__: haxe.ds.StringMap
-};
-haxe.io = {};
-haxe.io.Bytes = function(length,b) {
-	this.length = length;
-	this.b = b;
-};
-$hxClasses["haxe.io.Bytes"] = haxe.io.Bytes;
-haxe.io.Bytes.__name__ = ["haxe","io","Bytes"];
-haxe.io.Bytes.alloc = function(length) {
-	var a = new Array();
-	var _g = 0;
-	while(_g < length) {
-		var i = _g++;
-		a.push(0);
-	}
-	return new haxe.io.Bytes(length,a);
-};
-haxe.io.Bytes.ofString = function(s) {
-	var a = new Array();
-	var i = 0;
-	while(i < s.length) {
-		var c = StringTools.fastCodeAt(s,i++);
-		if(55296 <= c && c <= 56319) c = c - 55232 << 10 | StringTools.fastCodeAt(s,i++) & 1023;
-		if(c <= 127) a.push(c); else if(c <= 2047) {
-			a.push(192 | c >> 6);
-			a.push(128 | c & 63);
-		} else if(c <= 65535) {
-			a.push(224 | c >> 12);
-			a.push(128 | c >> 6 & 63);
-			a.push(128 | c & 63);
-		} else {
-			a.push(240 | c >> 18);
-			a.push(128 | c >> 12 & 63);
-			a.push(128 | c >> 6 & 63);
-			a.push(128 | c & 63);
-		}
-	}
-	return new haxe.io.Bytes(a.length,a);
-};
-haxe.io.Bytes.prototype = {
-	sub: function(pos,len) {
-		if(pos < 0 || len < 0 || pos + len > this.length) throw haxe.io.Error.OutsideBounds;
-		return new haxe.io.Bytes(len,this.b.slice(pos,pos + len));
-	}
-	,setFloat: function(pos,v) {
-		throw "Not supported";
-	}
-	,getString: function(pos,len) {
-		if(pos < 0 || len < 0 || pos + len > this.length) throw haxe.io.Error.OutsideBounds;
-		var s = "";
-		var b = this.b;
-		var fcc = String.fromCharCode;
-		var i = pos;
-		var max = pos + len;
-		while(i < max) {
-			var c = b[i++];
-			if(c < 128) {
-				if(c == 0) break;
-				s += fcc(c);
-			} else if(c < 224) s += fcc((c & 63) << 6 | b[i++] & 127); else if(c < 240) {
-				var c2 = b[i++];
-				s += fcc((c & 31) << 12 | (c2 & 127) << 6 | b[i++] & 127);
-			} else {
-				var c21 = b[i++];
-				var c3 = b[i++];
-				var u = (c & 15) << 18 | (c21 & 127) << 12 | (c3 & 127) << 6 | b[i++] & 127;
-				s += fcc((u >> 10) + 55232);
-				s += fcc(u & 1023 | 56320);
-			}
-		}
-		return s;
-	}
-	,toString: function() {
-		return this.getString(0,this.length);
-	}
-	,__class__: haxe.io.Bytes
 };
 haxe.io.Eof = function() { };
 $hxClasses["haxe.io.Eof"] = haxe.io.Eof;
@@ -915,6 +1057,12 @@ tannus.Application.prototype = $extend(tannus.core.EventDispatcher.prototype,{
 	}
 	,__class__: tannus.Application
 });
+tannus.core.Destructible = function() { };
+$hxClasses["tannus.core.Destructible"] = tannus.core.Destructible;
+tannus.core.Destructible.__name__ = ["tannus","core","Destructible"];
+tannus.core.Destructible.prototype = {
+	__class__: tannus.core.Destructible
+};
 tannus.core._Object = {};
 tannus.core._Object.Object_Impl_ = function() { };
 $hxClasses["tannus.core._Object.Object_Impl_"] = tannus.core._Object.Object_Impl_;
@@ -1002,6 +1150,17 @@ tannus.core._Object.Object_Impl_.toDynamic = function(this1) {
 };
 tannus.core._Object.Object_Impl_.toString = function(this1) {
 	return Std.string(this1);
+};
+tannus.core._Object.Object_Impl_.toJSON = function(this1,prettyPrint) {
+	if(prettyPrint != null) {
+		var spaces = "";
+		var _g = 0;
+		while(_g < prettyPrint) {
+			var i = _g++;
+			spaces += " ";
+		}
+		return JSON.stringify(this1,null,spaces);
+	} else return JSON.stringify(this1);
 };
 tannus.core._Object.Object_Impl_.toStringMap = function(this1) {
 	return tannus.utils.MapTools.fromDynamic(this1);
@@ -1203,6 +1362,777 @@ tannus.core.promises.Promise.prototype = $extend(tannus.core.EventDispatcher.pro
 	}
 	,__class__: tannus.core.promises.Promise
 });
+tannus.crypto = {};
+tannus.crypto.Tea = function() { };
+$hxClasses["tannus.crypto.Tea"] = tannus.crypto.Tea;
+tannus.crypto.Tea.__name__ = ["tannus","crypto","Tea"];
+tannus.crypto.Tea.strToLongs = function(s) {
+	var longs = new Array();
+	var len = Math.ceil(s.length / 4);
+	var _g = 0;
+	while(_g < len) {
+		var i = _g++;
+		var i1 = HxOverrides.cca(s,i * 4) + (HxOverrides.cca(s,i * 4 + 1) << 8) + (HxOverrides.cca(s,i * 4 + 2) << 16) + (HxOverrides.cca(s,i * 4 + 3) << 24);
+		longs[i] = i1;
+	}
+	return longs;
+};
+tannus.crypto.Tea.longsToStr = function(longs) {
+	var a;
+	var bytes = haxe.io.Bytes.alloc(longs.length);
+	a = bytes;
+	var _g1 = 0;
+	var _g = longs.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		var other;
+		var set = [longs[i] & 255,longs[i] >>> 8 & 255,longs[i] >>> 16 & 255,longs[i] >>> 24 & 255];
+		var bytes1 = haxe.io.Bytes.alloc(set.length);
+		var _g11 = 0;
+		var _g2 = set.length;
+		while(_g11 < _g2) {
+			var i1 = _g11++;
+			bytes1.b[i1] = set[i1] & 255;
+		}
+		other = bytes1;
+		var one = a;
+		var other1 = other;
+		other1 = js.Boot.__cast(other1 , haxe.io.Bytes);
+		one = js.Boot.__cast(one , haxe.io.Bytes);
+		var sum;
+		var bits = haxe.io.Bytes.alloc(one.length + other1.length);
+		sum = bits;
+		var i2 = 0;
+		while(i2 < one.length) {
+			var val;
+			try {
+				val = one.b[i2];
+			} catch( err ) {
+				if( js.Boot.__instanceof(err,String) ) {
+					val = null;
+				} else throw(err);
+			}
+			sum.b[i2] = val & 255;
+			val;
+			i2++;
+		}
+		while(i2 < one.length + other1.length) {
+			var val1;
+			try {
+				val1 = other1.b[i2 - one.length];
+			} catch( err1 ) {
+				if( js.Boot.__instanceof(err1,String) ) {
+					val1 = null;
+				} else throw(err1);
+			}
+			sum.b[i2] = val1 & 255;
+			val1;
+			i2++;
+		}
+		a = sum;
+	}
+	return a;
+};
+tannus.display = {};
+tannus.display.Entity = $hx_exports.tannus.display.Entity = function() {
+	tannus.core.EventDispatcher.call(this);
+	this.x = 0;
+	this.y = 0;
+	this.z = 0;
+	this.width = 0;
+	this.height = 0;
+	this.stage = null;
+	this._remove = false;
+	this._hidden = false;
+	this._cached = false;
+	this.assets = new Array();
+	this.on("activate",(function(f) {
+		return function(a1) {
+			return f(a1);
+		};
+	})($bind(this,this.__init)));
+};
+$hxClasses["tannus.display.Entity"] = tannus.display.Entity;
+tannus.display.Entity.__name__ = ["tannus","display","Entity"];
+tannus.display.Entity.__interfaces__ = [tannus.core.Destructible];
+tannus.display.Entity.__super__ = tannus.core.EventDispatcher;
+tannus.display.Entity.prototype = $extend(tannus.core.EventDispatcher.prototype,{
+	__init: function(stage) {
+		this.stage = stage;
+	}
+	,render: function(stage,surface) {
+		tannus.core.EventDispatcher.prototype.emit.call(this,"render",this);
+	}
+	,update: function(stage,surface) {
+		tannus.core.EventDispatcher.prototype.emit.call(this,"update",this);
+	}
+	,destroy: function() {
+		var _g = 0;
+		var _g1 = this.assets;
+		while(_g < _g1.length) {
+			var asset = _g1[_g];
+			++_g;
+			asset.destroy();
+		}
+		tannus.core.EventDispatcher.prototype.emit.call(this,"destroy",this);
+		this._remove = true;
+	}
+	,cache: function() {
+		this._cached = true;
+	}
+	,uncache: function() {
+		this._cached = false;
+	}
+	,hide: function() {
+		this._hidden = true;
+	}
+	,show: function() {
+		this._hidden = false;
+	}
+	,getPoint: function() {
+		return new tannus.geom.Point(this.x,this.y,this.z);
+	}
+	,setPoint: function(newpoint) {
+		this.x = newpoint.x;
+		this.y = newpoint.y;
+		this.z = newpoint.z;
+	}
+	,position: function(pos) {
+		if(pos == null) return this.getPoint(); else {
+			this.setPoint(pos);
+			return null;
+		}
+	}
+	,getRectangle: function() {
+		return new tannus.geom.Rectangle(this.x,this.y,this.width,this.height);
+	}
+	,setRectangle: function(newrect) {
+		this.x = newrect.x;
+		this.y = newrect.y;
+		this.width = newrect.width;
+		this.height = newrect.height;
+	}
+	,rect: function(rect) {
+		if(rect == null) return this.getRectangle(); else {
+			this.setRectangle(rect);
+			return null;
+		}
+	}
+	,addAsset: function(asset) {
+		this.assets.push(asset);
+	}
+	,removeAsset: function(asset) {
+		this.assets = this.assets.filter(function(x) {
+			return x != asset;
+		});
+	}
+	,__class__: tannus.display.Entity
+});
+tannus.display.CropCorner = $hx_exports.tannus.display.CropCorner = function(x,y) {
+	tannus.display.Entity.call(this);
+	this.z = 1000;
+	this.ptx = x;
+	this.pty = y;
+	this.followMouse = false;
+	this.x = x.getValue();
+	this.y = y.getValue();
+	this.width = 10;
+	this.height = 10;
+	this.color = "white";
+	this.border = "#888888";
+	this.on("activate",(function(f) {
+		return function() {
+			return f();
+		};
+	})($bind(this,this.init)));
+};
+$hxClasses["tannus.display.CropCorner"] = tannus.display.CropCorner;
+tannus.display.CropCorner.__name__ = ["tannus","display","CropCorner"];
+tannus.display.CropCorner.__super__ = tannus.display.Entity;
+tannus.display.CropCorner.prototype = $extend(tannus.display.Entity.prototype,{
+	init: function() {
+		var _g = this;
+		console.log("Crop-Corner Stuff-n-Stuff");
+		var me = this;
+		this.on("mousedown",function(e) {
+			_g.followMouse = true;
+			var myPoint = new tannus.geom.Point(_g.x + _g.width / 2,_g.y + _g.height / 2);
+			me.emit("drag-start",myPoint);
+		});
+		this.on("mouseup",function(e1) {
+			var newPoint = new tannus.geom.Point(_g.x + _g.width / 2,_g.y + _g.height / 2);
+			me.emit("drag-end",newPoint);
+			_g.followMouse = false;
+		});
+		this.stage.on("mousemove",function(e2) {
+			if(_g.followMouse) {
+				_g.x = _g.stage.mouse.x - _g.width / 2;
+				_g.y = _g.stage.mouse.y - _g.height / 2;
+				var newPoint1 = new tannus.geom.Point(_g.x + _g.width / 2,_g.y + _g.height / 2);
+				me.emit("drag",newPoint1);
+			}
+		});
+	}
+	,render: function(stage,c) {
+		c.save();
+		c.fillStyle = this.color;
+		c.strokeStyle = this.border;
+		if(stage.mouse != null) {
+			if(this.rect().containsPoint(stage.mouse)) c.globalAlpha = 1; else c.globalAlpha = 0.8;
+		}
+		c.fillRect(this.x,this.y,this.width,this.height);
+		c.strokeRect(this.x,this.y,this.width,this.height);
+		c.restore();
+	}
+	,update: function(stage,c) {
+		if(!this.followMouse) {
+			this.x = this.ptx.getValue() - this.width / 2;
+			this.y = this.pty.getValue() - this.width / 2;
+		}
+		if(stage.mouse != null) {
+			if(this.rect().containsPoint(stage.mouse)) {
+				this.width = 12;
+				this.height = 12;
+				this.border = "#444444";
+			} else {
+				this.width = 10;
+				this.height = 10;
+				this.border = "#666666";
+			}
+		}
+	}
+	,__class__: tannus.display.CropCorner
+});
+tannus.display.CropWidget = function(ref,options) {
+	tannus.display.Entity.call(this);
+	this.image = new tannus.display.Image(ref);
+	this.addAsset(this.image);
+	this.box = new tannus.display.Cropbox(this.image);
+	this.addAsset(this.box);
+	this.on("activate",(function(f) {
+		return function() {
+			return f();
+		};
+	})($bind(this,this.init)));
+};
+$hxClasses["tannus.display.CropWidget"] = tannus.display.CropWidget;
+tannus.display.CropWidget.__name__ = ["tannus","display","CropWidget"];
+tannus.display.CropWidget.__super__ = tannus.display.Entity;
+tannus.display.CropWidget.prototype = $extend(tannus.display.Entity.prototype,{
+	init: function() {
+		this.stage.add(this.image);
+		this.stage.add(this.box);
+	}
+	,bindToInput: function(ref) {
+		var _g = this;
+		var finput = new tannus.ui.FileInput(ref);
+		finput.on("file-loaded",function(file) {
+			console.log(file);
+			if(new EReg("image","").match(file.type)) {
+				var data = file.data;
+				var imgUrl;
+				var encoded = haxe.crypto.Base64.encode(data);
+				imgUrl = "data:" + file.type + ";base64," + encoded;
+				var img = new tannus.display.Image("<img src=\"" + imgUrl + "\" />");
+				_g.image.destroy();
+				_g.box.destroy();
+				_g.image = img;
+				_g.addAsset(_g.image);
+				_g.stage.add(_g.image);
+				_g.box = new tannus.display.Cropbox(img);
+				_g.addAsset(_g.box);
+				_g.stage.add(_g.box);
+			}
+		});
+	}
+	,__class__: tannus.display.CropWidget
+});
+tannus.display.Cropbox = $hx_exports.tannus.display.Cropbox = function(img) {
+	tannus.display.Entity.call(this);
+	this.z = 999;
+	this.image = img;
+	this.cropCorners = new Array();
+	this.box = new tannus.geom.Rectangle();
+	this.modalColor = new tannus.io.Color(255,255,255,130);
+	this.image.on("ready",(function(f) {
+		return function() {
+			return f();
+		};
+	})($bind(this,this.initImage)));
+	this.on("activate",(function(f1) {
+		return function() {
+			return f1();
+		};
+	})($bind(this,this.init)));
+};
+$hxClasses["tannus.display.Cropbox"] = tannus.display.Cropbox;
+tannus.display.Cropbox.__name__ = ["tannus","display","Cropbox"];
+tannus.display.Cropbox.__super__ = tannus.display.Entity;
+tannus.display.Cropbox.prototype = $extend(tannus.display.Entity.prototype,{
+	addCorner: function(corner) {
+		this.cropCorners.push(corner);
+		this.addAsset(corner);
+		this.stage.add(corner);
+	}
+	,init: function() {
+		var _g = this;
+		console.log("Cropbox initialized");
+		var topLeft = new tannus.display.CropCorner(new tannus.utils.CPointer(function() {
+			return _g.box.x;
+		}),new tannus.utils.CPointer(function() {
+			return _g.box.y;
+		}));
+		var tlDragHandler = function(newPoint) {
+			var topleft = newPoint;
+			var bottomright = new tannus.geom.Point(_g.box.x + _g.box.width,_g.box.y + _g.box.height);
+			_g.box = new tannus.geom.Line(topleft,bottomright).rect();
+		};
+		topLeft.on("drag-end",tlDragHandler);
+		topLeft.on("drag",tlDragHandler);
+		this.addCorner(topLeft);
+		var topRight = new tannus.display.CropCorner(new tannus.utils.CPointer(function() {
+			return _g.box.x + _g.box.width;
+		}),new tannus.utils.CPointer(function() {
+			return _g.box.y;
+		}));
+		var trDragHandler = function(newPoint1) {
+			var topright = newPoint1;
+			var bottomleft = new tannus.geom.Point(_g.box.x,_g.box.y + _g.box.height);
+			_g.box = new tannus.geom.Line(topright,bottomleft).rect();
+		};
+		topRight.on("drag-end",trDragHandler);
+		topRight.on("drag",trDragHandler);
+		this.addCorner(topRight);
+		var bottomLeft = new tannus.display.CropCorner(new tannus.utils.CPointer(function() {
+			return _g.box.x;
+		}),new tannus.utils.CPointer(function() {
+			return _g.box.y + _g.box.height;
+		}));
+		var blDragHandler = function(newPoint2) {
+			var topright1 = new tannus.geom.Point(_g.box.x + _g.box.width,_g.box.y);
+			var bottomleft1 = newPoint2;
+			_g.box = new tannus.geom.Line(topright1,bottomleft1).rect();
+		};
+		bottomLeft.on("drag-end",blDragHandler);
+		bottomLeft.on("drag",blDragHandler);
+		this.addCorner(bottomLeft);
+		var bottomRight = new tannus.display.CropCorner(new tannus.utils.CPointer(function() {
+			return _g.box.x + _g.box.width;
+		}),new tannus.utils.CPointer(function() {
+			return _g.box.y + _g.box.height;
+		}));
+		var brDragHandler = function(newPoint3) {
+			var topleft1 = new tannus.geom.Point(_g.box.x,_g.box.y);
+			var bottomright1 = newPoint3;
+			_g.box = new tannus.geom.Line(topleft1,bottomright1).rect();
+		};
+		bottomRight.on("drag",brDragHandler);
+		bottomRight.on("drag-end",brDragHandler);
+		this.addCorner(bottomRight);
+		this.bindBoxEvents();
+	}
+	,bindBoxEvents: function() {
+		var _g = this;
+		var me = this;
+		var followMouse = false;
+		var dragOffset = null;
+		me.on("mousemove",function(e) {
+			if(followMouse) {
+				var pos = dragOffset.relativeTo(_g.stage.mouse);
+				me.box.x = pos.x;
+				me.box.y = pos.y;
+			}
+		});
+		me.on("mousedown",function(e1) {
+			if(_g.box.containsPoint(_g.stage.mouse)) {
+				followMouse = true;
+				dragOffset = new tannus.geom.Point(_g.box.x,_g.box.y).relativeTo(_g.stage.mouse);
+				console.log(Std.string(dragOffset) + "");
+			}
+		});
+		me.on("mouseup",function(e2) {
+			followMouse = false;
+		});
+	}
+	,initImage: function() {
+		this.box = new tannus.geom.Rectangle(0,0,100,100);
+		this.image.width = this.stage.width;
+		this.image.height = this.stage.height;
+		this.width = this.image.width;
+		this.height = this.image.height;
+		this.box.x = this.image.width / 2 - this.box.width / 2;
+		this.box.y = this.image.height / 2 - this.box.height / 2;
+		var imageBrightness = this.image.canvas.pixels().average().brightness();
+		if(imageBrightness > 127.5) this.modalColor = new tannus.io.Color(); else this.modalColor = new tannus.io.Color(255,255,255);
+	}
+	,render: function(stage,c) {
+		if(this.image.complete) {
+			c.save();
+			var inCropRect = stage.canvas.crop(this.box);
+			c.fillStyle = Std.string(this.modalColor) + "";
+			if(stage.mouse != null && this.box.containsPoint(stage.mouse)) c.globalAlpha = 0.6; else c.globalAlpha = 0.4;
+			c.fillRect(0,0,this.width,this.height);
+			c.globalAlpha = 1;
+			c.drawImage(inCropRect.component,0,0,inCropRect.component.width,inCropRect.component.height,this.box.x,this.box.y,this.box.width,this.box.height);
+			c.strokeStyle = "#666666";
+			c.strokeRect(this.box.x,this.box.y,this.box.width,this.box.height);
+			c.restore();
+		}
+	}
+	,update: function(stage,c) {
+	}
+	,__class__: tannus.display.Cropbox
+});
+tannus.display.Image = $hx_exports.tannus.display.Image = function(ref) {
+	var _g = this;
+	tannus.display.Entity.call(this);
+	this.image = tannus.ui.JQuery.select(ref).at(0);
+	this.complete = false;
+	console.log("Image created");
+	tannus.ui.Canvas.fromImage(this.image,function(canvas) {
+		_g.canvas = canvas;
+		_g.width = _g.canvas.component.width;
+		_g.height = _g.canvas.component.height;
+		console.log("Canvas initialized");
+	});
+};
+$hxClasses["tannus.display.Image"] = tannus.display.Image;
+tannus.display.Image.__name__ = ["tannus","display","Image"];
+tannus.display.Image.__super__ = tannus.display.Entity;
+tannus.display.Image.prototype = $extend(tannus.display.Entity.prototype,{
+	render: function(stage,c) {
+		tannus.display.Entity.prototype.render.call(this,stage,c);
+		if(this.canvas != null) {
+			this.canvas.set_width(this.image.naturalWidth);
+			this.canvas.set_height(this.image.naturalHeight);
+			var myc = this.canvas.getContext("2d");
+			myc.drawImage(this.image,0,0,this.canvas.component.width,this.canvas.component.height,0,0,this.canvas.component.width,this.canvas.component.height);
+			c.save();
+			c.drawImage(this.canvas.component,0,0,this.canvas.component.width,this.canvas.component.height,this.x,this.y,this.width,this.height);
+			c.restore();
+		}
+	}
+	,update: function(stage,c) {
+		tannus.display.Entity.prototype.update.call(this,stage,c);
+		if(this.canvas != null) {
+			if(!this.complete) {
+				this.emit("ready",this);
+				this.complete = true;
+			}
+		}
+	}
+	,__class__: tannus.display.Image
+});
+tannus.display.Pixel = function(x,y,color,container) {
+	tannus.core.EventDispatcher.call(this);
+	this._pos = new tannus.geom.Point(x,y);
+	this._color = color;
+	this._owner = container;
+	this.init();
+};
+$hxClasses["tannus.display.Pixel"] = tannus.display.Pixel;
+tannus.display.Pixel.__name__ = ["tannus","display","Pixel"];
+tannus.display.Pixel.__super__ = tannus.core.EventDispatcher;
+tannus.display.Pixel.prototype = $extend(tannus.core.EventDispatcher.prototype,{
+	init: function() {
+		var _g = this;
+		var me = this;
+		this._color.on("change",function(e) {
+			me.emit("change-color",_g._color);
+		});
+	}
+	,color: function() {
+		return this._color;
+	}
+	,position: function() {
+		return this._pos;
+	}
+	,__class__: tannus.display.Pixel
+});
+tannus.display.PixelArray = function(parent) {
+	tannus.core.EventDispatcher.call(this);
+	this._data = parent.imageData();
+	this._owner = parent;
+};
+$hxClasses["tannus.display.PixelArray"] = tannus.display.PixelArray;
+tannus.display.PixelArray.__name__ = ["tannus","display","PixelArray"];
+tannus.display.PixelArray.__super__ = tannus.core.EventDispatcher;
+tannus.display.PixelArray.prototype = $extend(tannus.core.EventDispatcher.prototype,{
+	get: function(sx,sy) {
+		var img = this._data;
+		var data = img.data;
+		var x = sx | 0;
+		var y = sy | 0;
+		var color = new tannus.io.Color(data[y * (img.width * 4) + x * 4],data[y * (img.width * 4) + x * 4 + 1],data[y * (img.width * 4) + x * 4 + 2],data[y * (img.width * 4) + x * 4 + 3]);
+		var pixl = new tannus.display.Pixel(x,y,color,this);
+		this.initPixel(pixl);
+		return pixl;
+	}
+	,setColorAt: function(sx,sy,color) {
+		var ctx = this._owner.getContext("2d");
+		ctx.save();
+		ctx.fillStyle = Std.string(color) + "";
+		ctx.fillRect(sx,sy,1,1);
+		ctx.restore();
+	}
+	,initPixel: function(pixl) {
+		var me = this;
+		pixl.on("change-color",function(e) {
+			var pos = pixl.position();
+			me.setColorAt(pos.x,pos.y,pixl.color());
+		});
+	}
+	,getAllColorFields: function(field) {
+		if(field < 5) {
+			var values = new Array();
+			var data = this._data.data;
+			var i = 0;
+			while(i < data.length) {
+				values.push(data[i + field]);
+				i += 4;
+			}
+			return values;
+		} else {
+			throw "ColorField " + field + " out of range. (must be within range(0 - 4))";
+			return [];
+		}
+	}
+	,reds: function() {
+		return this.getAllColorFields(0);
+	}
+	,greens: function() {
+		return this.getAllColorFields(1);
+	}
+	,blues: function() {
+		return this.getAllColorFields(2);
+	}
+	,alphas: function() {
+		return this.getAllColorFields(3);
+	}
+	,average: function() {
+		var i = (function(f) {
+			return function(x) {
+				return f(x);
+			};
+		})(Std["int"]);
+		return new tannus.io.Color(i(tannus.math.TMath.average(this.reds())),i(tannus.math.TMath.average(this.greens())),i(tannus.math.TMath.average(this.blues())),i(tannus.math.TMath.average(this.alphas())));
+	}
+	,__class__: tannus.display.PixelArray
+});
+tannus.display.Stage = $hx_exports.tannus.display.Stage = function(can) {
+	tannus.core.EventDispatcher.call(this);
+	this.canvas = new tannus.ui.Canvas(can);
+	this.childNodes = new Array();
+	this.mouse = null;
+	this.width = null;
+	this.height = null;
+	this.init();
+};
+$hxClasses["tannus.display.Stage"] = tannus.display.Stage;
+tannus.display.Stage.__name__ = ["tannus","display","Stage"];
+tannus.display.Stage.__super__ = tannus.core.EventDispatcher;
+tannus.display.Stage.prototype = $extend(tannus.core.EventDispatcher.prototype,{
+	init: function() {
+		this.initEvents();
+		this.startHeartbeat();
+	}
+	,add: function(ent) {
+		if(!Lambda.has(this.childNodes,ent)) {
+			this.childNodes.push(ent);
+			ent.emit("activate",this);
+		}
+	}
+	,render: function() {
+		this.canvas.reset();
+		var ctx = this.canvas.getContext("2d");
+		var _g = 0;
+		var _g1 = this.childNodes;
+		while(_g < _g1.length) {
+			var child = _g1[_g];
+			++_g;
+			if(!child._hidden) child.render(this,ctx);
+		}
+	}
+	,update: function() {
+		if(this.width != null) this.canvas.set_width(this.width | 0);
+		if(this.height != null) this.canvas.set_height(this.height | 0);
+		this.childNodes = this.childNodes.filter(function(ent) {
+			return !ent._remove;
+		});
+		haxe.ds.ArraySort.sort(this.childNodes,function(x,y) {
+			return (x.z | 0) - (y.z | 0);
+		});
+		var ctx = this.canvas.getContext("2d");
+		var _g = 0;
+		var _g1 = this.childNodes;
+		while(_g < _g1.length) {
+			var child = _g1[_g];
+			++_g;
+			if(!child._cached) child.update(this,ctx);
+		}
+	}
+	,startHeartbeat: function() {
+		var _g = this;
+		var win = window;
+		var frameDelay = 30;
+		var frame;
+		var frame1 = null;
+		frame1 = function(n) {
+			_g.update();
+			_g.render();
+			win.requestAnimationFrame(frame1);
+			return true;
+		};
+		frame = frame1;
+		win.requestAnimationFrame(frame);
+	}
+	,initEvents: function() {
+		var _g = this;
+		var events = ["click","mousedown","mouseup","mousemove"];
+		var _g1 = 0;
+		while(_g1 < events.length) {
+			var eventName = events[_g1];
+			++_g1;
+			this.canvas.on(eventName,(function(f,a1) {
+				return function(a2) {
+					return f(a1,a2);
+				};
+			})($bind(this,this.emit),eventName));
+		}
+		var handleEvent = function(type,event) {
+			var targets = new Array();
+			var _g11 = 0;
+			var _g2 = _g.childNodes;
+			while(_g11 < _g2.length) {
+				var child = _g2[_g11];
+				++_g11;
+				if(child.rect().containsPoint(event.position)) targets.push(child);
+			}
+			if(targets.length > 0) {
+				var target = targets[0];
+				var _g12 = 0;
+				while(_g12 < targets.length) {
+					var ent = targets[_g12];
+					++_g12;
+					if(ent.z > target.z) target = ent;
+				}
+				target.emit(type,event);
+			}
+			if(type == "mousemove") _g.mouse = event.position;
+		};
+		var _g3 = 0;
+		while(_g3 < events.length) {
+			var eventName1 = events[_g3];
+			++_g3;
+			this.on(eventName1,(function(f1,a11) {
+				return function(a21) {
+					return f1(a11,a21);
+				};
+			})(handleEvent,eventName1));
+		}
+	}
+	,__class__: tannus.display.Stage
+});
+tannus.geom = {};
+tannus.geom.Line = $hx_exports.tannus.geom.Line = function(start,end) {
+	this.start = start;
+	this.end = end;
+};
+$hxClasses["tannus.geom.Line"] = tannus.geom.Line;
+tannus.geom.Line.__name__ = ["tannus","geom","Line"];
+tannus.geom.Line.prototype = {
+	rect: function() {
+		var x = Math.min(this.start.x,this.end.x);
+		var y = Math.min(this.start.y,this.end.y);
+		var width = Math.max(this.start.x,this.end.x) - x;
+		var height = Math.max(this.start.y,this.end.y) - y;
+		return new tannus.geom.Rectangle(x,y,width,height);
+	}
+	,__class__: tannus.geom.Line
+};
+tannus.geom.Point = $hx_exports.tannus.geom.Point = function(x,y,z) {
+	if(z == null) z = 0;
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	this.x = x;
+	this.y = y;
+	this.z = z;
+};
+$hxClasses["tannus.geom.Point"] = tannus.geom.Point;
+tannus.geom.Point.__name__ = ["tannus","geom","Point"];
+tannus.geom.Point.prototype = {
+	clone: function() {
+		return new tannus.geom.Point(this.x,this.y,this.z);
+	}
+	,equals: function(other) {
+		return this.x == other.x && this.y == other.y && this.z == other.z;
+	}
+	,relativeTo: function(other) {
+		return new tannus.geom.Point(other.x - this.x,other.y - this.y,other.z - this.z);
+	}
+	,toString: function() {
+		return "Point(" + this.x + ", " + this.y + ", " + this.z + ")";
+	}
+	,__class__: tannus.geom.Point
+};
+tannus.geom.Rectangle = $hx_exports.tannus.geom.Rectangle = function(x,y,width,height) {
+	if(height == null) height = 0;
+	if(width == null) width = 0;
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	this.x = x;
+	this.y = y;
+	this.width = width;
+	this.height = height;
+};
+$hxClasses["tannus.geom.Rectangle"] = tannus.geom.Rectangle;
+tannus.geom.Rectangle.__name__ = ["tannus","geom","Rectangle"];
+tannus.geom.Rectangle.prototype = {
+	clone: function() {
+		return new tannus.geom.Rectangle(this.x,this.y,this.width,this.height);
+	}
+	,equals: function(other) {
+		return this.x == other.x && this.y == other.y && this.width == other.width && this.height == other.height;
+	}
+	,corners: function() {
+		var points = new Array();
+		points.push(new tannus.geom.Point(this.x,this.y));
+		points.push(new tannus.geom.Point(this.x + this.width,this.y));
+		points.push(new tannus.geom.Point(this.x + this.width,this.y + this.height));
+		points.push(new tannus.geom.Point(this.x,this.y + this.height));
+		return points;
+	}
+	,contains: function(cx,cy) {
+		return cx > this.x && cx < this.x + this.width && (cy > this.y && cy < this.y + this.height);
+	}
+	,containsPoint: function(point) {
+		return this.contains(point.x,point.y);
+	}
+	,containsRect: function(rect) {
+		var pts = this.corners();
+		var _g = 0;
+		while(_g < pts.length) {
+			var pt = pts[_g];
+			++_g;
+			if(!this.containsPoint(pt)) return false;
+		}
+		return true;
+	}
+	,intersects: function(other) {
+		var pts = other.corners();
+		var _g = 0;
+		while(_g < pts.length) {
+			var pt = pts[_g];
+			++_g;
+			if(this.containsPoint(pt)) return true;
+		}
+		return false;
+	}
+	,isEmpty: function() {
+		return this.x == 0 && this.y == 0 && this.width == 0 && this.height == 0;
+	}
+	,__class__: tannus.geom.Rectangle
+};
 tannus.io = {};
 tannus.io._Byte = {};
 tannus.io._Byte.Byte_Impl_ = function() { };
@@ -1285,10 +2215,38 @@ tannus.io._ByteArray.ByteArray_Impl_.toBuffer = function(this1) {
 };
 tannus.io._ByteArray.ByteArray_Impl_.toByteArray = function(this1) {
 	var _g = [];
-	var $it0 = this1.buffer;
+	var $it0 = (function($this) {
+		var $r;
+		var buf = this1.buffer;
+		var i = -1;
+		var iter = { next : function() {
+			i++;
+			try {
+				return buf.b[i];
+			} catch( err ) {
+				if( js.Boot.__instanceof(err,String) ) {
+					return null;
+				} else throw(err);
+			}
+		}, hasNext : function() {
+			return i <= buf.length - 1 && (function($this) {
+				var $r;
+				try {
+					$r = buf.b[i + 1];
+				} catch( err1 ) {
+					if( js.Boot.__instanceof(err1,String) ) {
+						$r = null;
+					} else throw(err1);
+				}
+				return $r;
+			}(this)) != null;
+		}};
+		$r = iter;
+		return $r;
+	}(this));
 	while( $it0.hasNext() ) {
-		var i = $it0.next();
-		_g.push(i);
+		var i1 = $it0.next();
+		_g.push(i1);
 	}
 	return _g;
 };
@@ -1472,6 +2430,113 @@ tannus.io.IByteArray.prototype = {
 	}
 	,__class__: tannus.io.IByteArray
 	,__properties__: {get_length:"get_length"}
+};
+tannus.io.Color = $hx_exports.tannus.io.Color = function(r,g,b,a) {
+	if(a == null) a = 0;
+	if(b == null) b = 0;
+	if(g == null) g = 0;
+	if(r == null) r = 0;
+	tannus.core.EventDispatcher.call(this);
+	this.data = [r,g,b,a];
+};
+$hxClasses["tannus.io.Color"] = tannus.io.Color;
+tannus.io.Color.__name__ = ["tannus","io","Color"];
+tannus.io.Color.__super__ = tannus.core.EventDispatcher;
+tannus.io.Color.prototype = $extend(tannus.core.EventDispatcher.prototype,{
+	clamp: function(val) {
+		return Math.round(Math.min(val,255));
+	}
+	,red: function(nr) {
+		if(nr == null) return this.data[0]; else {
+			this.data[0] = Math.round(Math.min(nr,255));
+			this.emit("change",this);
+			return null;
+		}
+	}
+	,green: function(ng) {
+		if(ng == null) return this.data[1]; else {
+			this.data[1] = Math.round(Math.min(ng,255));
+			this.emit("change",this);
+			return null;
+		}
+	}
+	,blue: function(nb) {
+		if(nb == null) return this.data[2]; else {
+			this.data[2] = Math.round(Math.min(nb,255));
+			this.emit("change",this);
+			return null;
+		}
+	}
+	,alpha: function(na) {
+		if(na == null) return this.data[3]; else {
+			this.data[3] = Math.round(Math.min(na,255));
+			this.emit("change",this);
+			return null;
+		}
+	}
+	,brightness: function() {
+		return Std["int"](Math.sqrt(this.red() * this.red() * 0.241 + this.green() * this.green() * 0.691 + this.blue() * this.blue() * 0.068));
+	}
+	,toString: function(includeAlpha) {
+		if(includeAlpha == null) includeAlpha = false;
+		var repr = "#";
+		if(includeAlpha == true) repr += StringTools.hex(this.alpha(),2);
+		repr += StringTools.hex(this.red(),2);
+		repr += StringTools.hex(this.green(),2);
+		repr += StringTools.hex(this.blue(),2);
+		return repr;
+	}
+	,__class__: tannus.io.Color
+});
+tannus.math = {};
+tannus.math.TMath = function() { };
+$hxClasses["tannus.math.TMath"] = tannus.math.TMath;
+tannus.math.TMath.__name__ = ["tannus","math","TMath"];
+tannus.math.TMath.toRadians = function(degrees) {
+	return degrees * 3.141592653589793 / 180;
+};
+tannus.math.TMath.toDegrees = function(radians) {
+	return radians * 180 / 3.141592653589793;
+};
+tannus.math.TMath.max = function(a,b) {
+	if(a > b) return a; else return b;
+};
+tannus.math.TMath.min = function(a,b) {
+	if(a < b) return a; else return b;
+};
+tannus.math.TMath.average = function(values) {
+	var sum = 0;
+	var _g = 0;
+	while(_g < values.length) {
+		var n = values[_g];
+		++_g;
+		sum += n;
+	}
+	return sum / values.length;
+};
+tannus.math.TMath.largest = function(items,predicate) {
+	var highest = 0;
+	var $it0 = $iterator(items)();
+	while( $it0.hasNext() ) {
+		var item = $it0.next();
+		highest = tannus.math.TMath.max(highest,predicate(item));
+	}
+	return highest;
+};
+tannus.math.TMath.smallest = function(items,predicate) {
+	var lowest = 0;
+	var $it0 = $iterator(items)();
+	while( $it0.hasNext() ) {
+		var item = $it0.next();
+		lowest = tannus.math.TMath.min(lowest,predicate(item));
+	}
+	return lowest;
+};
+tannus.math.TMath.clamp = function(value,min,max) {
+	if(value < min) return min; else if(value > max) return max; else return value;
+};
+tannus.math.TMath.sign = function(value) {
+	if(value < 0) return -1; else if(value > 0) return 1; else return 0;
 };
 tannus.mvc = {};
 tannus.mvc.Controller = function(app) {
@@ -2457,72 +3522,6 @@ tannus.ore.Utils.smallest = function(list) {
 	return smallest;
 };
 tannus.serverside = {};
-tannus.serverside.NodeFileSystem = function() { };
-$hxClasses["tannus.serverside.NodeFileSystem"] = tannus.serverside.NodeFileSystem;
-tannus.serverside.NodeFileSystem.__name__ = ["tannus","serverside","NodeFileSystem"];
-tannus.serverside.NodeFileSystem.exists = function(path) {
-	return tannus.serverside.NodeFileSystem.fs.existsSync(path) == true;
-};
-tannus.serverside.NodeFileSystem.grabstats = function(path) {
-	return tannus.serverside.NodeFileSystem.fs.statSync(path);
-};
-tannus.serverside.NodeFileSystem.isDirectory = function(path) {
-	return tannus.serverside.NodeFileSystem.exists(path) && tannus.serverside.NodeFileSystem.grabstats(path).isDirectory() == true;
-};
-tannus.serverside.NodeFileSystem.isFile = function(path) {
-	return tannus.serverside.NodeFileSystem.grabstats(path).isFile() == true;
-};
-tannus.serverside.NodeFileSystem.createDirectory = function(path) {
-	tannus.serverside.NodeFileSystem.fs.mkdirSync(path);
-};
-tannus.serverside.NodeFileSystem.removeDirectory = function(path) {
-	tannus.serverside.NodeFileSystem.fs.rmdirSync(path);
-};
-tannus.serverside.NodeFileSystem.readDirectory = function(path) {
-	var _g = [];
-	var _g1 = 0;
-	var _g2;
-	_g2 = js.Boot.__cast(tannus.serverside.NodeFileSystem.fs.readdirSync(path) , Array);
-	while(_g1 < _g2.length) {
-		var item = _g2[_g1];
-		++_g1;
-		_g.push(js.Boot.__cast(item , String));
-	}
-	return _g;
-};
-tannus.serverside.NodeFileSystem.rename = function(oldPath,newPath) {
-	try {
-		tannus.serverside.NodeFileSystem.fs.renameSync(oldPath,newPath);
-		return true;
-	} catch( err ) {
-		if( js.Boot.__instanceof(err,String) ) {
-			return false;
-		} else throw(err);
-	}
-};
-tannus.serverside.NodeFileSystem.read = function(path) {
-	var nodebuffer = tannus.serverside.NodeFileSystem.fs.readFileSync(path);
-	var buff;
-	var len = Std.parseInt(Std.string(nodebuffer.length));
-	var bitlist = new Array();
-	var _g = 0;
-	while(_g < len) {
-		var i = _g++;
-		bitlist.push(nodebuffer[i]);
-	}
-	var bytes = haxe.io.Bytes.alloc(bitlist.length);
-	var _g1 = 0;
-	var _g2 = bitlist.length;
-	while(_g1 < _g2) {
-		var i1 = _g1++;
-		bytes.b[i1] = bitlist[i1] & 255;
-	}
-	buff = bytes;
-	return buff;
-};
-tannus.serverside.NodeFileSystem.write = function(path,content) {
-	tannus.serverside.NodeFileSystem.fs.writeFileSync(path,tannus.utils._Buffer.Buffer_Impl_.toNodeBuffer(content));
-};
 tannus.serverside.socks = {};
 tannus.serverside.socks.Utils = function() { };
 $hxClasses["tannus.serverside.socks.Utils"] = tannus.serverside.socks.Utils;
@@ -2589,6 +3588,244 @@ tannus.serverside.socks.Utils.mapFromPairs = function(pairs) {
 	}
 	return mp;
 };
+tannus.ui = {};
+tannus.ui.Canvas = function(component) {
+	tannus.core.EventDispatcher.call(this);
+	this.component = component;
+	this.document = window.document;
+	this.initEvents();
+};
+$hxClasses["tannus.ui.Canvas"] = tannus.ui.Canvas;
+tannus.ui.Canvas.__name__ = ["tannus","ui","Canvas"];
+tannus.ui.Canvas.fromImage = function(img,callback) {
+	var dummy = window.document.createElement("canvas");
+	var canvas = new tannus.ui.Canvas(dummy);
+	var doTheStuff = function(e) {
+		var w = img.naturalWidth;
+		var h = img.naturalHeight;
+		canvas.set_width(img.width);
+		canvas.set_height(img.height);
+		var ctx = canvas.component.getContext("2d");
+		ctx.drawImage(img,0,0,w,h,0,0,w,h);
+	};
+	if(img.complete) {
+		doTheStuff(null);
+		callback(canvas);
+	} else img.onload = function(e1) {
+		doTheStuff(e1);
+		callback(canvas);
+	};
+};
+tannus.ui.Canvas.__super__ = tannus.core.EventDispatcher;
+tannus.ui.Canvas.prototype = $extend(tannus.core.EventDispatcher.prototype,{
+	get_width: function() {
+		return this.component.width;
+	}
+	,set_width: function(nw) {
+		this.component.width = nw;
+		return nw;
+	}
+	,set_src: function(nsrc) {
+		var _g = this;
+		var img = this.document.createElement("canvas");
+		var w = img.naturalWidth;
+		var h = img.naturalHeight;
+		img.src = nsrc;
+		this.src = nsrc;
+		img.onload = function(e) {
+			var ctx = _g.component.getContext("2d");
+			ctx.drawImage(img,0,0,w,h,0,0,_g.component.width,_g.component.height);
+		};
+		return nsrc;
+	}
+	,get_height: function() {
+		return this.component.height;
+	}
+	,set_height: function(nh) {
+		this.component.height = nh;
+		return nh;
+	}
+	,relMouseCoords: function(event) {
+		var totalOffsetX = 0;
+		var totalOffsetY = 0;
+		var canvasX = 0;
+		var canvasY = 0;
+		var currentElement = this.component;
+		do {
+			totalOffsetX += currentElement.offsetLeft - currentElement.scrollLeft;
+			totalOffsetY += currentElement.offsetTop - currentElement.scrollTop;
+			currentElement = currentElement.offsetParent;
+		} while(currentElement != null);
+		canvasX = event.pageX - totalOffsetX - window.scrollX;
+		canvasY = event.pageY - totalOffsetY - window.scrollY;
+		return new tannus.geom.Point(canvasX,canvasY);
+	}
+	,initEvents: function() {
+		var _g = this;
+		var handler = function(type,event) {
+			var point = _g.relMouseCoords(event);
+			event.position = point;
+			_g.emit(type,event);
+			console.log({ type : type, event : event});
+		};
+		var events = ["click","mousemove","mousedown","mouseup"];
+		var self = tannus.ui.JQuery.select(this.component);
+		var _g1 = 0;
+		while(_g1 < events.length) {
+			var ename = events[_g1];
+			++_g1;
+			self.on(ename,(function(f,a1) {
+				return function(a2) {
+					return f(a1,a2);
+				};
+			})(handler,ename));
+		}
+	}
+	,getContext: function(type) {
+		return this.component.getContext(type);
+	}
+	,imageData: function() {
+		return this.getContext("2d").getImageData(0,0,this.component.width,this.component.height);
+	}
+	,pixels: function() {
+		return new tannus.display.PixelArray(this);
+	}
+	,reset: function() {
+		var ctx = this.getContext("2d");
+		ctx.save();
+		ctx.fillStyle = "white";
+		ctx.fillRect(0,0,this.component.width,this.component.height);
+		ctx.restore();
+	}
+	,toDataURI: function() {
+		return this.component.toDataURL();
+	}
+	,toBuffer: function() {
+		var uri = this.component.toDataURL();
+		var buf;
+		var b64 = uri.substring(uri.indexOf(",") + 1);
+		var bytes = haxe.crypto.Base64.decode(b64);
+		buf = bytes;
+		return buf;
+	}
+	,toBlob: function() {
+		return tannus.utils._Buffer.Buffer_Impl_.toClientBlob(this.toBuffer(),"image/png");
+	}
+	,toImage: function(callback) {
+		var img = this.document.createElement("img");
+		img.src = this.toDataURI();
+		img.onload = function(e) {
+			callback(img,e);
+		};
+		img.onerror = function(e1) {
+			callback(img,e1);
+		};
+	}
+	,replace: function(target) {
+		tannus.ui.JQuery.select(target).replaceWith(this.component);
+	}
+	,crop: function(rect) {
+		var dummy = this.document.createElement("canvas");
+		var canvas = new tannus.ui.Canvas(dummy);
+		canvas.set_width(rect.width | 0);
+		canvas.set_height(rect.height | 0);
+		var ctx = canvas.getContext("2d");
+		ctx.drawImage(this.component,rect.x,rect.y,rect.width,rect.height,0,0,rect.width,rect.height);
+		return canvas;
+	}
+	,__class__: tannus.ui.Canvas
+	,__properties__: {set_src:"set_src",set_height:"set_height",get_height:"get_height",set_width:"set_width",get_width:"get_width"}
+});
+tannus.ui.FileInput = function(ref) {
+	tannus.core.EventDispatcher.call(this);
+	this.el = tannus.ui.JQuery.select(ref).at(0);
+	this.init();
+};
+$hxClasses["tannus.ui.FileInput"] = tannus.ui.FileInput;
+tannus.ui.FileInput.__name__ = ["tannus","ui","FileInput"];
+tannus.ui.FileInput.q = function(sel) {
+	return tannus.ui.JQuery.select(sel);
+};
+tannus.ui.FileInput.__super__ = tannus.core.EventDispatcher;
+tannus.ui.FileInput.prototype = $extend(tannus.core.EventDispatcher.prototype,{
+	init: function() {
+		var _g = this;
+		tannus.ui.JQuery.select(this.el).on("change",function(e) {
+			var files = _g.el.files;
+			var _g1 = 0;
+			while(_g1 < files.length) {
+				var file = files[_g1];
+				++_g1;
+				_g.loadFile(file);
+			}
+		});
+	}
+	,loadFile: function(file) {
+		var _g = this;
+		var data = { name : file.name, type : file.type != null?file.type:"application/octet-stream", data : (function($this) {
+			var $r;
+			var bytes = haxe.io.Bytes.alloc(0);
+			$r = bytes;
+			return $r;
+		}(this))};
+		var reader = new FileReader();
+		reader.onload = function(e) {
+			var result = reader.result;
+			var buf;
+			var b64 = result.substring(result.indexOf(",") + 1);
+			var bytes1 = haxe.crypto.Base64.decode(b64);
+			buf = bytes1;
+			data.data = buf;
+			_g.emit("file-loaded",data);
+		};
+		reader.readAsDataURL(file);
+	}
+	,__class__: tannus.ui.FileInput
+});
+tannus.ui.JQuery = function(sel) {
+	this.el = tannus.ui.JQuery.jq(sel);
+};
+$hxClasses["tannus.ui.JQuery"] = tannus.ui.JQuery;
+tannus.ui.JQuery.__name__ = ["tannus","ui","JQuery"];
+tannus.ui.JQuery.select = function(sel) {
+	return new tannus.ui.JQuery(sel);
+};
+tannus.ui.JQuery.prototype = {
+	at: function(index) {
+		return this.el[index];
+	}
+	,css: function(one,two) {
+		return this.el.css(one,two);
+	}
+	,addClass: function(classes) {
+		this.el.addClass(classes);
+	}
+	,hasClass: function(klass) {
+		return this.el.hasClass(klass);
+	}
+	,attr: function(one,two) {
+		return this.el.attr(one,two);
+	}
+	,append: function(newchild) {
+		return this.el.append(newchild);
+	}
+	,appendTo: function(parent) {
+		return this.el.appendTo(parent);
+	}
+	,replace: function(oldChild,newChild) {
+		return this.el.replace(oldChild,newChild);
+	}
+	,replaceWith: function(replacement) {
+		return this.el.replaceWith(replacement);
+	}
+	,remove: function() {
+		return this.el.remove();
+	}
+	,on: function(channel,handler) {
+		return this.el.on(channel,handler);
+	}
+	,__class__: tannus.ui.JQuery
+};
 tannus.utils = {};
 tannus.utils.ArrayTools = function() { };
 $hxClasses["tannus.utils.ArrayTools"] = tannus.utils.ArrayTools;
@@ -2607,8 +3844,12 @@ tannus.utils._Buffer = {};
 tannus.utils._Buffer.Buffer_Impl_ = function() { };
 $hxClasses["tannus.utils._Buffer.Buffer_Impl_"] = tannus.utils._Buffer.Buffer_Impl_;
 tannus.utils._Buffer.Buffer_Impl_.__name__ = ["tannus","utils","_Buffer","Buffer_Impl_"];
+tannus.utils._Buffer.Buffer_Impl_.__properties__ = {get_self:"get_self"}
 tannus.utils._Buffer.Buffer_Impl_._new = function(bytes) {
 	return bytes;
+};
+tannus.utils._Buffer.Buffer_Impl_.get_self = function(this1) {
+	return this1;
 };
 tannus.utils._Buffer.Buffer_Impl_.slice = function(this1,start,end) {
 	if(end == null) end = this1.length;
@@ -2838,64 +4079,24 @@ tannus.utils._Buffer.Buffer_Impl_.split = function(this1,delimiter) {
 			chunk = bytes1;
 		} else {
 			var other;
-			var buf1;
 			try {
-				buf1 = buf.b[index];
+				other = buf.b[index];
 			} catch( err1 ) {
 				if( js.Boot.__instanceof(err1,String) ) {
-					buf1 = null;
+					other = null;
 				} else throw(err1);
 			}
-			var len = Std.parseInt(Std.string(buf1.length));
-			var bitlist = new Array();
-			var _g = 0;
-			while(_g < len) {
-				var i = _g++;
-				bitlist.push(buf1[i]);
-			}
-			var bytes2 = haxe.io.Bytes.alloc(bitlist.length);
-			var _g1 = 0;
-			var _g2 = bitlist.length;
-			while(_g1 < _g2) {
-				var i1 = _g1++;
-				bytes2.b[i1] = bitlist[i1] & 255;
-			}
-			other = bytes2;
-			var one = chunk;
-			var other1 = other;
-			other1 = js.Boot.__cast(other1 , haxe.io.Bytes);
-			one = js.Boot.__cast(one , haxe.io.Bytes);
-			var sum;
-			var bits = haxe.io.Bytes.alloc(one.length + other1.length);
-			sum = bits;
-			var i2 = 0;
-			while(i2 < one.length) {
-				var val;
-				try {
-					val = one.b[i2];
-				} catch( err2 ) {
-					if( js.Boot.__instanceof(err2,String) ) {
-						val = null;
-					} else throw(err2);
-				}
-				sum.b[i2] = val & 255;
-				val;
-				i2++;
-			}
-			while(i2 < one.length + other1.length) {
-				var val1;
-				try {
-					val1 = other1.b[i2 - one.length];
-				} catch( err3 ) {
-					if( js.Boot.__instanceof(err3,String) ) {
-						val1 = null;
-					} else throw(err3);
-				}
-				sum.b[i2] = val1 & 255;
-				val1;
-				i2++;
-			}
-			chunk = sum;
+			var copy;
+			var this2 = chunk;
+			var end = null;
+			if(end == null) end = this2.length;
+			if(end < 0) end = this2.length - end;
+			var len = end - 1;
+			var bytes2 = this2.sub(0,len);
+			copy = bytes2;
+			copy.b[copy.length] = other & 255;
+			other;
+			chunk = copy;
 		}
 		index++;
 	}
@@ -3027,21 +4228,41 @@ tannus.utils._Buffer.Buffer_Impl_.toArray = function(this1) {
 	}
 	return set;
 };
-tannus.utils._Buffer.Buffer_Impl_.toNodeBuffer = function(this1) {
-	var len = this1.length;
-	var buf = new Buffer(len || 0);
-	var _g = 0;
-	while(_g < len) {
-		var index = _g++;
-		buf[index] = this1.b[index];
-	}
-	return buf;
+tannus.utils._Buffer.Buffer_Impl_.toInt32Array = function(this1) {
+	return new Int32Array((function($this) {
+		var $r;
+		var this2 = this1;
+		var set = new Array();
+		var i = 0;
+		while(i < this2.length) {
+			set.push(this2.b[i]);
+			i++;
+		}
+		$r = set;
+		return $r;
+	}(this)));
+};
+tannus.utils._Buffer.Buffer_Impl_.toClientBlob = function(this1,mime_type) {
+	return new Blob([tannus.utils._Buffer.Buffer_Impl_.toInt32Array(this1)],{ type : mime_type != null?mime_type:"application/octet-stream"});
 };
 tannus.utils._Buffer.Buffer_Impl_.fromBytes = function(bits) {
 	return bits;
 };
 tannus.utils._Buffer.Buffer_Impl_.fromString = function(chars) {
 	var bytes = haxe.io.Bytes.ofString(chars);
+	return bytes;
+};
+tannus.utils._Buffer.Buffer_Impl_.toDataURI = function(this1,mimeType) {
+	var encoded = haxe.crypto.Base64.encode(this1);
+	return "data:" + mimeType + ";base64," + encoded;
+};
+tannus.utils._Buffer.Buffer_Impl_.fromBase64String = function(encoded) {
+	var bytes = haxe.crypto.Base64.decode(encoded);
+	return bytes;
+};
+tannus.utils._Buffer.Buffer_Impl_.fromDataURI = function(uri) {
+	var b64 = uri.substring(uri.indexOf(",") + 1);
+	var bytes = haxe.crypto.Base64.decode(b64);
 	return bytes;
 };
 tannus.utils._Buffer.Buffer_Impl_.fromIntArray = function(set) {
@@ -3061,23 +4282,6 @@ tannus.utils._Buffer.Buffer_Impl_.fromFloatArray = function(set) {
 	while(_g1 < _g) {
 		var i = _g1++;
 		bytes.setFloat(i,set[i]);
-	}
-	return bytes;
-};
-tannus.utils._Buffer.Buffer_Impl_.fromNodeBuffer = function(buf) {
-	var len = Std.parseInt(Std.string(buf.length));
-	var bitlist = new Array();
-	var _g = 0;
-	while(_g < len) {
-		var i = _g++;
-		bitlist.push(buf[i]);
-	}
-	var bytes = haxe.io.Bytes.alloc(bitlist.length);
-	var _g1 = 0;
-	var _g2 = bitlist.length;
-	while(_g1 < _g2) {
-		var i1 = _g1++;
-		bytes.b[i1] = bitlist[i1] & 255;
 	}
 	return bytes;
 };
@@ -3121,66 +4325,6 @@ tannus.utils.CompileTimeClassList.initialise = function() {
 			tannus.utils.CompileTimeClassList.lists.set(listID,list);
 		}
 	}
-};
-tannus.utils.File = function(ref) {
-	this.name = ref;
-};
-$hxClasses["tannus.utils.File"] = tannus.utils.File;
-tannus.utils.File.__name__ = ["tannus","utils","File"];
-tannus.utils.File.prototype = {
-	toJSON: function() {
-		try {
-			return JSON.parse((function($this) {
-				var $r;
-				var this1 = tannus.serverside.NodeFileSystem.read($this.name);
-				$r = this1.toString();
-				return $r;
-			}(this)));
-		} catch( err ) {
-			if( js.Boot.__instanceof(err,String) ) {
-				return null;
-			} else throw(err);
-		}
-	}
-	,get_content: function() {
-		return tannus.serverside.NodeFileSystem.read(this.name);
-	}
-	,get_type: function() {
-		return tannus.utils.MimeTypes.getMimeType(tannus.utils.PathTools.extname(tannus.utils.PathTools.simplify(this.name)));
-	}
-	,get_size: function() {
-		return tannus.serverside.NodeFileSystem.read(this.name).length;
-	}
-	,__class__: tannus.utils.File
-	,__properties__: {get_size:"get_size",get_content:"get_content",get_type:"get_type"}
-};
-tannus.utils.Folder = function(path) {
-	if(!tannus.serverside.NodeFileSystem.exists(path) || !tannus.serverside.NodeFileSystem.isDirectory(path)) tannus.serverside.NodeFileSystem.createDirectory(path);
-	this.location = path;
-	this.set_name(tannus.utils.PathTools.basename(path));
-};
-$hxClasses["tannus.utils.Folder"] = tannus.utils.Folder;
-tannus.utils.Folder.__name__ = ["tannus","utils","Folder"];
-tannus.utils.Folder.prototype = {
-	childNames: function() {
-		return tannus.serverside.NodeFileSystem.readDirectory(tannus.utils.PathTools.normalize(this.location));
-	}
-	,file: function(filename) {
-		return new tannus.utils.File(tannus.utils.PathTools.normalize(this.location + "/" + filename));
-	}
-	,get_parent: function() {
-		return new tannus.utils.Folder(tannus.utils.PathTools.dirname(this.location));
-	}
-	,set_name: function(newname) {
-		var oldPath = this.location;
-		var newPath = tannus.utils.PathTools.normalize(tannus.utils.PathTools.dirname(this.location) + "/" + newname);
-		var worked = tannus.serverside.NodeFileSystem.rename(oldPath,this.location);
-		if(worked) this.location = newPath;
-		this.name = tannus.utils.PathTools.basename(this.location);
-		return this.name;
-	}
-	,__class__: tannus.utils.Folder
-	,__properties__: {set_name:"set_name",get_parent:"get_parent"}
 };
 tannus.utils.MapTools = function() { };
 $hxClasses["tannus.utils.MapTools"] = tannus.utils.MapTools;
@@ -3234,29 +4378,6 @@ tannus.utils.MapTools.merge = function(props,others) {
 		if(!res.exists(key)) res.set(key,others.get(key));
 	}
 	return res;
-};
-tannus.utils.MimeTypes = $hx_exports.tannus.utils.MimeTypes = function() { };
-$hxClasses["tannus.utils.MimeTypes"] = tannus.utils.MimeTypes;
-tannus.utils.MimeTypes.__name__ = ["tannus","utils","MimeTypes"];
-tannus.utils.MimeTypes.getMimeType = function(ext) {
-	var all_mimes = Reflect.fields(tannus.utils.MimeTypes.primitive_known_types);
-	var _g = 0;
-	while(_g < all_mimes.length) {
-		var mime = all_mimes[_g];
-		++_g;
-		var _exts = Reflect.getProperty(tannus.utils.MimeTypes.primitive_known_types,mime);
-		var extensions;
-		var _g1 = [];
-		var _g2 = 0;
-		while(_g2 < _exts.length) {
-			var x = _exts[_g2];
-			++_g2;
-			_g1.push(js.Boot.__cast(x , String));
-		}
-		extensions = _g1;
-		if(Lambda.has(extensions,ext)) return mime;
-	}
-	return null;
 };
 tannus.utils.PathTools = function() { };
 $hxClasses["tannus.utils.PathTools"] = tannus.utils.PathTools;
@@ -3363,6 +4484,51 @@ tannus.utils.PathTools.extname = function(path) {
 		var bits = base.split(".");
 		return bits.pop();
 	} else return "";
+};
+tannus.utils.PathTools.toAbsolute = function(path) {
+	var result = tannus.utils.PathTools.normalize(path);
+	if(result.substring(0,1) != "/") result = "/" + result;
+	return result;
+};
+tannus.utils._Pointer = {};
+tannus.utils._Pointer.Pointer_Impl_ = function() { };
+$hxClasses["tannus.utils._Pointer.Pointer_Impl_"] = tannus.utils._Pointer.Pointer_Impl_;
+tannus.utils._Pointer.Pointer_Impl_.__name__ = ["tannus","utils","_Pointer","Pointer_Impl_"];
+tannus.utils._Pointer.Pointer_Impl_._new = function(getter) {
+	return new tannus.utils.CPointer(getter);
+};
+tannus.utils._Pointer.Pointer_Impl_.get = function(this1) {
+	return this1.getValue();
+};
+tannus.utils._Pointer.Pointer_Impl_.reassignToValue = function(this1,other) {
+	this1.getter = function() {
+		return other;
+	};
+};
+tannus.utils._Pointer.Pointer_Impl_.getter = function(gtr) {
+	return new tannus.utils.CPointer(gtr);
+};
+tannus.utils.CPointer = function(gtr) {
+	this.getter = gtr;
+};
+$hxClasses["tannus.utils.CPointer"] = tannus.utils.CPointer;
+tannus.utils.CPointer.__name__ = ["tannus","utils","CPointer"];
+tannus.utils.CPointer.prototype = {
+	rerouteToGetter: function(ngtr) {
+		this.getter = ngtr;
+	}
+	,rerouteToPointer: function(ptr) {
+		this.getter = ptr.getter;
+	}
+	,rerouteToValue: function(val) {
+		this.getter = function() {
+			return val;
+		};
+	}
+	,getValue: function() {
+		return this.getter();
+	}
+	,__class__: tannus.utils.CPointer
 };
 tannus.utils._RegEx = {};
 tannus.utils._RegEx.RegEx_Impl_ = function() { };
@@ -3799,35 +4965,30 @@ if(Array.prototype.filter == null) Array.prototype.filter = function(f1) {
 	}
 	return a1;
 };
+(function(){for(var e=0,b=["ms","moz","webkit","o"],a=0;a<b.length&&!window.requestAnimationFrame;++a)window.requestAnimationFrame=window[b[a]+"RequestAnimationFrame"],window.cancelAnimationFrame=window[b[a]+"CancelAnimationFrame"]||window[b[a]+"CancelRequestAnimationFrame"];window.requestAnimationFrame||(window.requestAnimationFrame=function(a,b){var c=(new Date).getTime(),d=Math.max(0,16-(c-e)),f=window.setTimeout(function(){a(c+d)},d);e=c+d;return f});window.cancelAnimationFrame||(window.cancelAnimationFrame=function(a){clearTimeout(a)})})();;
 tannus.ore.Compiler.OpFunctions = new haxe.ds.StringMap();
 tannus.ore.Compiler.BoolOperators = new haxe.ds.StringMap();
-tannus.utils.MimeTypes.known_types = new haxe.ds.StringMap();
-var all_mimes = Reflect.fields(tannus.utils.MimeTypes.primitive_known_types);
-var _g = 0;
-while(_g < all_mimes.length) {
-	var mime = all_mimes[_g];
-	++_g;
-	var _exts = Reflect.getProperty(tannus.utils.MimeTypes.primitive_known_types,mime);
-	var extensions;
-	var _g1 = [];
-	var _g2 = 0;
-	while(_g2 < _exts.length) {
-		var x = _exts[_g2];
-		++_g2;
-		_g1.push(js.Boot.__cast(x , String));
-	}
-	extensions = _g1;
-	tannus.utils.MimeTypes.known_types.set(mime,extensions);
-	extensions;
-}
+haxe.crypto.Base64.CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+haxe.crypto.Base64.BYTES = haxe.io.Bytes.ofString(haxe.crypto.Base64.CHARS);
+tannus.math.TMath.E = 2.718281828459045;
+tannus.math.TMath.LN2 = 0.6931471805599453;
+tannus.math.TMath.LN10 = 2.302585092994046;
+tannus.math.TMath.LOG2E = 1.4426950408889634;
+tannus.math.TMath.LOG10E = 0.43429448190325176;
+tannus.math.TMath.PI = 3.141592653589793;
+tannus.math.TMath.SQRT1_2 = 0.7071067811865476;
+tannus.math.TMath.SQRT2 = 1.4142135623730951;
+tannus.math.TMath.INT_MIN = -2147483648;
+tannus.math.TMath.INT_MAX = 2147483647;
+tannus.math.TMath.FLOAT_MIN = -1.79769313486231e+308;
+tannus.math.TMath.FLOAT_MAX = 1.79769313486231e+308;
 tannus.ore.ObjectRegEx.selectors = new haxe.ds.StringMap();
 tannus.ore.ObjectRegEx.helpers = new haxe.ds.StringMap();
 tannus.ore.ObjectRegEx.memoize = true;
-tannus.serverside.NodeFileSystem.fs = require("fs");
 tannus.serverside.socks.Utils.current_unid = 0;
+tannus.ui.JQuery.jq = jQuery;
 tannus.utils._Buffer.Buffer_Impl_.__meta__ = { statics : { fromFloatArray : { from : null}}};
 tannus.utils.CompileTimeClassList.__meta__ = { obj : { classLists : [["null,true,tannus.core.promises.Promise",""]]}};
-tannus.utils.MimeTypes.primitive_known_types = { 'application/pkix-attr-cert' : ["ac"], 'application/vnd.ahead.space' : ["ahead"], 'application/vnd.powerbuilder75-s' : [], 'application/moss-keys' : [], 'application/vnd.oma.bcast.drm-trigger+xml' : [], 'application/activemessage' : [], 'audio/atrac3' : [], 'application/vnd.rs-274x' : [], 'audio/amr-wb+' : [], 'application/vnd.groove-account' : ["gac"], 'application/wordperfect5.1' : [], 'application/x-chess-pgn' : ["pgn"], 'application/cdmi-container' : ["cdmic"], 'image/vnd.dvb.subtitle' : ["sub"], 'audio/vnd.celp' : [], 'application/xop+xml' : ["xop"], 'application/x-dtbresource+xml' : ["res"], 'text/prs.fallenstein.rst' : [], 'audio/3gpp' : [], 'application/vnd.openxmlformats-officedocument.wordprocessingml.endnotes+xml' : [], 'application/vnd.software602.filler.form+xml' : [], 'application/vnd.fujixerox.docuworks.binder' : ["xbd"], 'application/x-cdlink' : ["vcd"], 'audio/gsm-efr' : [], 'application/vnd.dolby.mlp' : ["mlp"], 'application/cdmi-queue' : ["cdmiq"], 'application/vnd.arastra.swi' : [], 'application/x-apple-diskimage' : ["dmg"], 'application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml' : [], 'application/vnd.radisys.moml+xml' : [], 'application/x-msterminal' : ["trm"], 'video/mpeg4-generic' : [], 'application/vnd.groove-help' : ["ghf"], 'application/remote-printing' : [], 'application/vnd.eudora.data' : [], 'application/vnd.liberty-request+xml' : [], 'application/x-stuffitx' : ["sitx"], 'application/vnd.ms-officetheme' : ["thmx"], 'application/rls-services+xml' : ["rs"], 'audio/dsr-es202212' : [], 'audio/dsr-es202211' : [], 'audio/dsr-es202050' : [], 'application/vnd.quark.quarkxpress' : ["qxd","qxt","qwd","qwt","qxl","qxb"], 'application/vnd.pocketlearn' : ["plf"], 'application/x-netcdf' : ["nc","cdf"], 'multipart/parallel' : [], 'application/vnd.immervision-ivu' : ["ivu"], 'application/vnd.immervision-ivp' : ["ivp"], 'application/vnd.dir-bi.plate-dl-nosuffix' : [], 'application/vnd.openxmlformats-package.digital-signature-xmlsignature+xml' : [], 'application/edi-x12' : [], 'application/thraud+xml' : ["tfi"], 'application/vnd.lotus-1-2-3' : ["123"], 'audio/dsr-es201108' : [], 'application/vnd.netfpx' : [], 'text/turtle' : ["ttl"], 'application/vnd.sailingtracker.track' : ["st"], 'application/vnd.iptc.g2.newsmessage+xml' : [], 'application/vnd.openxmlformats-package.relationships+xml' : [], 'application/vnd.informedcontrol.rms+xml' : [], 'application/vnd.etsi.sci+xml' : [], 'application/timestamp-query' : [], 'application/vnd.etsi.iptvsad-npvr+xml' : [], 'application/vnd.tao.intent-module-archive' : ["tao"], 'text/vnd.curl.scurl' : ["scurl"], 'application/vnd.fints' : [], 'message/vnd.si.simp' : [], 'image/x-xwindowdump' : ["xwd"], 'application/vnd.marlin.drm.license+xml' : [], 'application/wsdl+xml' : ["wsdl"], 'application/vnd.americandynamics.acc' : ["acc"], 'application/widget' : ["wgt"], 'application/vnd.openxmlformats-officedocument.presentationml.handoutmaster+xml' : [], 'application/vnd.dvb.ipdcesgaccess' : [], 'application/vnd.japannet-directory-service' : [], 'application/vnd.ms-works' : ["wps","wks","wcm","wdb"], 'application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml' : [], 'audio/dat12' : [], 'application/vnd.syncml.dm+wbxml' : ["bdm"], 'application/vnd.mediastation.cdkey' : ["cdkey"], 'application/vnd.motorola.flexsuite' : [], 'application/lost+xml' : ["lostxml"], 'audio/vnd.dlna.adts' : [], 'application/x-ms-shortcut' : ["lnk"], 'application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml' : [], 'application/vnd.ms-artgalry' : ["cil"], 'application/vnd.ffsns' : [], 'image/x-portable-graymap' : ["pgm"], 'application/onenote' : ["onetoc","onetoc2","onetmp","onepkg"], 'application/vnd.kde.kchart' : ["chrt"], 'video/x-msvideo' : ["avi"], 'application/index.vnd' : [], 'application/index.obj' : [], 'audio/evrc-qcp' : [], 'application/index.cmd' : [], 'application/watcherinfo+xml' : [], 'video/vnd.directv.mpeg-tts' : [], 'application/vnd.flographit' : ["gph"], 'application/vnd.yamaha.openscoreformat' : ["osf"], 'application/vnd.japannet-verification-wakeup' : [], 'application/cdmi-domain' : ["cdmid"], 'application/vnd.medcalcdata' : ["mc1"], 'application/relax-ng-compact-syntax' : ["rnc"], 'application/vnd.geometry-explorer' : ["gex","gre"], 'application/x-mswrite' : ["wri"], 'text/xml' : [], 'text/x-c' : ["c","cc","cxx","cpp","h","hh","dic"], 'text/rtx' : [], 'text/rtf' : [], 'text/red' : [], 'text/dns' : [], 'text/csv' : ["csv"], 'text/css' : ["css"], 'application/vnd.acucobol' : ["acu"], 'application/vnd.pwg-multiplexed' : [], 'audio/amr-wb' : [], 'application/xcap-el+xml' : [], 'application/vnd.ms-powerpoint' : ["ppt","pps","pot"], 'application/vnd.uplanet.listcmd' : [], 'application/vnd.sun.xml.writer' : ["sxw"], 'audio/qcelp' : [], 'application/vnd.kde.kivio' : ["flw"], 'application/vnd.micrografx.igx' : ["igx"], 'application/vnd.micrografx.flo' : ["flo"], 'application/x-ms-wmz' : ["wmz"], 'application/x-ms-wmd' : ["wmd"], 'application/vnd.pawaafile' : ["paw"], 'application/vnd.llamagraphics.life-balance.exchange+xml' : ["lbe"], 'application/vnd.wolfram.mathematica' : [], 'application/vnd.ms-wpl' : ["wpl"], 'application/vnd.ms-lrm' : ["lrm"], 'application/vnd.ms-ims' : ["ims"], 'application/vnd.ms-asf' : [], 'application/vnd.ms-htmlhelp' : ["chm"], 'application/vnd.oasis.opendocument.presentation-template' : ["otp"], 'application/vnd.seemail' : ["see"], 'application/jsonml+json' : ["jsonml"], 'application/x-cfs-compressed' : ["cfs"], 'application/vnd.hcl-bireports' : [], 'application/vnd.radisys.msml-dialog-base+xml' : [], 'application/vnd.oasis.opendocument.chart' : ["odc"], 'application/vnd.openxmlformats-officedocument.spreadsheetml.revisionheaders+xml' : [], 'application/vnd.intertrust.nncp' : [], 'application/simplesymbolcontainer' : [], 'text/vnd.fly' : ["fly"], 'text/vnd.abc' : [], 'application/prs.nprend' : [], 'application/vnd.sss-ntf' : [], 'application/vnd.sss-dtf' : [], 'application/vnd.sss-cod' : [], 'application/xproc+xml' : ["xpl"], 'application/vnd.minisoft-hp3000-save' : [], 'application/vq-rtcpxr' : [], 'application/vnd.adobe.air-application-installer-package+zip' : ["air"], 'application/mathml+xml' : ["mathml"], 'application/vnd.uiq.theme' : ["utz"], 'application/x-research-info-systems' : ["ris"], 'application/vnd.dece.data' : ["uvf","uvvf","uvd","uvvd"], 'application/poc-settings+xml' : [], 'application/rpki-roa' : ["roa"], 'application/vnd.geospace' : ["g3w"], 'image/vnd.microsoft.icon' : [], 'application/vnd.openxmlformats-officedocument.drawingml.diagramstyle+xml' : [], 'application/vnd.sun.xml.calc.template' : ["stc"], 'application/prs.alvestrand.titrax-sheet' : [], 'application/vnd.meridian-slingshot' : [], 'application/vnd.oma.bcast.simple-symbol-container' : [], 'audio/32kadpcm' : [], 'audio/x-pn-realaudio-plugin' : ["rmp"], 'application/mathematica' : ["ma","nb","mb"], 'application/x-envoy' : ["evy"], 'application/held+xml' : [], 'application/tamp-apex-update-confirm' : [], 'application/vnd.ms-powerpoint.template.macroenabled.12' : ["potm"], 'application/hyperstudio' : ["stk"], 'application/vnd.wolfram.mathematica.package' : [], 'application/vnd.openxmlformats-officedocument.presentationml.slidemaster+xml' : [], 'application/x-latex' : ["latex"], 'application/vnd.xfdl' : ["xfdl"], 'application/vnd.xara' : ["xar"], 'text/vnd.sun.j2me.app-descriptor' : ["jad"], 'video/3gpp2' : ["3g2"], 'application/vnd.uplanet.bearer-choice' : [], 'application/octet-stream' : ["bin","dms","lrf","mar","so","dist","distz","pkg","bpk","dump","elc","deploy"], 'video/ulpfec' : [], 'application/vnd.sealedmedia.softseal.html' : [], 'application/vnd.airzip.filesecure.azs' : ["azs"], 'application/vnd.airzip.filesecure.azf' : ["azf"], 'application/vnd.nokia.conml+wbxml' : [], 'application/framework-attributes+xml' : [], 'image/vnd.sealed.png' : [], 'application/vnd.stardivision.math' : ["smf"], 'video/quicktime' : ["qt","mov"], 'application/vnd.uplanet.listcmd-wbxml' : [], 'application/vnd.motorola.iprm' : [], 'application/ulpfec' : [], 'application/vnd.llamagraphics.life-balance.desktop' : ["lbd"], 'application/vnd.oipf.dae.xhtml+xml' : [], 'application/vnd.ms-word.template.macroenabled.12' : ["dotm"], 'application/vnd.ufdl' : ["ufd","ufdl"], 'application/vnd.wmf.bootstrap' : [], 'application/vnd.etsi.iptvsad-cod+xml' : [], 'application/vnd.las.las+xml' : ["lasxml"], 'application/vnd.motorola.flexsuite.adsi' : [], 'application/vnd.framemaker' : ["fm","frame","maker","book"], 'application/vnd.hal+xml' : ["hal"], 'application/rpki-manifest' : ["mft"], 'application/vnd.recordare.musicxml+xml' : ["musicxml"], 'application/pkix-cert' : ["cer"], 'application/vnd.ezpix-package' : ["ez3"], 'application/vnd.solent.sdkm+xml' : ["sdkm","sdkd"], 'audio/atrac-x' : [], 'application/vnd.dvb.pfr' : [], 'application/vnd.dvb.ait' : ["ait"], 'application/vnd.etsi.cug+xml' : [], 'application/vnd.smaf' : ["mmf"], 'application/vnd.semf' : ["semf"], 'application/vnd.semd' : ["semd"], 'application/vnd.sema' : ["sema"], 'application/vnd.oipf.spdlist+xml' : [], 'model/vnd.parasolid.transmit.text' : [], 'application/vnd.oasis.opendocument.text-web' : ["oth"], 'multipart/mixed' : [], 'application/x-lzh-compressed' : ["lzh","lha"], 'application/vnd.ntt-local.sip-ta_tcp_stream' : [], 'application/vnd.cups-postscript' : [], 'application/rpki-ghostbusters' : ["gbr"], 'audio/vnd.dece.audio' : ["uva","uvva"], 'application/vnd.oasis.opendocument.image' : ["odi"], 'application/vnd.acucorp' : ["atc","acutc"], 'audio/vnd.cmles.radio-events' : [], 'audio/example' : [], 'application/mac-compactpro' : ["cpt"], 'application/vnd.font-fontforge-sfd' : [], 'application/vnd.palm' : ["pdb","pqa","oprc"], 'application/x-xpinstall' : ["xpi"], 'application/sbml+xml' : ["sbml"], 'application/x-font-framemaker' : [], 'text/vnd.ms-mediapackage' : [], 'application/kpml-response+xml' : [], 'application/vnd.oipf.dae.svg+xml' : [], 'application/vnd.music-niff' : [], 'video/jpeg2000' : [], 'application/vnd.intercon.formnet' : ["xpw","xpx"], 'application/vnd.nitf' : ["ntf","nitf"], 'application/vnd.iptc.g2.planningitem+xml' : [], 'application/vnd.stardivision.draw' : ["sda"], 'application/vnd.webturbo' : ["wtb"], 'image/prs.btif' : ["btif"], 'message/tracking-status' : [], 'multipart/encrypted' : [], 'application/vnd.recordare.musicxml' : ["mxl"], 'application/vnd.mseq' : ["mseq"], 'application/vnd.commonspace' : ["csp"], 'application/vnd.mfmp' : ["mfm"], 'application/vnd.mfer' : ["mwf"], 'video/vnd.uvvu.mp4' : ["uvu","uvvu"], 'application/vcard+xml' : [], 'application/andrew-inset' : ["ez"], 'application/vnd.openxmlformats-officedocument.presentationml.slideupdateinfo+xml' : [], 'application/vnd.stardivision.calc' : ["sdc"], 'application/marcxml+xml' : ["mrcx"], 'application/vnd.dece.unspecified' : ["uvx","uvvx"], 'application/vnd.osgi.bundle' : [], 'audio/x-mpegurl' : ["m3u"], 'application/mbms-deregister+xml' : [], 'image/x-cmu-raster' : ["ras"], 'application/vnd.openxmlformats-officedocument.theme+xml' : [], 'application/vnd.groove-identity-message' : ["gim"], 'application/vnd.koan' : ["skp","skd","skt","skm"], 'application/vnd.ms-office.activex+xml' : [], 'application/mbms-msk-response+xml' : [], 'image/vnd.fujixerox.edmics-rlc' : ["rlc"], 'image/vnd.fujixerox.edmics-mmr' : ["mmr"], 'application/news-transmission' : [], 'application/javascript' : ["js"], 'application/vnd.uplanet.cacheop-wbxml' : [], 'application/tamp-status-response' : [], 'application/vnd.jisp' : ["jisp"], 'application/x-tex-tfm' : ["tfm"], 'video/webm' : ["webm"], 'application/calendar+xml' : [], 'model/x3d+vrml' : ["x3dv","x3dvz"], 'application/vnd.oasis.opendocument.text-master' : ["odm"], 'application/vnd.handheld-entertainment+xml' : ["zmm"], 'application/vnd.sun.xml.impress.template' : ["sti"], 'application/simple-filter+xml' : [], 'text/vnd.iptc.nitf' : [], 'application/vnd.etsi.aoc+xml' : [], 'application/news-groupinfo' : [], 'application/oebps-package+xml' : ["opf"], 'application/vnd.hbci' : ["hbci"], 'application/vnd.noblenet-sealer' : ["nns"], 'application/mets+xml' : ["mets"], 'application/xml-dtd' : ["dtd"], 'application/vnd.3gpp2.bcmcsinfo+xml' : [], 'application/vnd.pg.osasli' : ["ei6"], 'text/uri-list' : ["uri","uris","urls"], 'application/vnd.radisys.msml-audit-stream+xml' : [], 'image/x-portable-bitmap' : ["pbm"], 'application/vnd.lotus-organizer' : ["org"], 'audio/vnd.ms-playready.media.pya' : ["pya"], 'application/vnd.kde.kontour' : ["kon"], 'application/vnd.openxmlformats-officedocument.wordprocessingml.websettings+xml' : [], 'application/vnd.dvb.notif-init+xml' : [], 'application/inkml+xml' : ["ink","inkml"], 'application/vnd.cloanto.rp9' : ["rp9"], 'application/vnd.dart' : ["dart"], 'application/vnd.oasis.opendocument.spreadsheet-template' : ["ots"], 'application/dskpp+xml' : [], 'application/vnd.oipf.contentaccessstreaming+xml' : [], 'application/vnd.curl' : [], 'application/vnd.mitsubishi.misty-guard.trustweb' : [], 'model/vrml' : ["wrl","vrml"], 'application/patch-ops-error+xml' : ["xer"], 'audio/clearmode' : [], 'audio/vnd.cisco.nse' : [], 'application/vnd.etsi.iptvcommand+xml' : [], 'application/x-font-ttf' : ["ttf","ttc"], 'application/x-font-snf' : ["snf"], 'application/vnd.piaccess.application-licence' : [], 'application/x-font-pcf' : ["pcf"], 'application/x-font-otf' : ["otf"], 'application/vnd.innopath.wamp.notification' : [], 'application/x-font-dos' : [], 'application/x-font-bdf' : ["bdf"], 'video/vnd.fvt' : ["fvt"], 'image/x-portable-anymap' : ["pnm"], 'audio/evrcwb1' : [], 'audio/evrcwb0' : [], 'image/prs.pti' : [], 'audio/ulpfec' : [], 'audio/vnd.nokia.mobile-xmf' : [], 'application/edi-consent' : [], 'application/vnd.openxmlformats-officedocument.spreadsheetml.chartsheet+xml' : [], 'video/vnd.dvb.file' : ["dvb"], 'application/vnd.openxmlformats-officedocument.drawingml.chartshapes+xml' : [], 'application/vnd.sun.xml.impress' : ["sxi"], 'image/x-mrsid-image' : ["sid"], 'application/x-dgc-compressed' : ["dgc"], 'application/vnd.apple.installer+xml' : ["mpkg"], 'application/vnd.cups-raw' : [], 'application/vnd.cups-ppd' : ["ppd"], 'application/vnd.cups-pdf' : [], 'application/x-xfig' : ["fig"], 'application/ocsp-response' : [], 'application/vnd.yamaha.remote-setup' : [], 'application/vnd.muvee.style' : ["msty"], 'application/vnd.oma.bcast.notification+xml' : [], 'audio/mobile-xmf' : [], 'video/mpeg' : ["mpeg","mpg","mpe","m1v","m2v"], 'video/mp2t' : [], 'video/mp2p' : [], 'video/mp1s' : [], 'application/vnd.triscape.mxs' : ["mxs"], 'application/x-t3vm-image' : ["t3"], 'application/vnd.irepository.package+xml' : ["irp"], 'application/x-ms-xbap' : ["xbap"], 'application/xaml+xml' : ["xaml"], 'application/vnd.globalplatform.card-content-mgt-response' : [], 'application/vnd.chipnuts.karaoke-mmd' : ["mmd"], 'application/vnd.ms-excel.template.macroenabled.12' : ["xltm"], 'application/cdmi-object' : ["cdmio"], 'application/tamp-update-confirm' : [], 'application/vnd.ibm.minipay' : ["mpy"], 'application/vnd.motorola.flexsuite.gotap' : [], 'application/vnd.chemdraw+xml' : ["cdxml"], 'application/mbms-register-response+xml' : [], 'application/xhtml+xml' : ["xhtml","xht"], 'video/jpeg' : ["jpgv"], 'application/vnd.openxmlformats-officedocument.presentationml.commentauthors+xml' : [], 'application/scvp-vp-response' : ["spp"], 'application/x-tgif' : ["obj"], 'application/x-tads' : ["gam"], 'text/n3' : ["n3"], 'application/vnd.rapid' : [], 'application/vnd.syncml.ds.notification' : [], 'application/prs.rdf-xml-crypt' : [], 'application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml' : [], 'application/mbms-msk+xml' : [], 'application/x-shar' : ["shar"], 'application/vnd.zul' : ["zir","zirz"], 'application/vnd.wqd' : ["wqd"], 'application/vnd.wmc' : [], 'application/vnd.vsf' : ["vsf"], 'application/vnd.vcx' : ["vcx"], 'application/vnd.svd' : ["svd"], 'application/vnd.obn' : [], 'application/vnd.mif' : ["mif"], 'application/vnd.mcd' : ["mcd"], 'application/vnd.jam' : ["jam"], 'application/vnd.gmx' : ["gmx"], 'application/vnd.fdf' : ["fdf"], 'application/vnd.dxr' : [], 'application/vnd.dna' : ["dna"], 'application/vnd.bmi' : ["bmi"], 'application/vnd.stardivision.impress' : ["sdd"], 'application/vnd.autopackage' : [], 'image/vnd.adobe.photoshop' : ["psd"], 'text/vnd.net2phone.commcenter.command' : [], 'application/vnd.eszigno3+xml' : ["es3","et3"], 'application/vnd.ms-playready.initiator+xml' : [], 'application/postscript' : ["ai","eps","ps"], 'video/h264' : ["h264"], 'video/h263' : ["h263"], 'video/h261' : ["h261"], 'application/rdf+xml' : ["rdf"], 'application/tamp-community-update-confirm' : [], 'audio/vmr-wb' : [], 'model/mesh' : ["msh","mesh","silo"], 'video/vnd.iptvforum.1dparityfec-2005' : [], 'application/vnd.is-xpr' : ["xpr"], 'multipart/related' : [], 'application/vnd.ms-xpsdocument' : ["xps"], 'message/news' : [], 'application/vnd.openxmlformats-officedocument.presentationml.presentation' : ["pptx"], 'image/vnd.globalgraphics.pgb' : [], 'application/vnd.wap.wbxml' : ["wbxml"], 'image/vnd.fastbidsheet' : ["fbs"], 'application/vnd.httphone' : [], 'video/vnd.iptvforum.1dparityfec-1010' : [], 'application/vnd.etsi.iptvueprofile+xml' : [], 'application/vnd.kinar' : ["kne","knp"], 'application/vnd.ezpix-album' : ["ez2"], 'application/x-gnumeric' : ["gnumeric"], 'application/vnd.openxmlformats-officedocument.drawingml.diagramdata+xml' : [], 'application/vnd.openxmlformats-officedocument.spreadsheetml.pivottable+xml' : [], 'application/vnd.ms-opentype' : [], 'application/vnd.oma.cab-feature-handler+xml' : [], 'application/vnd.dvb.notif-aggregate-root+xml' : [], 'audio/x-wav' : ["wav"], 'audio/x-tta' : [], 'audio/x-caf' : ["caf"], 'audio/x-aac' : ["aac"], 'application/vnd.ms-tnef' : [], 'application/vnd.dvb.notif-generic+xml' : [], 'text/richtext' : ["rtx"], 'application/vnd.ctct.ws+xml' : [], 'application/vnd.ms-powerpoint.addin.macroenabled.12' : ["ppam"], 'application/x-font-linux-psf' : ["psf"], 'application/vnd.ms-excel.addin.macroenabled.12' : ["xlam"], 'application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml' : [], 'video/pointer' : [], 'video/rtp-enc-aescm128' : [], 'video/celb' : [], 'model/iges' : ["igs","iges"], 'application/vnd.oftn.l10n+json' : [], 'application/vnd.etsi.overload-control-policy-dataset+xml' : [], 'application/x-mscardfile' : ["crd"], 'application/vnd.hal+json' : [], 'application/vnd.oma.cab-pcc+xml' : [], 'text/vnd.dvb.subtitle' : ["sub"], 'application/vnd.openxmlformats-officedocument.wordprocessingml.template.main+xml' : [], 'application/mads+xml' : ["mads"], 'application/font-woff' : ["woff"], 'application/vnd.kde.kpresenter' : ["kpr","kpt"], 'application/vnd.openxmlformats-officedocument.spreadsheetml.template.main+xml' : [], 'multipart/voice-message' : [], 'application/vnd.ms-pki.stl' : ["stl"], 'video/vnd.motorola.videop' : [], 'application/vnd.yamaha.hv-script' : ["hvs"], 'application/mbms-register+xml' : [], 'application/rss+xml' : ["rss"], 'chemical/x-xyz' : ["xyz"], 'chemical/x-pdb' : [], 'application/vnd.kde.karbon' : ["karbon"], 'chemical/x-cml' : ["cml"], 'chemical/x-cif' : ["cif"], 'chemical/x-cdx' : ["cdx"], 'application/vnd.ntt-local.sip-ta_remote' : [], 'message/http' : [], 'application/vnd.blueice.multipass' : ["mpm"], 'application/vnd.shana.informed.formdata' : ["ifm"], 'application/vnd.ecowin.series' : [], 'application/xcap-att+xml' : [], 'text/vnd.curl.dcurl' : ["dcurl"], 'application/vnd.oma.bcast.sgboot' : [], 'application/vnd.verimatrix.vcas' : [], 'application/cals-1840' : [], 'application/vnd.etsi.iptvprofile+xml' : [], 'application/vnd.iptc.g2.conceptitem+xml' : [], 'application/cybercash' : [], 'text/vnd.esmertec.theme-descriptor' : [], 'model/vnd.moml+xml' : [], 'application/xcon-conference-info+xml' : [], 'application/vnd.hzn-3d-crossword' : [], 'application/pics-rules' : ["prf"], 'application/vnd.umajin' : ["umj"], 'audio/vnd.dvb.file' : [], 'image/t38' : [], 'image/sgi' : ["sgi"], 'image/png' : ["png"], 'image/ktx' : ["ktx"], 'image/jpx' : [], 'image/jpm' : [], 'image/jp2' : [], 'image/ief' : ["ief"], 'image/gif' : ["gif"], 'image/cgm' : ["cgm"], 'image/bmp' : ["bmp"], 'application/vnd.rim.cod' : ["cod"], 'application/vnd.oma.bcast.smartcard-trigger+xml' : [], 'application/vnd.openxmlformats-officedocument.spreadsheetml.pivotcacherecords+xml' : [], 'application/vnd.intu.qfx' : ["qfx"], 'application/vnd.intu.qbo' : ["qbo"], 'application/vnd.etsi.iptvdiscovery+xml' : [], 'application/x-futuresplash' : ["spl"], 'application/vnd.ecowin.chart' : ["mag"], 'application/x-gzip' : [], 'application/x-gtar' : ["gtar"], 'application/vnd.fujitsu.oasysprs' : ["bh2"], 'application/vnd.oma.group-usage-list+xml' : [], 'application/pidf+xml' : [], 'application/vnd.oma.drm.risd+xml' : [], 'audio/vnd.qcelp' : [], 'application/samlassertion+xml' : [], 'message/cpim' : [], 'application/mikey' : [], 'application/vnd.3m.post-it-notes' : ["pwn"], 'text/vnd.si.uricatalogue' : [], 'application/vnd.dvb.notif-ia-msglist+xml' : [], 'application/kpml-request+xml' : [], 'image/x-tga' : ["tga"], 'image/x-rgb' : ["rgb"], 'image/x-pcx' : ["pcx"], 'image/x-cmx' : ["cmx"], 'application/vnd.macports.portpkg' : ["portpkg"], 'image/x-3ds' : ["3ds"], 'application/x-doom' : ["wad"], 'application/3gpp-ims+xml' : [], 'audio/mp4a-latm' : [], 'application/scvp-cv-request' : ["scq"], 'application/xmpp+xml' : [], 'application/x-cpio' : ["cpio"], 'application/pkcs10' : ["p10"], 'application/x-chat' : ["chat"], 'application/vnd.s3sms' : [], 'application/vnd.visionary' : ["vis"], 'video/vnd.directv.mpeg' : [], 'video/vnd.dlna.mpeg-tts' : [], 'application/x-bzip' : ["bz"], 'audio/rtp-midi' : [], 'application/vnd.route66.link66+xml' : ["link66"], 'audio/vnd.3gpp.iufp' : [], 'application/x-msschedule' : ["scd"], 'audio/basic' : ["au","snd"], 'text/x-fortran' : ["f","for","f77","f90"], 'application/im-iscomposing+xml' : [], 'video/vnd.nokia.interleaved-multimedia' : [], 'application/vnd.genomatix.tuxedo' : ["txd"], 'application/vnd.dvb.ipdcdftnotifaccess' : [], 'audio/musepack' : [], 'application/vnd.anser-web-funds-transfer-initiation' : ["fti"], 'application/vnd.xmpie.xlim' : [], 'application/mosskey-data' : [], 'text/plain' : ["txt","text","conf","def","list","log","in"], 'message/external-body' : [], 'application/vnd.ibm.secure-container' : ["sc"], 'application/vnd.jcp.javame.midlet-rms' : ["rms"], 'application/vnd.marlin.drm.mdcf' : [], 'application/vnd.hp-jlyt' : ["jlt"], 'application/vnd.ah-barcode' : [], 'application/dca-rft' : [], 'application/tei+xml' : ["tei","teicorpus"], 'application/vnd.groove-tool-template' : ["tpl"], 'application/vnd.adobe.xdp+xml' : ["xdp"], 'application/vnd.oma.cab-address-book+xml' : [], 'application/samlmetadata+xml' : [], 'application/vnd.openxmlformats-officedocument.presentationml.tags+xml' : [], 'multipart/appledouble' : [], 'application/vnd.multiad.creator' : [], 'application/scvp-cv-response' : ["scs"], 'application/vnd.hp-hpid' : ["hpid"], 'application/vnd.hp-hpgl' : ["hpgl"], 'application/vnd.hhe.lesson-player' : ["les"], 'application/ccmp+xml' : [], 'audio/telephone-event' : [], 'application/java-serialized-object' : ["ser"], 'text/vnd.in3d.spot' : ["spot"], 'application/vnd.hp-pclxl' : ["pclxl"], 'application/vnd.openxmlformats-officedocument.presentationml.notesslide+xml' : [], 'application/epp+xml' : [], 'application/vnd.ibm.modcap' : ["afp","listafp","list3820"], 'application/x-msmetafile' : ["wmf","wmz","emf","emz"], 'audio/uemclip' : [], 'application/sparql-query' : ["rq"], 'application/mbms-reception-report+xml' : [], 'application/vnd.oma.xcap-directory+xml' : [], 'application/vnd.yellowriver-custom-menu' : ["cmp"], 'application/vnd.syncml.dm.notification' : [], 'application/vnd.openxmlformats-officedocument.spreadsheetml.revisionlog+xml' : [], 'audio/vnd.dolby.pulse.1' : [], 'multipart/header-set' : [], 'application/vnd.epson.quickanime' : ["qam"], 'video/vnd.sealedmedia.softseal.mov' : [], 'application/vnd.nokia.n-gage.data' : ["ngdat"], 'application/vnd.enliven' : ["nml"], 'application/vnd.openxmlformats-officedocument.presentationml.template' : ["potx"], 'application/vnd.fujixerox.hbpl' : [], 'application/vnd.oma-scws-http-response' : [], 'application/atomcat+xml' : ["atomcat"], 'application/dialog-info+xml' : [], 'audio/vnd.audiokoz' : [], 'application/vnd.crick.clicker.palette' : ["clkp"], 'application/prs.plucker' : [], 'application/vnd.intergeo' : ["i2g"], 'text/vnd.latex-z' : [], 'message/example' : [], 'application/vnd.publishare-delta-tree' : ["qps"], 'application/vnd.xmpie.ppkg' : [], 'application/vnd.xmpie.plan' : [], 'application/vnd.oasis.opendocument.database' : ["odb"], 'application/x-install-instructions' : ["install"], 'application/vnd.software602.filler.form-xml-zip' : [], 'text/vnd.graphviz' : ["gv"], 'text/vnd.radisys.msml-basic-layout' : [], 'audio/vnd.dolby.pl2z' : [], 'audio/vnd.dolby.pl2x' : [], 'application/vnd.omads-file+xml' : [], 'text/vnd.trolltech.linguist' : [], 'audio/vnd.dts.hd' : ["dtshd"], 'application/vnd.wrq-hp3000-labelled' : [], 'application/slate' : [], 'image/example' : [], 'application/vnd.openxmlformats-officedocument.wordprocessingml.template' : ["dotx"], 'image/vnd.dece.graphic' : ["uvi","uvvi","uvg","uvvg"], 'application/vnd.oma-scws-config' : [], 'application/vnd.kahootz' : ["ktz","ktr"], 'text/enriched' : [], 'application/vnd.easykaraoke.cdgdownload' : [], 'text/x-vcard' : ["vcf"], 'application/vnd.uplanet.alert-wbxml' : [], 'application/resource-lists-diff+xml' : ["rld"], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml' : [], 'application/mac-binhex40' : ["hqx"], 'multipart/digest' : [], 'application/vnd.novadigm.ext' : ["ext"], 'application/vnd.novadigm.edx' : ["edx"], 'application/vnd.novadigm.edm' : ["edm"], 'application/vnd.openxmlformats-officedocument.spreadsheetml.querytable+xml' : [], 'application/ecmascript' : ["ecma"], 'application/batch-smtp' : [], 'application/vnd.ecowin.seriesupdate' : [], 'application/sieve' : [], 'application/vnd.stepmania.stepchart' : ["sm"], 'multipart/signed' : [], 'application/vnd.oasis.opendocument.graphics' : ["odg"], 'application/vnd.openxmlformats-officedocument.presentationml.slideshow' : ["ppsx"], 'application/vnd.oasis.opendocument.formula-template' : ["odft"], 'application/msword' : ["doc","dot"], 'application/vnd.yamaha.smaf-audio' : ["saf"], 'application/vnd.fujixerox.art4' : [], 'application/vnd.omaloc-supl-init' : [], 'message/global-disposition-notification' : [], 'application/vnd.crick.clicker.template' : ["clkt"], 'application/vnd.oma.bcast.sgdd+xml' : [], 'application/vnd.3gpp2.tcap' : ["tcap"], 'audio/x-flac' : ["flac"], 'application/vnd.openxmlformats-officedocument.presentationml.presprops+xml' : [], 'application/vnd.ds-keypoint' : ["kpxx"], 'video/vnd.iptvforum.ttsavc' : [], 'video/3gpp-tt' : [], 'application/vnd.ncd.reference' : [], 'application/vnd.oasis.opendocument.image-template' : ["oti"], 'application/ocsp-request' : [], 'application/vnd.japannet-registration-wakeup' : [], 'application/vnd.groove-vcard' : ["vcg"], 'application/mathml-presentation+xml' : [], 'application/vnd.pmi.widget' : ["wg"], 'application/ibe-pkg-reply+xml' : [], 'application/applefile' : [], 'application/vnd.lotus-notes' : ["nsf"], 'application/vnd.oma.bcast.imd+xml' : [], 'application/vnd.omads-folder+xml' : [], 'application/vnd.nokia.conml+xml' : [], 'application/vnd.lotus-approach' : ["apr"], 'text/1d-interleaved-parityfec' : [], 'application/vnd.amazon.ebook' : ["azw"], 'application/vnd.etsi.tsl.der' : [], 'audio/3gpp2' : [], 'application/vnd.proteus.magazine' : ["mgz"], 'application/vnd.nokia.n-gage.ac+xml' : [], 'application/vnd.geoplan' : ["g2w"], 'application/vnd.osa.netdeploy' : [], 'application/vnd.lotus-wordpro' : ["lwp"], 'video/h264-rcdo' : [], 'application/vnd.quobject-quoxdocument' : [], 'audio/vnd.dolby.pl2' : [], 'audio/vnd.dolby.mps' : [], 'audio/vnd.dolby.mlp' : [], 'application/vnd.nokia.pcd+wbxml' : [], 'audio/1d-interleaved-parityfec' : [], 'application/vnd.clonk.c4group' : ["c4g","c4d","c4f","c4p","c4u"], 'video/mp4v-es' : [], 'audio/x-matroska' : ["mka"], 'application/vnd.geonext' : ["gxt"], 'audio/x-aiff' : ["aif","aiff","aifc"], 'application/news-checkgroups' : [], 'application/vnd.etsi.tsl+xml' : [], 'application/x-mspublisher' : ["pub"], 'message/global-delivery-status' : [], 'application/mpeg4-generic' : [], 'application/vnd.dvb.iptv.alfec-enhancement' : [], 'application/vnd.openxmlformats-officedocument.presentationml.slidelayout+xml' : [], 'application/vnd.xmpie.dpkg' : [], 'application/vnd.adobe.xfdf' : ["xfdf"], 'application/vnd.geocube+xml' : [], 'application/vnd.sun.xml.writer.global' : ["sxg"], 'application/conference-info+xml' : [], 'application/vnd.fujixerox.ddd' : ["ddd"], 'application/vnd.oma.poc.detailed-progress-report+xml' : [], 'application/vnd.xmpie.cpkg' : [], 'application/cstadata+xml' : [], 'application/vnd.amiga.ami' : ["ami"], 'application/vnd.anser-web-certificate-issue-initiation' : ["cii"], 'application/vnd.wv.ssp+xml' : [], 'application/pkixcmp' : ["pki"], 'text/x-sfv' : ["sfv"], 'text/x-nfo' : ["nfo"], 'multipart/byteranges' : [], 'application/vnd.openxmlformats-package.core-properties+xml' : [], 'text/x-asm' : ["s","asm"], 'application/vnd.yamaha.hv-voice' : ["hvp"], 'application/vnd.informix-visionary' : [], 'application/vnd.openxmlformats-officedocument.spreadsheetml.volatiledependencies+xml' : [], 'application/pkcs7-signature' : ["p7s"], 'application/vnd.ms-wmdrm.meter-chlg-req' : [], 'application/xhtml-voice+xml' : [], 'application/sru+xml' : ["sru"], 'model/vnd.collada+xml' : ["dae"], 'application/vnd.vd-study' : [], 'application/vnd.ibm.rights-management' : ["irm"], 'image/vnd.sealedmedia.softseal.jpg' : [], 'image/vnd.sealedmedia.softseal.gif' : [], 'application/vnd.trid.tpt' : ["tpt"], 'application/vnd.openofficeorg.extension' : ["oxt"], 'application/vnd.radisys.msml-dialog-fax-detect+xml' : [], 'video/x-ms-wvx' : ["wvx"], 'video/x-ms-wmx' : ["wmx"], 'video/x-ms-wmv' : ["wmv"], 'video/x-ms-vob' : ["vob"], 'video/x-ms-asf' : ["asf","asx"], 'application/vnd.insors.igm' : ["igm"], 'application/vnd.audiograph' : ["aep"], 'application/vnd.radisys.msml-dialog-transform+xml' : [], 'application/vnd.ms-project' : ["mpp","mpt"], 'audio/adpcm' : ["adp"], 'application/vnd.openxmlformats-officedocument.customxmlproperties+xml' : [], 'application/vnd.cups-raster' : [], 'application/msc-mixer+xml' : [], 'text/vnd.fmi.flexstor' : ["flx"], 'application/vnd.openxmlformats-officedocument.presentationml.comments+xml' : [], 'application/x-msaccess' : ["mdb"], 'application/spirits-event+xml' : [], 'application/eshop' : [], 'audio/vnd.rhetorex.32kadpcm' : [], 'image/x-xpixmap' : ["xpm"], 'text/vcard' : ["vcard"], 'application/vnd.radisys.msml-dialog-group+xml' : [], 'application/vnd.epson.salt' : ["slt"], 'text/x-java-source' : ["java"], 'audio/vnd.rip' : ["rip"], 'application/vnd.dece.zip' : ["uvz","uvvz"], 'audio/vnd.dts' : ["dts"], 'audio/vnd.dra' : ["dra"], 'application/x-msmediaview' : ["mvb","m13","m14"], 'application/vnd.ruckus.download' : [], 'audio/evrcwb' : [], 'audio/evrcb1' : [], 'audio/evrcb0' : [], 'audio/vnd.4sb' : [], 'application/vnd.ms-excel.sheet.macroenabled.12' : ["xlsm"], 'application/x-bzip2' : ["bz2","boz"], 'application/vnd.uplanet.list' : [], 'application/emma+xml' : ["emma"], 'application/vnd.nokia.radio-preset' : ["rpst"], 'application/vnd.osgeo.mapguide.package' : ["mgp"], 'application/x-rar-compressed' : ["rar"], 'application/vnd.apple.mpegurl' : ["m3u8"], 'application/vnd.oma.pal+xml' : [], 'application/vnd.sun.xml.writer.template' : ["stw"], 'application/xenc+xml' : ["xenc"], 'application/vnd.simtech-mindmapper' : ["twd","twds"], 'application/tamp-status-query' : [], 'application/vnd.fujitsu.oasys3' : ["oa3"], 'application/vnd.fujitsu.oasys2' : ["oa2"], 'audio/pcmu-wb' : [], 'application/vnd.sealedmedia.softseal.pdf' : [], 'audio/vnd.sealedmedia.softseal.mpeg' : [], 'application/gpx+xml' : ["gpx"], 'application/vnd.intertrust.digibox' : [], 'video/vnd.mpegurl' : ["mxu","m4u"], 'application/set-registration' : [], 'application/pkcs7-mime' : ["p7m","p7c"], 'application/ibe-key-request+xml' : [], 'application/vnd.globalplatform.card-content-mgt' : [], 'application/vnd.radisys.msml-conf+xml' : [], 'application/vnd.uplanet.channel-wbxml' : [], 'application/vnd.hp-pcl' : ["pcl"], 'application/vnd.hp-hps' : ["hps"], 'text/xml-external-parsed-entity' : [], 'application/xcon-conference-info-diff+xml' : [], 'application/rpki-updown' : [], 'application/x-ms-application' : ["application"], 'application/vnd.businessobjects' : ["rep"], 'application/resource-lists+xml' : ["rl"], 'application/vnd.dvb.iptv.alfec-base' : [], 'application/vnd.oasis.opendocument.graphics-template' : ["otg"], 'application/vnd.infotech.project+xml' : [], 'application/xcap-error+xml' : [], 'application/metalink+xml' : ["metalink"], 'application/vnd.ericsson.quickcall' : [], 'application/vnd.yamaha.hv-dic' : ["hvd"], 'application/vnd.openxmlformats-officedocument.spreadsheetml.connections+xml' : [], 'application/vnd.ecowin.fileupdate' : [], 'text/vnd.motorola.reflex' : [], 'video/vnd.vivo' : ["viv"], 'video/h264-svc' : [], 'application/vnd.fsc.weblaunch' : ["fsc"], 'application/vnd.oma.poc.invocation-descriptor+xml' : [], 'application/vnd.syncml+xml' : ["xsm"], 'audio/vnd.dolby.heaac.2' : [], 'audio/vnd.dolby.heaac.1' : [], 'video/3gpp' : ["3gp"], 'model/x3d+xml' : ["x3d","x3dz"], 'application/tamp-apex-update' : [], 'audio/vnd.nuera.ecelp9600' : ["ecelp9600"], 'model/vnd.gs.gdl' : [], 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' : ["docx"], 'application/vnd.openxmlformats-officedocument.spreadsheetml.calcchain+xml' : [], 'application/vnd.openxmlformats-officedocument.spreadsheetml.usernames+xml' : [], 'application/java-archive' : ["jar"], 'application/vnd.commerce-battelle' : [], 'application/vnd.uplanet.channel' : [], 'model/vnd.gs-gdl' : [], 'application/vnd.adobe.partial-upload' : [], 'application/vnd.japannet-payment-wakeup' : [], 'audio/smv-qcp' : [], 'application/vnd.sun.wadl+xml' : [], 'audio/vnd.nuera.ecelp7470' : ["ecelp7470"], 'application/pls+xml' : ["pls"], 'application/vnd.symbian.install' : ["sis","sisx"], 'image/vnd.ms-modi' : ["mdi"], 'audio/vorbis-config' : [], 'application/vnd.etsi.mcid+xml' : [], 'video/vnd.dece.sd' : ["uvs","uvvs"], 'video/vnd.dece.pd' : ["uvp","uvvp"], 'video/vnd.dece.hd' : ["uvh","uvvh"], 'application/set-registration-initiation' : ["setreg"], 'application/vnd.poc.group-advertisement+xml' : [], 'application/vnd.shana.informed.interchange' : ["iif"], 'application/x-wais-source' : ["src"], 'application/commonground' : [], 'application/x-font-libgrx' : [], 'application/java-vm' : ["class"], 'audio/vnd.nuera.ecelp4800' : ["ecelp4800"], 'application/vnd.nokia.landmark+xml' : [], 'application/pgp-signature' : ["asc","sig"], 'application/xv+xml' : ["mxml","xhvml","xvml","xvm"], 'application/beep+xml' : [], 'application/vnd.shana.informed.formtemplate' : ["itp"], 'application/vnd.spotfire.sfs' : ["sfs"], 'application/vnd.spotfire.dxp' : ["dxp"], 'application/x-gramps-xml' : ["gramps"], 'application/x-blorb' : ["blb","blorb"], 'application/vnd.ms-wmdrm.lic-chlg-req' : [], 'application/vnd.fujitsu.oasysgp' : ["fg5"], 'application/rsd+xml' : ["rsd"], 'application/tve-trigger' : [], 'application/vnd.nokia.landmarkcollection+xml' : [], 'application/vnd.oma.push' : [], 'application/vnd.yamaha.through-ngn' : [], 'application/vnd.collection+json' : [], 'application/vnd.otps.ct-kip+xml' : [], 'application/vnd.amundsen.maze+xml' : [], 'application/vnd.openxmlformats-officedocument.wordprocessingml.comments+xml' : [], 'application/vnd.dvb.ipdcroaming' : [], 'video/h263-2000' : [], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : ["xlsx"], 'application/vnd.oipf.pae.gem' : [], 'application/vnd.iptc.g2.newsitem+xml' : [], 'application/vnd.ms-package.obfuscated-opentype' : [], 'video/x-sgi-movie' : ["movie"], 'video/h263-1998' : [], 'application/vnd.openxmlformats-officedocument.custom-properties+xml' : [], 'application/vnd.stardivision.writer-global' : ["sgl"], 'application/vnd.radisys.msml-audit-conn+xml' : [], 'application/vnd.sbm.cid' : [], 'application/x-msmoney' : ["mny"], 'video/parityfec' : [], 'application/vnd.yamaha.tunnel-udpencap' : [], 'image/x-pict' : ["pic","pct"], 'video/vnd.ms-playready.media.pyv' : ["pyv"], 'application/vnd.google-earth.kml+xml' : ["kml"], 'application/vnd.ms-word.document.macroenabled.12' : ["docm"], 'application/vnd.openxmlformats-officedocument.extended-properties+xml' : [], 'application/vnd.oma.cab-user-prefs+xml' : [], 'application/atom+xml' : ["atom"], 'message/partial' : [], 'application/vnd.previewsystems.box' : ["box"], 'application/vnd.ibm.electronic-media' : [], 'application/vnd.tcpdump.pcap' : ["pcap","cap","dmp"], 'application/x-pkcs12' : ["p12","pfx"], 'application/vnd.oasis.opendocument.presentation' : ["odp"], 'application/vnd.musician' : ["mus"], 'application/whoispp-query' : [], 'application/vnd.fut-misnet' : [], 'text/ulpfec' : [], 'message/sipfrag' : [], 'application/x-zmachine' : ["z1","z2","z3","z4","z5","z6","z7","z8"], 'application/vnd.openxmlformats-officedocument.drawingml.diagramcolors+xml' : [], 'application/vnd.rig.cryptonote' : ["cryptonote"], 'image/vnd.wap.wbmp' : ["wbmp"], 'application/vnd.3gpp2.sms' : [], 'application/fastinfoset' : [], 'image/vnd.radiance' : [], 'application/vnd.powerbuilder7' : [], 'application/vnd.powerbuilder6' : ["pbd"], 'application/vnd.visio' : ["vsd","vst","vss","vsw"], 'application/vnd.uoml+xml' : ["uoml"], 'application/media_control+xml' : [], 'application/vividence.scriptfile' : [], 'application/vnd.vectorworks' : [], 'application/x-compress' : [], 'audio/pcma-wb' : [], 'application/mpeg4-iod-xmt' : [], 'application/vnd.isac.fcs' : ["fcs"], 'application/timestamped-data' : ["tsd"], 'application/x-bcpio' : ["bcpio"], 'audio/fwdred' : [], 'application/x-debian-package' : ["deb","udeb"], 'audio/vnd.vmx.cvsd' : [], 'application/x-x509-ca-cert' : ["der","crt"], 'application/tamp-update' : [], 'application/vnd.oma.poc.optimized-progress-report+xml' : [], 'application/vnd.iptc.g2.packageitem+xml' : [], 'application/vnd.ibm.afplinedata' : [], 'application/vnd.ms-powerpoint.slide.macroenabled.12' : ["sldm"], 'application/vnd.openxmlformats-officedocument.themeoverride+xml' : [], 'image/x-icon' : ["ico"], 'application/ssml+xml' : ["ssml"], 'video/vnd.cctv' : [], 'application/vnd.openxmlformats-officedocument.spreadsheetml.pivotcachedefinition+xml' : [], 'application/vnd.uplanet.signal' : [], 'application/tamp-sequence-adjust' : [], 'application/x-java-jnlp-file' : ["jnlp"], 'application/vnd.wap.slc' : [], 'application/vnd.wap.sic' : [], 'application/cpl+xml' : [], 'application/vnd.igloader' : ["igl"], 'message/s-http' : [], 'application/vnd.oma.dcdc' : [], 'application/vnd.ms-excel.sheet.binary.macroenabled.12' : ["xlsb"], 'video/vnd.objectvideo' : [], 'application/vnd.dvb.notif-container+xml' : [], 'application/vnd.canon-lips' : [], 'message/global-headers' : [], 'audio/vnd.everad.plj' : [], 'application/atomicmail' : [], 'application/vnd.oasis.opendocument.formula' : ["odf"], 'application/x-conference' : ["nsc"], 'model/example' : [], 'application/x-abiword' : ["abw"], 'video/1d-interleaved-parityfec' : [], 'application/vnd.japannet-verification' : [], 'application/vnd.dvb.esgcontainer' : [], 'message/global' : [], 'application/x-ustar' : ["ustar"], 'application/vnd.dynageo' : ["geo"], 'video/vnd.dece.mobile' : ["uvm","uvvm"], 'application/x-dtbncx+xml' : ["ncx"], 'application/vnd.ms-wmdrm.lic-resp' : [], 'audio/webm' : ["weba"], 'application/vnd.marlin.drm.conftoken+xml' : [], 'application/x-font-sunos-news' : [], 'audio/vnd.octel.sbc' : [], 'application/auth-policy+xml' : [], 'application/vnd.openxmlformats-officedocument.vmldrawing' : [], 'application/vnd.criticaltools.wbs+xml' : ["wbs"], 'audio/vdvi' : [], 'application/vnd.ipunplugged.rcprofile' : ["rcprofile"], 'application/vnd.nokia.iptv.config+xml' : [], 'application/vnd.wv.csp+xml' : [], 'image/vnd.xiff' : ["xif"], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sharedstrings+xml' : [], 'application/vnd.pvi.ptid1' : ["ptid"], 'application/xcap-diff+xml' : ["xdf"], 'application/vnd.iptc.g2.knowledgeitem+xml' : [], 'audio/tone' : [], 'application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml' : [], 'application/vnd.oasis.opendocument.chart-template' : ["otc"], 'application/vnd.kidspiration' : ["kia"], 'text/javascript' : [], 'application/x-stuffit' : ["sit"], 'application/vnd.oasis.opendocument.text' : ["odt"], 'audio/smv0' : [], 'application/sgml-open-catalog' : [], 'audio/silk' : ["sil"], 'application/vnd.3gpp.sms' : [], 'audio/rtp-enc-aescm128' : [], 'application/vnd.etsi.iptvsad-bc+xml' : [], 'application/vnd.rn-realmedia-vbr' : ["rmvb"], 'audio/xm' : ["xm"], 'audio/l8' : [], 'audio/dv' : [], 'audio/cn' : [], 'application/x-xliff+xml' : ["xlf"], 'application/scvp-vp-request' : ["spq"], 'text/x-vcalendar' : ["vcs"], 'application/vnd.nervana' : [], 'message/sip' : [], 'application/vnd.canon-cpdl' : [], 'application/vnd.nokia.radio-presets' : ["rpss"], 'text/vnd.iptc.newsml' : [], 'application/vnd.openxmlformats-officedocument.presentationml.template.main+xml' : [], 'application/vnd.curl.car' : ["car"], 'application/pgp-keys' : [], 'application/vnd.openxmlformats-officedocument.presentationml.slideshow.main+xml' : [], 'application/x-subrip' : ["srt"], 'audio/vnd.digital-winds' : ["eol"], 'application/srgs+xml' : ["grxml"], 'audio/pcmu' : [], 'audio/pcma' : [], 'application/dicom' : [], 'audio/speex' : [], 'application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml' : [], 'application/vnd.dvb.notif-ia-registration-response+xml' : [], 'application/vnd.dvb.ipdcesgpdd' : [], 'application/vnd.shana.informed.package' : ["ipk"], 'application/vnd.android.package-archive' : ["apk"], 'audio/opus' : [], 'application/vnd.marlin.drm.actiontoken+xml' : [], 'application/nasdata' : [], 'application/vnd.infotech.project' : [], 'application/vnd.aether.imp' : [], 'application/ibe-pp-data' : [], 'application/x-dtbook+xml' : ["dtb"], 'application/vnd.radisys.msml-audit+xml' : [], 'text/vnd.in3d.3dml' : ["3dml"], 'application/vnd.cluetrust.cartomobile-config' : ["c11amc"], 'application/vnd.ms-pki.seccat' : ["cat"], 'image/x-xbitmap' : ["xbm"], 'audio/mpeg' : ["mpga","mp2","mp2a","mp3","m2a","m3a"], 'image/naplps' : [], 'audio/midi' : ["mid","midi","kar","rmi"], 'text/vnd.wap.wml' : ["wml"], 'text/prs.lines.tag' : ["dsc"], 'application/vnd.crick.clicker.wordbank' : ["clkw"], 'application/vnd.gridmp' : [], 'application/vnd.ms-wmdrm.meter-resp' : [], 'application/xml-external-parsed-entity' : [], 'image/x-freehand' : ["fh","fhc","fh4","fh5","fh7"], 'video/vnd.iptvforum.2dparityfec-2005' : [], 'application/vnd.oipf.mippvcontrolmessage+xml' : [], 'application/vnd.paos.xml' : [], 'application/vnd.radisys.msml+xml' : [], 'application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml' : [], 'audio/ip-mr_v2.5' : [], 'text/troff' : ["t","tr","roff","man","me","ms"], 'video/vnd.iptvforum.2dparityfec-1010' : [], 'application/vnd.aristanetworks.swi' : ["swi"], 'application/vnd.kde.kspread' : ["ksp"], 'text/rtp-enc-aescm128' : [], 'application/vnd.dolby.mobile.2' : [], 'application/vnd.dolby.mobile.1' : [], 'application/vnd.fdsn.mseed' : ["mseed"], 'application/vnd.radisys.msml-dialog+xml' : [], 'application/x-msbinder' : ["obd"], 'text/t140' : [], 'application/vnd.cirpack.isdn-ext' : [], 'application/vnd.ms-excel' : ["xls","xlm","xla","xlc","xlt","xlw"], 'application/vnd.scribus' : [], 'application/vnd.noblenet-directory' : ["nnd"], 'text/sgml' : ["sgml","sgm"], 'audio/parityfec' : [], 'audio/isac' : [], 'audio/ilbc' : [], 'application/edifact' : [], 'application/vnd.openxmlformats-officedocument.wordprocessingml.fonttable+xml' : [], 'application/vnd.oma.scidm.messages+xml' : [], 'application/vnd.unity' : ["unityweb"], 'application/gml+xml' : ["gml"], 'application/vnd.yamaha.openscoreformat.osfpvg+xml' : ["osfpvg"], 'application/vnd.omads-email+xml' : [], 'application/vnd.eprints.data+xml' : [], 'application/prs.cww' : ["cww"], 'application/vnd.oipf.ueprofile+xml' : [], 'application/vnd.rainstor.data' : [], 'audio/g729' : [], 'audio/g728' : [], 'audio/g723' : [], 'audio/g722' : [], 'audio/g719' : [], 'text/example' : [], 'application/x-bittorrent' : ["torrent"], 'application/shf+xml' : ["shf"], 'application/msc-ivr+xml' : [], 'model/vnd.parasolid.transmit.binary' : [], 'application/mods+xml' : ["mods"], 'application/xcap-caps+xml' : [], 'application/vnd.3gpp.pic-bw-small' : ["psb"], 'application/vnd.fujixerox.art-ex' : [], 'application/vnd.iccprofile' : ["icc","icm"], 'application/vnd.oipf.contentaccessdownload+xml' : [], 'image/vnd.svf' : [], 'image/vnd.mix' : [], 'image/vnd.fst' : ["fst"], 'image/vnd.fpx' : ["fpx"], 'image/vnd.dxf' : ["dxf"], 'image/vnd.dwg' : ["dwg"], 'audio/evrc' : [], 'application/vnd.emclient.accessrequest+xml' : [], 'audio/eac3' : [], 'audio/vnd.cns.inf1' : [], 'application/x-msdownload' : ["exe","dll","com","bat","msi"], 'application/vnd.grafeq' : ["gqf","gqs"], 'application/x-pkcs7-certreqresp' : ["p7r"], 'application/whoispp-response' : [], 'application/vnd.zzazz.deck+xml' : ["zaz"], 'text/x-setext' : ["etx"], 'application/vnd.smart.teacher' : ["teacher"], 'audio/dvi4' : [], 'application/set-payment-initiation' : ["setpay"], 'text/x-opml' : ["opml"], 'application/prs.xsf+xml' : [], 'application/x-font-vfont' : [], 'application/vnd.ctc-posml' : ["pml"], 'application/vnd.oma.bcast.sprov+xml' : [], 'application/vnd.ms-powerpoint.slideshow.macroenabled.12' : ["ppsm"], 'application/vnd.vidsoft.vidconference' : [], 'application/vnd.openxmlformats-officedocument.presentationml.notesmaster+xml' : [], 'application/vnd.tmobile-livetv' : ["tmo"], 'text/x-pascal' : ["p","pas"], 'audio/bv32' : [], 'audio/bv16' : [], 'application/vnd.bluetooth.ep.oob' : [], 'application/x-iso9660-image' : ["iso"], 'application/vnd.etsi.iptvsync+xml' : [], 'application/vnd.uplanet.list-wbxml' : [], 'image/vnd.djvu' : ["djvu","djv"], 'text/tab-separated-values' : ["tsv"], 'application/vnd.openxmlformats-officedocument.drawing+xml' : [], 'application/vnd.joost.joda-archive' : ["joda"], 'application/vnd.fdsn.seed' : ["seed","dataless"], 'application/vnd.openxmlformats-officedocument.presentationml.viewprops+xml' : [], 'application/vnd.japannet-setstore-wakeup' : [], 'application/vnd.cluetrust.cartomobile-config-pkg' : ["c11amz"], 'application/vnd.oma.poc.final-report+xml' : [], 'application/mediaservercontrol+xml' : ["mscml"], 'application/x-sv4crc' : ["sv4crc"], 'application/vnd.motorola.flexsuite.wem' : [], 'multipart/form-data' : [], 'application/vnd.motorola.flexsuite.ttc' : [], 'application/vnd.motorola.flexsuite.kmr' : [], 'application/smil+xml' : ["smi","smil"], 'application/vnd.motorola.flexsuite.fis' : [], 'video/smpte292m' : [], 'application/vnd.ms-fontobject' : ["eot"], 'application/vnd.oma.bcast.associated-procedure-parameter+xml' : [], 'multipart/report' : [], 'application/yin+xml' : ["yin"], 'application/vnd.sbm.mid2' : [], 'message/delivery-status' : [], 'audio/evrcb' : [], 'audio/evrc1' : [], 'audio/evrc0' : [], 'text/html' : ["html","htm"], 'audio/vnd.nortel.vbk' : [], 'application/x-msclip' : ["clp"], 'application/mbms-associated-procedure-description+xml' : [], 'video/vc1' : [], 'application/vnd.wolfram.player' : ["nbp"], 'video/rtx' : [], 'video/raw' : [], 'video/ogg' : ["ogv"], 'video/mpv' : [], 'video/mp4' : ["mp4","mp4v","mpg4"], 'video/mj2' : ["mj2","mjp2"], 'video/jpm' : ["jpm","jpgm"], 'application/vnd.japannet-jpnstore-wakeup' : [], 'application/vnd.xmi+xml' : [], 'application/vnd.openxmlformats-officedocument.spreadsheetml.externallink+xml' : [], 'application/cdmi-capability' : ["cdmia"], 'application/vnd.powerbuilder75' : [], 'audio/vnd.cns.anp1' : [], 'application/vnd.ms-color.iccprofile' : [], 'video/vnd.dece.video' : ["uvv","uvvv"], 'application/vnd.openxmlformats-officedocument.presentationml.slide+xml' : [], 'application/vnd.preminet' : [], 'application/pkix-pkipath' : ["pkipath"], 'application/ccxml+xml' : ["ccxml"], 'application/vnd.adobe.formscentral.fcdt' : ["fcdt"], 'application/vnd.openxmlformats-officedocument.drawingml.diagramlayout+xml' : [], 'application/vnd.data-vision.rdz' : ["rdz"], 'application/vnd.oma.dd2+xml' : ["dd2"], 'application/mosskey-request' : [], 'application/parityfec' : [], 'application/davmount+xml' : ["davmount"], 'application/cnrp+xml' : [], 'application/cellml+xml' : [], 'application/vnd.radisys.msml-audit-conf+xml' : [], 'application/vnd.fujixerox.docuworks' : ["xdw"], 'application/mbms-protection-description+xml' : [], 'application/xcap-ns+xml' : [], 'application/yang' : ["yang"], 'application/vnd.realvnc.bed' : ["bed"], 'application/vnd.ms-cab-compressed' : ["cab"], 'application/vnd.cinderella' : ["cdy"], 'video/nv' : [], 'video/dv' : [], 'application/vnd.noblenet-web' : ["nnw"], 'application/rlmi+xml' : [], 'image/tiff-fx' : [], 'application/vnd.oipf.cspg-hexbinary' : [], 'application/vnd.geogebra.tool' : ["ggt"], 'audio/g729e' : [], 'audio/g729d' : [], 'audio/g7291' : [], 'audio/g7221' : [], 'application/vnd.accpac.simply.imp' : ["imp"], 'application/x-xz' : ["xz"], 'application/x-sh' : ["sh"], 'application/vnd.accpac.simply.aso' : ["aso"], 'image/webp' : ["webp"], 'application/vnd.kodak-descriptor' : ["sse"], 'application/vnd.oma-scws-http-request' : [], 'application/vnd.olpc-sugar' : ["xo"], 'application/x-glulx' : ["ulx"], 'application/omdoc+xml' : ["omdoc"], 'application/vnd.xfdl.webform' : [], 'application/wita' : [], 'audio/vnd.lucent.voice' : ["lvp"], 'multipart/alternative' : [], 'application/vnd.denovo.fcselayout-link' : ["fe_launch"], 'application/zip' : ["zip"], 'application/vnd.ms-printing.printticket+xml' : [], 'application/xml' : ["xml","xsl"], 'application/vnd.openxmlformats-officedocument.presentationml.tablestyles+xml' : [], 'application/sdp' : ["sdp"], 'application/rtx' : [], 'application/rtf' : ["rtf"], 'application/pdf' : ["pdf"], 'text/vnd.wap.wmlscript' : ["wmls"], 'application/ogg' : ["ogx"], 'application/oda' : ["oda"], 'application/nss' : [], 'application/mxf' : ["mxf"], 'application/mp4' : ["mp4s"], 'application/ipp' : [], 'application/gxf' : ["gxf"], 'application/exi' : ["exi"], 'application/dns' : [], 'application/cfw' : [], 'text/rfc822-headers' : [], 'application/vnd.cosmocaller' : ["cmc"], 'application/vnd.dpgraph' : ["dpg"], 'message/rfc822' : ["eml","mime"], 'image/tiff' : ["tiff","tif"], 'application/vnd.cendio.thinlinc.clientconf' : [], 'application/x-authorware-seg' : ["aas"], 'application/ssdl+xml' : ["ssdl"], 'application/x-authorware-map' : ["aam"], 'application/vnd.radisys.msml-dialog-fax-sendrecv+xml' : [], 'application/x-authorware-bin' : ["aab","x32","u32","vox"], 'application/vnd.dvb.dvbj' : [], 'application/index.response' : [], 'application/vnd.google-earth.kmz' : ["kmz"], 'application/vnd.ntt-local.file-transfer' : [], 'application/vnd.wv.csp+wbxml' : [], 'application/srgs' : ["gram"], 'application/smil' : [], 'application/sgml' : [], 'video/x-ms-wm' : ["wm"], 'application/vnd.uplanet.bearer-choice-wbxml' : [], 'application/vnd.uplanet.alert' : [], 'audio/t38' : [], 'audio/smv' : [], 'audio/s3m' : ["s3m"], 'audio/rtx' : [], 'audio/red' : [], 'audio/ogg' : ["oga","ogg","spx"], 'audio/mpa' : [], 'audio/mp4' : ["mp4a"], 'audio/lpc' : [], 'audio/l24' : [], 'audio/l20' : [], 'audio/l16' : [], 'audio/gsm' : [], 'audio/dls' : [], 'audio/asc' : [], 'audio/amr' : [], 'audio/ac3' : [], 'application/vnd.oipf.spdiscovery+xml' : [], 'application/vnd.lotus-freelance' : ["pre"], 'application/vnd.groove-injector' : ["grv"], 'application/vnd.ecdis-update' : [], 'application/set-payment' : [], 'message/imdn+xml' : [], 'application/vnd.stepmania.package' : ["smzip"], 'application/vnd.qualcomm.brew-app-res' : [], 'application/docbook+xml' : ["dbk"], 'application/vnd.fluxtime.clip' : ["ftc"], 'application/qsig' : [], 'application/vnd.mophun.application' : ["mpn"], 'application/vnd.etsi.simservs+xml' : [], 'application/dec-dx' : [], 'application/csta+xml' : [], 'application/vnd.japannet-registration' : [], 'audio/x-ms-wma' : ["wma"], 'audio/x-ms-wax' : ["wax"], 'application/cea-2018+xml' : [], 'application/vnd.sun.xml.draw.template' : ["std"], 'application/vnd.fuzzysheet' : ["fzs"], 'application/vnd.pwg-xhtml-print+xml' : [], 'application/oxps' : ["oxps"], 'application/vnd.avistar+xml' : [], 'application/soap+fastinfoset' : [], 'application/vnd.openxmlformats-officedocument.wordprocessingml.document.glossary+xml' : [], 'application/vnd.stardivision.writer' : ["sdw","vor"], 'application/vnd.dece.ttml+xml' : ["uvt","uvvt"], 'application/x400-bp' : [], 'application/vnd.sun.xml.math' : ["sxm"], 'application/x-director' : ["dir","dcr","dxr","cst","cct","cxt","w3d","fgd","swa"], 'application/mbms-user-service-description+xml' : [], 'application/vnd.3gpp.pic-bw-var' : ["pvb"], 'application/x-7z-compressed' : ["7z"], 'application/mp21' : ["m21","mp21"], 'application/pkcs8' : ["p8"], 'application/mbox' : ["mbox"], 'application/marc' : ["mrc"], 'text/parityfec' : [], 'application/vnd.smart.notebook' : [], 'application/vnd.ecowin.filerequest' : [], 'application/vnd.oma.bcast.stkm' : [], 'application/vnd.nokia.catalogs' : [], 'application/vnd.oma.bcast.sgdu' : [], 'application/vnd.dvb.ipdcesgaccess2' : [], 'application/vnd.wap.wmlc' : ["wmlc"], 'text/directory' : [], 'audio/t140c' : [], 'application/vnd.uplanet.cacheop' : [], 'application/vnd.3gpp.pic-bw-large' : ["plb"], 'application/x-pkcs7-certificates' : ["p7b","spc"], 'application/vnd.oma.poc.groups+xml' : [], 'application/x-silverlight-app' : ["xap"], 'text/calendar' : ["ics","ifb"], 'application/x-texinfo' : ["texinfo","texi"], 'application/x-gca-compressed' : ["gca"], 'image/vnd.ms-photo' : ["wdp"], 'image/jpeg' : ["jpeg","jpg","jpe"], 'application/applixware' : ["aw"], 'video/vnd.nokia.videovoip' : [], 'image/g3fax' : ["g3"], 'application/vnd.syncml.dm+xml' : ["xdm"], 'application/json' : ["json"], 'application/vnd.geogebra.file' : ["ggb"], 'video/example' : [], 'audio/sp-midi' : [], 'application/vnd.osgi.subsystem' : ["esa"], 'application/vnd.cybank' : [], 'application/isup' : [], 'application/iotp' : [], 'application/vnd.multiad.creator.cif' : [], 'application/pgp-encrypted' : ["pgp"], 'application/iges' : [], 'video/vnd.hns.video' : [], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheetmetadata+xml' : [], 'application/vnd.lotus-screencam' : ["scm"], 'x-conference/x-cooltalk' : ["ice"], 'audio/vnd.hns.audio' : [], 'message/disposition-notification' : [], 'application/x-font-speedo' : [], 'image/svg+xml' : ["svg","svgz"], 'audio/g726-40' : [], 'audio/g726-32' : [], 'audio/g726-24' : [], 'audio/g726-16' : [], 'application/vnd.rn-realmedia' : ["rm"], 'application/vnd.wordperfect' : ["wpd"], 'application/vnd.mynfc' : ["taglet"], 'application/http' : [], 'application/h224' : [], 'application/vnd.oasis.opendocument.spreadsheet' : ["ods"], 'text/x-uuencode' : ["uu"], 'application/vnd.nokia.ncd' : [], 'application/macwriteii' : [], 'audio/mpeg4-generic' : [], 'text/vnd.dmclientscript' : [], 'image/fits' : [], 'application/vnd.nokia.isds-radio-presets' : [], 'application/dssc+xml' : ["xdssc"], 'application/ipfix' : ["ipfix"], 'application/dssc+der' : ["dssc"], 'application/vnd.osgi.dp' : ["dp"], 'application/vnd.radisys.msml-dialog-speech+xml' : [], 'application/fits' : [], 'application/sparql-results+xml' : ["srx"], 'application/mbms-envelope+xml' : [], 'application/vnd.fujitsu.oasys' : ["oas"], 'application/vnd.dvb.notif-ia-registration-request+xml' : [], 'application/vnd.oma.bcast.ltkm' : [], 'application/vnd.radisys.msml-audit-dialog+xml' : [], 'multipart/example' : [], 'application/vnd.renlearn.rlprint' : [], 'application/fastsoap' : [], 'video/vnd.dece.mp4' : [], 'application/xspf+xml' : ["xspf"], 'application/vnd.openxmlformats-officedocument.drawingml.chart+xml' : [], 'application/tamp-sequence-adjust-confirm' : [], 'application/vnd.ecowin.seriesrequest' : [], 'application/vnd.sun.xml.draw' : ["sxd"], 'application/vnd.picsel' : ["efif"], 'application/vnd.mozilla.xul+xml' : ["xul"], 'application/vnd.wfa.wsc' : [], 'application/vnd.antix.game-component' : ["atx"], 'application/tamp-community-update' : [], 'application/index' : [], 'application/dvcs' : [], 'application/vnd.oma.dcd' : [], 'application/wspolicy+xml' : ["wspolicy"], 'application/vnd.claymore' : ["cla"], 'text/ecmascript' : [], 'application/x-shockwave-flash' : ["swf"], 'application/vnd.sun.xml.calc' : ["sxc"], 'application/example' : [], 'application/vnd.frogans.ltf' : ["ltf"], 'application/vnd.epson.ssf' : ["ssf"], 'application/vnd.frogans.fnc' : ["fnc"], 'application/vnd.epson.msf' : ["msf"], 'application/vnd.epson.esf' : ["esf"], 'text/cache-manifest' : ["appcache"], 'application/vnd.openxmlformats-officedocument.spreadsheetml.dialogsheet+xml' : [], 'application/vnd.wt.stf' : ["stf"], 'video/vnd.motorola.video' : [], 'application/vnd.pg.format' : ["str"], 'application/soap+xml' : [], 'application/vnd.msign' : [], 'video/x-matroska' : ["mkv","mk3d","mks"], 'application/vnd.etsi.iptvservice+xml' : [], 'video/bt656' : [], 'model/x3d+binary' : ["x3db","x3dbz"], 'application/vnd.street-stream' : [], 'application/x-freearc' : ["arc"], 'application/vnd.ubisoft.webplayer' : [], 'application/vnd.adobe.fxp' : ["fxp","fxpl"], 'application/vnd.nokia.landmark+wbxml' : [], 'video/vnd.sealed.swf' : [], 'application/vnd.crick.clicker' : ["clkx"], 'application/vnd.wap.wmlscriptc' : ["wmlsc"], 'application/pskc+xml' : ["pskcxml"], 'application/vnd.swiftview-ics' : [], 'application/vnd.curl.pcurl' : ["pcurl"], 'application/vnd.oma.bcast.provisioningtrigger' : [], 'application/vnd.oasis.opendocument.text-template' : ["ott"], 'application/metalink4+xml' : ["meta4"], 'application/vnd.sus-calendar' : ["sus","susp"], 'application/vnd.ncd.control' : [], 'application/pkix-crl' : ["crl"], 'audio/mpa-robust' : [], 'application/simple-message-summary' : [], 'application/vnd.neurolanguage.nlu' : ["nlu"], 'text/vnd.curl.mcurl' : ["mcurl"], 'application/vnd.contact.cmsg' : ["cdbcmsg"], 'application/vnd.dvb.service' : ["svc"], 'application/x-sv4cpio' : ["sv4cpio"], 'application/vnd.oipf.userprofile+xml' : [], 'chemical/x-csml' : ["csml"], 'application/vnd.kenameaapp' : ["htke"], 'chemical/x-cmdf' : ["cmdf"], 'application/x-ace-compressed' : ["ace"], 'audio/atrac-advanced-lossless' : [], 'application/vnd.yamaha.smaf-phrase' : ["spf"], 'application/cu-seeme' : ["cu"], 'application/pidf-diff+xml' : [], 'application/vnd.nokia.pcd+xml' : [], 'text/vnd.curl' : ["curl"], 'application/vnd.openxmlformats-officedocument.presentationml.slide' : ["sldx"], 'application/mathml-content+xml' : [], 'text/vnd.wap.sl' : [], 'text/vnd.wap.si' : [], 'application/vnd.astraea-software.iota' : ["iota"], 'application/vnd.powerbuilder7-s' : [], 'application/vnd.powerbuilder6-s' : [], 'application/vnd.f-secure.mobile' : [], 'application/x-mobipocket-ebook' : ["prc","mobi"], 'application/mpeg4-iod' : [], 'video/x-smv' : ["smv"], 'video/x-mng' : ["mng"], 'video/x-m4v' : ["m4v"], 'application/vnd.groove-tool-message' : ["gtm"], 'video/x-flv' : ["flv"], 'video/x-fli' : ["fli"], 'video/x-f4v' : ["f4v"], 'application/vnd.3gpp.bsf+xml' : [], 'application/vnd.openxmlformats-officedocument.spreadsheetml.tablesinglecells+xml' : [], 'message/feedback-report' : [], 'application/x-font-ghostscript' : ["gsf"], 'audio/x-pn-realaudio' : ["ram","ra"], 'application/vnd.vividence.scriptfile' : [], 'video/bmpeg' : [], 'application/vnd.crick.clicker.keyboard' : ["clkk"], 'application/vnd.mophun.certificate' : ["mpc"], 'application/riscos' : [], 'application/timestamp-reply' : [], 'audio/vorbis' : [], 'application/x-font-type1' : ["pfa","pfb","pfm","afm"], 'application/reginfo+xml' : ["rif"], 'application/vnd.cab-jscript' : [], 'application/vnd.ms-powerpoint.presentation.macroenabled.12' : ["pptm"], 'application/vnd.mobius.txf' : ["txf"], 'application/vnd.mobius.plc' : ["plc"], 'application/vnd.mobius.msl' : ["msl"], 'application/vnd.mobius.mqy' : ["mqy"], 'application/vnd.mobius.mbk' : ["mbk"], 'application/vnd.mobius.dis' : ["dis"], 'application/vnd.mobius.daf' : ["daf"], 'application/x-tex' : ["tex"], 'application/x-tcl' : ["tcl"], 'application/x-tar' : ["tar"], 'application/x-sql' : ["sql"], 'application/x-nzb' : ["nzb"], 'application/x-mie' : ["mie"], 'application/voicexml+xml' : ["vxml"], 'audio/prs.sid' : [], 'application/x-hdf' : ["hdf"], 'application/x-eva' : ["eva"], 'application/x-dvi' : ["dvi"], 'application/x-csh' : ["csh"], 'application/x-cbr' : ["cbr","cba","cbt","cbz","cb7"], 'application/x-amf' : [], 'application/vnd.truedoc' : [], 'application/vnd.trueapp' : ["tra"], 'model/vnd.flatland.3dml' : [], 'application/vnd.openxmlformats-officedocument.spreadsheetml.comments+xml' : [], 'application/vnd.sealed.xls' : [], 'application/vnd.sealed.ppt' : [], 'application/vnd.sealed.net' : [], 'application/vnd.sealed.mht' : [], 'application/vnd.sealed.eml' : [], 'application/vnd.sealed.doc' : [], 'application/vnd.sealed.csf' : [], 'application/atomsvc+xml' : ["atomsvc"], 'application/vnd.dreamfactory' : ["dfac"], 'application/vnd.sealed.3df' : [], 'audio/gsm-hr-08' : [], 'application/moss-signature' : [], 'application/vnd.openxmlformats-officedocument.spreadsheetml.template' : ["xltx"], 'application/epub+zip' : ["epub"], 'application/tamp-error' : [], 'video/vnd.iptvforum.ttsmpeg2' : [], 'application/xslt+xml' : ["xslt"], 'application/vnd.kde.kformula' : ["kfo"], 'video/vnd.sealed.mpeg4' : [], 'video/vnd.sealed.mpeg1' : [], 'application/vnd.openxmlformats-officedocument.wordprocessingml.footnotes+xml' : [], 'application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml' : [], 'application/1d-interleaved-parityfec' : [], 'application/vemmi' : [], 'application/vnd.sealed.tiff' : [], 'application/winhlp' : ["hlp"], 'image/vnd.net-fpx' : ["npx"], 'model/vnd.vtu' : ["vtu"], 'model/vnd.mts' : ["mts"], 'model/vnd.gtw' : ["gtw"], 'model/vnd.gdl' : ["gdl"], 'model/vnd.dwf' : ["dwf"], 'image/vnd.cns.inf2' : [], 'text/fwdred' : [], 'application/font-tdpfr' : ["pfr"], 'image/x-portable-pixmap' : ["ppm"], 'application/vnd.kde.kword' : ["kwd","kwt"]};
 tannus.utils.PathTools.PATH_DELIMITER = "/";
 tannus.utils.SearchEngine.CASE_OFFSET = 1.5;
 tannus.utils.SearchEngine.CONTAINS_OFFSET = 0.8;

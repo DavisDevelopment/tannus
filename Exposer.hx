@@ -13,6 +13,8 @@ import tannus.utils.SearchEngine;
 
 import tannus.db.tandb.*;
 import tannus.crypto.Tea;
+import tannus.display.Stage;
+import tannus.display.*;
 
 class Exposer {
 	private static var env(get, never):Object;
@@ -33,52 +35,27 @@ class Exposer {
 		envir['Utils'] = tannus.serverside.socks.Utils;
 		envir['ore'] = ObjectRegEx;
 
-		var enc = Tea.strToLongs('Hello, World');
-		trace( enc );
+		envir['ui'] = {
+			'Canvas' : tannus.ui.Canvas,
+			'Stage' : tannus.display.Stage
+		};
+		tannus.display.CropWidget;
+		
+		var canvas = tannus.ui.JQuery.select('#stage').at(0);
+		var stage = new Stage(canvas);
+		stage.width = 640;
+		stage.height = 480;
 
-		trace(Tea.longsToStr(enc).toArray());
-		var db = new DatabaseConnection('testing/data', {
-			'username' : 'root',
-		    	'password' : 'cheeks'
+		var ent = new tannus.display.CropWidget('#img');
+		stage.add(ent);
+
+		ent.on('ready', function(e) {
+			ent.width = stage.width;
+			ent.height = stage.height;
+			trace(ent.rect() + '');
 		});
-		var fewp = db.schema('fewp');
-		var users = fewp.table( 'users' );
-		
-		trace(users.select('[id=0]'));
 
-	//	var newdb = Database.create(
-	//		'testing/data',
-	//		'mydb',
-	//		'cheeks'
-	//	);
-	//	var db = new DatabaseConnection('testing/data', {
-	//		'username' : 'root',
-	//		'password' : 'cheeks'
-	//	});
-		
-	//	db.createUser('rdavis', 'cheeks');
-
-	//	db.setUserPermissions('rdavis', [
-	//		0, 1, 2
-	//	]);
-		
-	//	db.createSchema('fewp');
-
-	//	var fewp = db.schema('fewp');
-
-	//	fewp.createTable('users', 'id');
-
-	//	var users = fewp.table( 'users' );
-
-	//	users.addColumn('id', 'Int');
-	//	users.addColumn('first_name', 'Bytes');
-	//	users.addColumn('last_name', 'Bytes');
-
-	//	users.insert({
-	//		'id' : 0,
-	//		'first_name' : 'Ryan',
-	//		'last_name' : 'Davis'
-	//	});
+		ent.bindToInput('#file');
 
 		initHelpers();
 	}

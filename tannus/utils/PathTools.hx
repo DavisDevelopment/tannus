@@ -119,6 +119,17 @@ class PathTools {
 			return '';
 		}
 	}
+	
+	/**
+	  * converts [path] to an absolute path, if not already one
+	  */
+	public static inline function toAbsolute(path:String):String {
+		var result:String = normalize(path);
+		if (result.substring(0,1) != PATH_DELIMITER) {
+			result = (PATH_DELIMITER + result);
+		}
+		return result;
+	}
 
 //= Internal Properties
 	private static inline var PATH_DELIMITER:String = '/';

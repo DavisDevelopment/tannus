@@ -145,15 +145,7 @@ class Node extends EventDispatcher {
 	}
 
 	override public function on(channel:String, handler:Dynamic, once:Bool=false):Void {
-		if (this.handlers[channel] != null) {
-			super.on(channel, handler, once);
-		} else {
-			setListener(element, channel, function(event:Dynamic):Void {
-				_emit(channel, event);
-			});
-
-			super.on(channel, handler, false);
-		}
+		setListener(element, channel, handler);
 	}
 
 	private function _emit(channel:String, data:Dynamic):Void {

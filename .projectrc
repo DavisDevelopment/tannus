@@ -1,0 +1,7 @@
+
+echo ""
+echo "=== Tannus Library ==="
+echo ""
+
+git status
+

@@ -133,42 +133,46 @@ Exposer.main = function() {
 	}
 	var name1;
 	var this10;
-	if(tannus.utils.Types.basictype("Utils") == "StringMap") this10 = tannus.utils.MapTools.toDynamic("Utils"); else this10 = "Utils";
+	if(tannus.utils.Types.basictype("Application") == "StringMap") this10 = tannus.utils.MapTools.toDynamic("Application"); else this10 = "Application";
 	name1 = this10;
 	var value1;
-	var obj3 = tannus.serverside.socks.Utils;
+	var obj3 = tannus.Application;
 	var this11;
 	if(tannus.utils.Types.basictype(obj3) == "StringMap") this11 = tannus.utils.MapTools.toDynamic(obj3); else this11 = obj3;
 	value1 = this11;
 	Reflect.setProperty(envir,name1,value1);
 	var name2;
 	var this12;
-	if(tannus.utils.Types.basictype("ore") == "StringMap") this12 = tannus.utils.MapTools.toDynamic("ore"); else this12 = "ore";
+	if(tannus.utils.Types.basictype("Utils") == "StringMap") this12 = tannus.utils.MapTools.toDynamic("Utils"); else this12 = "Utils";
 	name2 = this12;
 	var value2;
-	var obj4 = tannus.ore.ObjectRegEx;
+	var obj4 = tannus.serverside.socks.Utils;
 	var this13;
 	if(tannus.utils.Types.basictype(obj4) == "StringMap") this13 = tannus.utils.MapTools.toDynamic(obj4); else this13 = obj4;
 	value2 = this13;
 	Reflect.setProperty(envir,name2,value2);
-	var enc = tannus.crypto.Tea.strToLongs("Hello, World");
-	console.log(enc);
+	var name3;
+	var this14;
+	if(tannus.utils.Types.basictype("ore") == "StringMap") this14 = tannus.utils.MapTools.toDynamic("ore"); else this14 = "ore";
+	name3 = this14;
+	var value3;
+	var obj5 = tannus.ore.ObjectRegEx;
+	var this15;
+	if(tannus.utils.Types.basictype(obj5) == "StringMap") this15 = tannus.utils.MapTools.toDynamic(obj5); else this15 = obj5;
+	value3 = this15;
+	Reflect.setProperty(envir,name3,value3);
+	var uri = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEUAAAD///+l2Z/dAAAAM0lEQVR4nGP4/5/h/1+G/58ZDrAz3D/McH8yw83NDDeNGe4Ug9C9zwz3gVLMDA/A6P9/AFGGFyjOXZtQAAAAAElFTkSuQmCC";
 	console.log((function($this) {
 		var $r;
-		var this14 = tannus.crypto.Tea.longsToStr(enc);
-		var set = new Array();
-		var i = 0;
-		while(i < this14.length) {
-			set.push(this14.b[i]);
-			i++;
+		var this16;
+		{
+			var b64 = uri.substring(uri.indexOf(",") + 1);
+			var bytes = haxe.crypto.Base64.decode(b64);
+			this16 = bytes;
 		}
-		$r = set;
+		$r = this16.toString();
 		return $r;
 	}(this)));
-	var db = new tannus.db.tandb.DatabaseConnection("testing/data",{ username : "root", password : "cheeks"});
-	var fewp = db.schema("fewp");
-	var users = fewp.table("users");
-	console.log(users.select("[id=0]"));
 	Exposer.initHelpers();
 };
 Exposer.initHelpers = function() {
@@ -194,37 +198,6 @@ Exposer.get_env = function() {
 var HxOverrides = function() { };
 $hxClasses["HxOverrides"] = HxOverrides;
 HxOverrides.__name__ = ["HxOverrides"];
-HxOverrides.dateStr = function(date) {
-	var m = date.getMonth() + 1;
-	var d = date.getDate();
-	var h = date.getHours();
-	var mi = date.getMinutes();
-	var s = date.getSeconds();
-	return date.getFullYear() + "-" + (m < 10?"0" + m:"" + m) + "-" + (d < 10?"0" + d:"" + d) + " " + (h < 10?"0" + h:"" + h) + ":" + (mi < 10?"0" + mi:"" + mi) + ":" + (s < 10?"0" + s:"" + s);
-};
-HxOverrides.strDate = function(s) {
-	var _g = s.length;
-	switch(_g) {
-	case 8:
-		var k = s.split(":");
-		var d = new Date();
-		d.setTime(0);
-		d.setUTCHours(k[0]);
-		d.setUTCMinutes(k[1]);
-		d.setUTCSeconds(k[2]);
-		return d;
-	case 10:
-		var k1 = s.split("-");
-		return new Date(k1[0],k1[1] - 1,k1[2],0,0,0);
-	case 19:
-		var k2 = s.split(" ");
-		var y = k2[0].split("-");
-		var t = k2[1].split(":");
-		return new Date(y[0],y[1] - 1,y[2],t[0],t[1],t[2]);
-	default:
-		throw "Invalid date format : " + s;
-	}
-};
 HxOverrides.cca = function(s,index) {
 	var x = s.charCodeAt(index);
 	if(x != x) return undefined;
@@ -281,27 +254,11 @@ var List = function() {
 $hxClasses["List"] = List;
 List.__name__ = ["List"];
 List.prototype = {
-	add: function(item) {
-		var x = [item];
-		if(this.h == null) this.h = x; else this.q[1] = x;
-		this.q = x;
-		this.length++;
-	}
-	,push: function(item) {
+	push: function(item) {
 		var x = [item,this.h];
 		this.h = x;
 		if(this.q == null) this.q = x;
 		this.length++;
-	}
-	,iterator: function() {
-		return { h : this.h, hasNext : function() {
-			return this.h != null;
-		}, next : function() {
-			if(this.h == null) return null;
-			var x = this.h[0];
-			this.h = this.h[1];
-			return x;
-		}};
 	}
 	,__class__: List
 };
@@ -312,13 +269,6 @@ Math.__name__ = ["Math"];
 var Reflect = function() { };
 $hxClasses["Reflect"] = Reflect;
 Reflect.__name__ = ["Reflect"];
-Reflect.field = function(o,field) {
-	try {
-		return o[field];
-	} catch( e ) {
-		return null;
-	}
-};
 Reflect.getProperty = function(o,field) {
 	var tmp;
 	if(o == null) return null; else if(o.__properties__ && (tmp = o.__properties__["get_" + field])) return o[tmp](); else return o[field];
@@ -348,11 +298,6 @@ Reflect.isObject = function(v) {
 Reflect.isEnumValue = function(v) {
 	return v != null && v.__enum__ != null;
 };
-Reflect.deleteField = function(o,field) {
-	if(!Object.prototype.hasOwnProperty.call(o,field)) return false;
-	delete(o[field]);
-	return true;
-};
 Reflect.makeVarArgs = function(f) {
 	return function() {
 		var a = Array.prototype.slice.call(arguments);
@@ -367,12 +312,6 @@ Std.string = function(s) {
 };
 Std["int"] = function(x) {
 	return x | 0;
-};
-Std.parseInt = function(x) {
-	var v = parseInt(x,10);
-	if(v == 0 && (HxOverrides.cca(x,1) == 120 || HxOverrides.cca(x,1) == 88)) v = parseInt(x);
-	if(isNaN(v)) return null;
-	return v;
 };
 Std.parseFloat = function(x) {
 	return parseFloat(x);
@@ -405,30 +344,6 @@ StringTools.replace = function(s,sub,by) {
 StringTools.fastCodeAt = function(s,index) {
 	return s.charCodeAt(index);
 };
-var ValueType = $hxClasses["ValueType"] = { __ename__ : ["ValueType"], __constructs__ : ["TNull","TInt","TFloat","TBool","TObject","TFunction","TClass","TEnum","TUnknown"] };
-ValueType.TNull = ["TNull",0];
-ValueType.TNull.toString = $estr;
-ValueType.TNull.__enum__ = ValueType;
-ValueType.TInt = ["TInt",1];
-ValueType.TInt.toString = $estr;
-ValueType.TInt.__enum__ = ValueType;
-ValueType.TFloat = ["TFloat",2];
-ValueType.TFloat.toString = $estr;
-ValueType.TFloat.__enum__ = ValueType;
-ValueType.TBool = ["TBool",3];
-ValueType.TBool.toString = $estr;
-ValueType.TBool.__enum__ = ValueType;
-ValueType.TObject = ["TObject",4];
-ValueType.TObject.toString = $estr;
-ValueType.TObject.__enum__ = ValueType;
-ValueType.TFunction = ["TFunction",5];
-ValueType.TFunction.toString = $estr;
-ValueType.TFunction.__enum__ = ValueType;
-ValueType.TClass = function(c) { var $x = ["TClass",6,c]; $x.__enum__ = ValueType; $x.toString = $estr; return $x; };
-ValueType.TEnum = function(e) { var $x = ["TEnum",7,e]; $x.__enum__ = ValueType; $x.toString = $estr; return $x; };
-ValueType.TUnknown = ["TUnknown",8];
-ValueType.TUnknown.toString = $estr;
-ValueType.TUnknown.__enum__ = ValueType;
 var Type = function() { };
 $hxClasses["Type"] = Type;
 Type.__name__ = ["Type"];
@@ -456,11 +371,6 @@ Type.resolveClass = function(name) {
 	if(cl == null || !cl.__name__) return null;
 	return cl;
 };
-Type.resolveEnum = function(name) {
-	var e = $hxClasses[name];
-	if(e == null || !e.__ename__) return null;
-	return e;
-};
 Type.createInstance = function(cl,args) {
 	var _g = args.length;
 	switch(_g) {
@@ -487,752 +397,149 @@ Type.createInstance = function(cl,args) {
 	}
 	return null;
 };
-Type.createEmptyInstance = function(cl) {
-	function empty() {}; empty.prototype = cl.prototype;
-	return new empty();
-};
-Type.createEnum = function(e,constr,params) {
-	var f = Reflect.field(e,constr);
-	if(f == null) throw "No such constructor " + constr;
-	if(Reflect.isFunction(f)) {
-		if(params == null) throw "Constructor " + constr + " need parameters";
-		return f.apply(e,params);
-	}
-	if(params != null && params.length != 0) throw "Constructor " + constr + " does not need parameters";
-	return f;
-};
-Type.getEnumConstructs = function(e) {
-	var a = e.__constructs__;
-	return a.slice();
-};
-Type["typeof"] = function(v) {
-	var _g = typeof(v);
-	switch(_g) {
-	case "boolean":
-		return ValueType.TBool;
-	case "string":
-		return ValueType.TClass(String);
-	case "number":
-		if(Math.ceil(v) == v % 2147483648.0) return ValueType.TInt;
-		return ValueType.TFloat;
-	case "object":
-		if(v == null) return ValueType.TNull;
-		var e = v.__enum__;
-		if(e != null) return ValueType.TEnum(e);
-		var c;
-		if((v instanceof Array) && v.__enum__ == null) c = Array; else c = v.__class__;
-		if(c != null) return ValueType.TClass(c);
-		return ValueType.TObject;
-	case "function":
-		if(v.__name__ || v.__ename__) return ValueType.TObject;
-		return ValueType.TFunction;
-	case "undefined":
-		return ValueType.TNull;
-	default:
-		return ValueType.TUnknown;
-	}
-};
 var haxe = {};
-haxe.Serializer = function() {
-	this.buf = new StringBuf();
-	this.cache = new Array();
-	this.useCache = haxe.Serializer.USE_CACHE;
-	this.useEnumIndex = haxe.Serializer.USE_ENUM_INDEX;
-	this.shash = new haxe.ds.StringMap();
-	this.scount = 0;
+haxe.io = {};
+haxe.io.Bytes = function(length,b) {
+	this.length = length;
+	this.b = b;
 };
-$hxClasses["haxe.Serializer"] = haxe.Serializer;
-haxe.Serializer.__name__ = ["haxe","Serializer"];
-haxe.Serializer.run = function(v) {
-	var s = new haxe.Serializer();
-	s.serialize(v);
-	return s.toString();
+$hxClasses["haxe.io.Bytes"] = haxe.io.Bytes;
+haxe.io.Bytes.__name__ = ["haxe","io","Bytes"];
+haxe.io.Bytes.alloc = function(length) {
+	var a = new Array();
+	var _g = 0;
+	while(_g < length) {
+		var i = _g++;
+		a.push(0);
+	}
+	return new haxe.io.Bytes(length,a);
 };
-haxe.Serializer.prototype = {
-	toString: function() {
-		return this.buf.b;
-	}
-	,serializeString: function(s) {
-		var x = this.shash.get(s);
-		if(x != null) {
-			this.buf.b += "R";
-			if(x == null) this.buf.b += "null"; else this.buf.b += "" + x;
-			return;
-		}
-		this.shash.set(s,this.scount++);
-		this.buf.b += "y";
-		s = encodeURIComponent(s);
-		if(s.length == null) this.buf.b += "null"; else this.buf.b += "" + s.length;
-		this.buf.b += ":";
-		if(s == null) this.buf.b += "null"; else this.buf.b += "" + s;
-	}
-	,serializeRef: function(v) {
-		var vt = typeof(v);
-		var _g1 = 0;
-		var _g = this.cache.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var ci = this.cache[i];
-			if(typeof(ci) == vt && ci == v) {
-				this.buf.b += "r";
-				if(i == null) this.buf.b += "null"; else this.buf.b += "" + i;
-				return true;
-			}
-		}
-		this.cache.push(v);
-		return false;
-	}
-	,serializeFields: function(v) {
-		var _g = 0;
-		var _g1 = Reflect.fields(v);
-		while(_g < _g1.length) {
-			var f = _g1[_g];
-			++_g;
-			this.serializeString(f);
-			this.serialize(Reflect.field(v,f));
-		}
-		this.buf.b += "g";
-	}
-	,serialize: function(v) {
-		{
-			var _g = Type["typeof"](v);
-			switch(_g[1]) {
-			case 0:
-				this.buf.b += "n";
-				break;
-			case 1:
-				var v1 = v;
-				if(v1 == 0) {
-					this.buf.b += "z";
-					return;
-				}
-				this.buf.b += "i";
-				if(v1 == null) this.buf.b += "null"; else this.buf.b += "" + v1;
-				break;
-			case 2:
-				var v2 = v;
-				if(Math.isNaN(v2)) this.buf.b += "k"; else if(!Math.isFinite(v2)) if(v2 < 0) this.buf.b += "m"; else this.buf.b += "p"; else {
-					this.buf.b += "d";
-					if(v2 == null) this.buf.b += "null"; else this.buf.b += "" + v2;
-				}
-				break;
-			case 3:
-				if(v) this.buf.b += "t"; else this.buf.b += "f";
-				break;
-			case 6:
-				var c = _g[2];
-				if(c == String) {
-					this.serializeString(v);
-					return;
-				}
-				if(this.useCache && this.serializeRef(v)) return;
-				switch(c) {
-				case Array:
-					var ucount = 0;
-					this.buf.b += "a";
-					var l = v.length;
-					var _g1 = 0;
-					while(_g1 < l) {
-						var i = _g1++;
-						if(v[i] == null) ucount++; else {
-							if(ucount > 0) {
-								if(ucount == 1) this.buf.b += "n"; else {
-									this.buf.b += "u";
-									if(ucount == null) this.buf.b += "null"; else this.buf.b += "" + ucount;
-								}
-								ucount = 0;
-							}
-							this.serialize(v[i]);
-						}
-					}
-					if(ucount > 0) {
-						if(ucount == 1) this.buf.b += "n"; else {
-							this.buf.b += "u";
-							if(ucount == null) this.buf.b += "null"; else this.buf.b += "" + ucount;
-						}
-					}
-					this.buf.b += "h";
-					break;
-				case List:
-					this.buf.b += "l";
-					var v3 = v;
-					var $it0 = v3.iterator();
-					while( $it0.hasNext() ) {
-						var i1 = $it0.next();
-						this.serialize(i1);
-					}
-					this.buf.b += "h";
-					break;
-				case Date:
-					var d = v;
-					this.buf.b += "v";
-					this.buf.add(HxOverrides.dateStr(d));
-					break;
-				case haxe.ds.StringMap:
-					this.buf.b += "b";
-					var v4 = v;
-					var $it1 = v4.keys();
-					while( $it1.hasNext() ) {
-						var k = $it1.next();
-						this.serializeString(k);
-						this.serialize(v4.get(k));
-					}
-					this.buf.b += "h";
-					break;
-				case haxe.ds.IntMap:
-					this.buf.b += "q";
-					var v5 = v;
-					var $it2 = v5.keys();
-					while( $it2.hasNext() ) {
-						var k1 = $it2.next();
-						this.buf.b += ":";
-						if(k1 == null) this.buf.b += "null"; else this.buf.b += "" + k1;
-						this.serialize(v5.get(k1));
-					}
-					this.buf.b += "h";
-					break;
-				case haxe.ds.ObjectMap:
-					this.buf.b += "M";
-					var v6 = v;
-					var $it3 = v6.keys();
-					while( $it3.hasNext() ) {
-						var k2 = $it3.next();
-						var id = Reflect.field(k2,"__id__");
-						Reflect.deleteField(k2,"__id__");
-						this.serialize(k2);
-						k2.__id__ = id;
-						this.serialize(v6.h[k2.__id__]);
-					}
-					this.buf.b += "h";
-					break;
-				case haxe.io.Bytes:
-					var v7 = v;
-					var i2 = 0;
-					var max = v7.length - 2;
-					var charsBuf = new StringBuf();
-					var b64 = haxe.Serializer.BASE64;
-					while(i2 < max) {
-						var b1 = v7.get(i2++);
-						var b2 = v7.get(i2++);
-						var b3 = v7.get(i2++);
-						charsBuf.add(b64.charAt(b1 >> 2));
-						charsBuf.add(b64.charAt((b1 << 4 | b2 >> 4) & 63));
-						charsBuf.add(b64.charAt((b2 << 2 | b3 >> 6) & 63));
-						charsBuf.add(b64.charAt(b3 & 63));
-					}
-					if(i2 == max) {
-						var b11 = v7.get(i2++);
-						var b21 = v7.get(i2++);
-						charsBuf.add(b64.charAt(b11 >> 2));
-						charsBuf.add(b64.charAt((b11 << 4 | b21 >> 4) & 63));
-						charsBuf.add(b64.charAt(b21 << 2 & 63));
-					} else if(i2 == max + 1) {
-						var b12 = v7.get(i2++);
-						charsBuf.add(b64.charAt(b12 >> 2));
-						charsBuf.add(b64.charAt(b12 << 4 & 63));
-					}
-					var chars = charsBuf.b;
-					this.buf.b += "s";
-					if(chars.length == null) this.buf.b += "null"; else this.buf.b += "" + chars.length;
-					this.buf.b += ":";
-					if(chars == null) this.buf.b += "null"; else this.buf.b += "" + chars;
-					break;
-				default:
-					if(this.useCache) this.cache.pop();
-					if(v.hxSerialize != null) {
-						this.buf.b += "C";
-						this.serializeString(Type.getClassName(c));
-						if(this.useCache) this.cache.push(v);
-						v.hxSerialize(this);
-						this.buf.b += "g";
-					} else {
-						this.buf.b += "c";
-						this.serializeString(Type.getClassName(c));
-						if(this.useCache) this.cache.push(v);
-						this.serializeFields(v);
-					}
-				}
-				break;
-			case 4:
-				if(this.useCache && this.serializeRef(v)) return;
-				this.buf.b += "o";
-				this.serializeFields(v);
-				break;
-			case 7:
-				var e = _g[2];
-				if(this.useCache) {
-					if(this.serializeRef(v)) return;
-					this.cache.pop();
-				}
-				if(this.useEnumIndex) this.buf.b += "j"; else this.buf.b += "w";
-				this.serializeString(Type.getEnumName(e));
-				if(this.useEnumIndex) {
-					this.buf.b += ":";
-					this.buf.b += Std.string(v[1]);
-				} else this.serializeString(v[0]);
-				this.buf.b += ":";
-				var l1 = v.length;
-				this.buf.b += Std.string(l1 - 2);
-				var _g11 = 2;
-				while(_g11 < l1) {
-					var i3 = _g11++;
-					this.serialize(v[i3]);
-				}
-				if(this.useCache) this.cache.push(v);
-				break;
-			case 5:
-				throw "Cannot serialize function";
-				break;
-			default:
-				throw "Cannot serialize " + Std.string(v);
-			}
+haxe.io.Bytes.ofString = function(s) {
+	var a = new Array();
+	var i = 0;
+	while(i < s.length) {
+		var c = StringTools.fastCodeAt(s,i++);
+		if(55296 <= c && c <= 56319) c = c - 55232 << 10 | StringTools.fastCodeAt(s,i++) & 1023;
+		if(c <= 127) a.push(c); else if(c <= 2047) {
+			a.push(192 | c >> 6);
+			a.push(128 | c & 63);
+		} else if(c <= 65535) {
+			a.push(224 | c >> 12);
+			a.push(128 | c >> 6 & 63);
+			a.push(128 | c & 63);
+		} else {
+			a.push(240 | c >> 18);
+			a.push(128 | c >> 12 & 63);
+			a.push(128 | c >> 6 & 63);
+			a.push(128 | c & 63);
 		}
 	}
-	,__class__: haxe.Serializer
+	return new haxe.io.Bytes(a.length,a);
 };
-haxe.Unserializer = function(buf) {
-	this.buf = buf;
-	this.length = buf.length;
-	this.pos = 0;
-	this.scache = new Array();
-	this.cache = new Array();
-	var r = haxe.Unserializer.DEFAULT_RESOLVER;
-	if(r == null) {
-		r = Type;
-		haxe.Unserializer.DEFAULT_RESOLVER = r;
+haxe.io.Bytes.prototype = {
+	get: function(pos) {
+		return this.b[pos];
 	}
-	this.setResolver(r);
-};
-$hxClasses["haxe.Unserializer"] = haxe.Unserializer;
-haxe.Unserializer.__name__ = ["haxe","Unserializer"];
-haxe.Unserializer.initCodes = function() {
-	var codes = new Array();
-	var _g1 = 0;
-	var _g = haxe.Unserializer.BASE64.length;
-	while(_g1 < _g) {
-		var i = _g1++;
-		codes[haxe.Unserializer.BASE64.charCodeAt(i)] = i;
+	,set: function(pos,v) {
+		this.b[pos] = v & 255;
 	}
-	return codes;
-};
-haxe.Unserializer.run = function(v) {
-	return new haxe.Unserializer(v).unserialize();
-};
-haxe.Unserializer.prototype = {
-	setResolver: function(r) {
-		if(r == null) this.resolver = { resolveClass : function(_) {
-			return null;
-		}, resolveEnum : function(_1) {
-			return null;
-		}}; else this.resolver = r;
+	,sub: function(pos,len) {
+		if(pos < 0 || len < 0 || pos + len > this.length) throw haxe.io.Error.OutsideBounds;
+		return new haxe.io.Bytes(len,this.b.slice(pos,pos + len));
 	}
-	,get: function(p) {
-		return this.buf.charCodeAt(p);
+	,setFloat: function(pos,v) {
+		throw "Not supported";
 	}
-	,readDigits: function() {
-		var k = 0;
-		var s = false;
-		var fpos = this.pos;
-		while(true) {
-			var c = this.buf.charCodeAt(this.pos);
-			if(c != c) break;
-			if(c == 45) {
-				if(this.pos != fpos) break;
-				s = true;
-				this.pos++;
-				continue;
+	,getString: function(pos,len) {
+		if(pos < 0 || len < 0 || pos + len > this.length) throw haxe.io.Error.OutsideBounds;
+		var s = "";
+		var b = this.b;
+		var fcc = String.fromCharCode;
+		var i = pos;
+		var max = pos + len;
+		while(i < max) {
+			var c = b[i++];
+			if(c < 128) {
+				if(c == 0) break;
+				s += fcc(c);
+			} else if(c < 224) s += fcc((c & 63) << 6 | b[i++] & 127); else if(c < 240) {
+				var c2 = b[i++];
+				s += fcc((c & 31) << 12 | (c2 & 127) << 6 | b[i++] & 127);
+			} else {
+				var c21 = b[i++];
+				var c3 = b[i++];
+				var u = (c & 15) << 18 | (c21 & 127) << 12 | (c3 & 127) << 6 | b[i++] & 127;
+				s += fcc((u >> 10) + 55232);
+				s += fcc(u & 1023 | 56320);
 			}
-			if(c < 48 || c > 57) break;
-			k = k * 10 + (c - 48);
-			this.pos++;
 		}
-		if(s) k *= -1;
-		return k;
+		return s;
 	}
-	,unserializeObject: function(o) {
-		while(true) {
-			if(this.pos >= this.length) throw "Invalid object";
-			if(this.buf.charCodeAt(this.pos) == 103) break;
-			var k = this.unserialize();
-			if(!(typeof(k) == "string")) throw "Invalid object key";
-			var v = this.unserialize();
-			o[k] = v;
-		}
-		this.pos++;
+	,toString: function() {
+		return this.getString(0,this.length);
 	}
-	,unserializeEnum: function(edecl,tag) {
-		if(this.get(this.pos++) != 58) throw "Invalid enum format";
-		var nargs = this.readDigits();
-		if(nargs == 0) return Type.createEnum(edecl,tag);
-		var args = new Array();
-		while(nargs-- > 0) args.push(this.unserialize());
-		return Type.createEnum(edecl,tag,args);
-	}
-	,unserialize: function() {
-		var _g = this.get(this.pos++);
-		switch(_g) {
-		case 110:
-			return null;
-		case 116:
-			return true;
-		case 102:
-			return false;
-		case 122:
-			return 0;
-		case 105:
-			return this.readDigits();
-		case 100:
-			var p1 = this.pos;
-			while(true) {
-				var c = this.buf.charCodeAt(this.pos);
-				if(c >= 43 && c < 58 || c == 101 || c == 69) this.pos++; else break;
-			}
-			return Std.parseFloat(HxOverrides.substr(this.buf,p1,this.pos - p1));
-		case 121:
-			var len = this.readDigits();
-			if(this.get(this.pos++) != 58 || this.length - this.pos < len) throw "Invalid string length";
-			var s = HxOverrides.substr(this.buf,this.pos,len);
-			this.pos += len;
-			s = decodeURIComponent(s.split("+").join(" "));
-			this.scache.push(s);
-			return s;
-		case 107:
-			return Math.NaN;
-		case 109:
-			return Math.NEGATIVE_INFINITY;
-		case 112:
-			return Math.POSITIVE_INFINITY;
-		case 97:
-			var buf = this.buf;
-			var a = new Array();
-			this.cache.push(a);
-			while(true) {
-				var c1 = this.buf.charCodeAt(this.pos);
-				if(c1 == 104) {
-					this.pos++;
-					break;
-				}
-				if(c1 == 117) {
-					this.pos++;
-					var n = this.readDigits();
-					a[a.length + n - 1] = null;
-				} else a.push(this.unserialize());
-			}
-			return a;
-		case 111:
-			var o = { };
-			this.cache.push(o);
-			this.unserializeObject(o);
-			return o;
-		case 114:
-			var n1 = this.readDigits();
-			if(n1 < 0 || n1 >= this.cache.length) throw "Invalid reference";
-			return this.cache[n1];
-		case 82:
-			var n2 = this.readDigits();
-			if(n2 < 0 || n2 >= this.scache.length) throw "Invalid string reference";
-			return this.scache[n2];
-		case 120:
-			throw this.unserialize();
-			break;
-		case 99:
-			var name = this.unserialize();
-			var cl = this.resolver.resolveClass(name);
-			if(cl == null) throw "Class not found " + name;
-			var o1 = Type.createEmptyInstance(cl);
-			this.cache.push(o1);
-			this.unserializeObject(o1);
-			return o1;
-		case 119:
-			var name1 = this.unserialize();
-			var edecl = this.resolver.resolveEnum(name1);
-			if(edecl == null) throw "Enum not found " + name1;
-			var e = this.unserializeEnum(edecl,this.unserialize());
-			this.cache.push(e);
-			return e;
-		case 106:
-			var name2 = this.unserialize();
-			var edecl1 = this.resolver.resolveEnum(name2);
-			if(edecl1 == null) throw "Enum not found " + name2;
-			this.pos++;
-			var index = this.readDigits();
-			var tag = Type.getEnumConstructs(edecl1)[index];
-			if(tag == null) throw "Unknown enum index " + name2 + "@" + index;
-			var e1 = this.unserializeEnum(edecl1,tag);
-			this.cache.push(e1);
-			return e1;
-		case 108:
-			var l = new List();
-			this.cache.push(l);
-			var buf1 = this.buf;
-			while(this.buf.charCodeAt(this.pos) != 104) l.add(this.unserialize());
-			this.pos++;
-			return l;
-		case 98:
-			var h = new haxe.ds.StringMap();
-			this.cache.push(h);
-			var buf2 = this.buf;
-			while(this.buf.charCodeAt(this.pos) != 104) {
-				var s1 = this.unserialize();
-				h.set(s1,this.unserialize());
-			}
-			this.pos++;
-			return h;
-		case 113:
-			var h1 = new haxe.ds.IntMap();
-			this.cache.push(h1);
-			var buf3 = this.buf;
-			var c2 = this.get(this.pos++);
-			while(c2 == 58) {
-				var i = this.readDigits();
-				h1.set(i,this.unserialize());
-				c2 = this.get(this.pos++);
-			}
-			if(c2 != 104) throw "Invalid IntMap format";
-			return h1;
-		case 77:
-			var h2 = new haxe.ds.ObjectMap();
-			this.cache.push(h2);
-			var buf4 = this.buf;
-			while(this.buf.charCodeAt(this.pos) != 104) {
-				var s2 = this.unserialize();
-				h2.set(s2,this.unserialize());
-			}
-			this.pos++;
-			return h2;
-		case 118:
-			var d;
-			var s3 = HxOverrides.substr(this.buf,this.pos,19);
-			d = HxOverrides.strDate(s3);
-			this.cache.push(d);
-			this.pos += 19;
-			return d;
-		case 115:
-			var len1 = this.readDigits();
-			var buf5 = this.buf;
-			if(this.get(this.pos++) != 58 || this.length - this.pos < len1) throw "Invalid bytes length";
-			var codes = haxe.Unserializer.CODES;
-			if(codes == null) {
-				codes = haxe.Unserializer.initCodes();
-				haxe.Unserializer.CODES = codes;
-			}
-			var i1 = this.pos;
-			var rest = len1 & 3;
-			var size;
-			size = (len1 >> 2) * 3 + (rest >= 2?rest - 1:0);
-			var max = i1 + (len1 - rest);
-			var bytes = haxe.io.Bytes.alloc(size);
-			var bpos = 0;
-			while(i1 < max) {
-				var c11 = codes[StringTools.fastCodeAt(buf5,i1++)];
-				var c21 = codes[StringTools.fastCodeAt(buf5,i1++)];
-				bytes.set(bpos++,c11 << 2 | c21 >> 4);
-				var c3 = codes[StringTools.fastCodeAt(buf5,i1++)];
-				bytes.set(bpos++,c21 << 4 | c3 >> 2);
-				var c4 = codes[StringTools.fastCodeAt(buf5,i1++)];
-				bytes.set(bpos++,c3 << 6 | c4);
-			}
-			if(rest >= 2) {
-				var c12 = codes[StringTools.fastCodeAt(buf5,i1++)];
-				var c22 = codes[StringTools.fastCodeAt(buf5,i1++)];
-				bytes.set(bpos++,c12 << 2 | c22 >> 4);
-				if(rest == 3) {
-					var c31 = codes[StringTools.fastCodeAt(buf5,i1++)];
-					bytes.set(bpos++,c22 << 4 | c31 >> 2);
-				}
-			}
-			this.pos += len1;
-			this.cache.push(bytes);
-			return bytes;
-		case 67:
-			var name3 = this.unserialize();
-			var cl1 = this.resolver.resolveClass(name3);
-			if(cl1 == null) throw "Class not found " + name3;
-			var o2 = Type.createEmptyInstance(cl1);
-			this.cache.push(o2);
-			o2.hxUnserialize(this);
-			if(this.get(this.pos++) != 103) throw "Invalid custom data";
-			return o2;
-		default:
-		}
-		this.pos--;
-		throw "Invalid char " + this.buf.charAt(this.pos) + " at position " + this.pos;
-	}
-	,__class__: haxe.Unserializer
+	,__class__: haxe.io.Bytes
 };
 haxe.crypto = {};
-haxe.crypto.Md5 = function() {
+haxe.crypto.Base64 = function() { };
+$hxClasses["haxe.crypto.Base64"] = haxe.crypto.Base64;
+haxe.crypto.Base64.__name__ = ["haxe","crypto","Base64"];
+haxe.crypto.Base64.decode = function(str,complement) {
+	if(complement == null) complement = true;
+	if(complement) while(HxOverrides.cca(str,str.length - 1) == 61) str = HxOverrides.substr(str,0,-1);
+	return new haxe.crypto.BaseCode(haxe.crypto.Base64.BYTES).decodeBytes(haxe.io.Bytes.ofString(str));
 };
-$hxClasses["haxe.crypto.Md5"] = haxe.crypto.Md5;
-haxe.crypto.Md5.__name__ = ["haxe","crypto","Md5"];
-haxe.crypto.Md5.encode = function(s) {
-	var m = new haxe.crypto.Md5();
-	var h = m.doEncode(haxe.crypto.Md5.str2blks(s));
-	return m.hex(h);
+haxe.crypto.BaseCode = function(base) {
+	var len = base.length;
+	var nbits = 1;
+	while(len > 1 << nbits) nbits++;
+	if(nbits > 8 || len != 1 << nbits) throw "BaseCode : base length must be a power of two.";
+	this.base = base;
+	this.nbits = nbits;
 };
-haxe.crypto.Md5.str2blks = function(str) {
-	var nblk = (str.length + 8 >> 6) + 1;
-	var blks = new Array();
-	var blksSize = nblk * 16;
-	var _g = 0;
-	while(_g < blksSize) {
-		var i = _g++;
-		blks[i] = 0;
-	}
-	var i1 = 0;
-	while(i1 < str.length) {
-		blks[i1 >> 2] |= HxOverrides.cca(str,i1) << (str.length * 8 + i1) % 4 * 8;
-		i1++;
-	}
-	blks[i1 >> 2] |= 128 << (str.length * 8 + i1) % 4 * 8;
-	var l = str.length * 8;
-	var k = nblk * 16 - 2;
-	blks[k] = l & 255;
-	blks[k] |= (l >>> 8 & 255) << 8;
-	blks[k] |= (l >>> 16 & 255) << 16;
-	blks[k] |= (l >>> 24 & 255) << 24;
-	return blks;
-};
-haxe.crypto.Md5.prototype = {
-	bitOR: function(a,b) {
-		var lsb = a & 1 | b & 1;
-		var msb31 = a >>> 1 | b >>> 1;
-		return msb31 << 1 | lsb;
-	}
-	,bitXOR: function(a,b) {
-		var lsb = a & 1 ^ b & 1;
-		var msb31 = a >>> 1 ^ b >>> 1;
-		return msb31 << 1 | lsb;
-	}
-	,bitAND: function(a,b) {
-		var lsb = a & 1 & (b & 1);
-		var msb31 = a >>> 1 & b >>> 1;
-		return msb31 << 1 | lsb;
-	}
-	,addme: function(x,y) {
-		var lsw = (x & 65535) + (y & 65535);
-		var msw = (x >> 16) + (y >> 16) + (lsw >> 16);
-		return msw << 16 | lsw & 65535;
-	}
-	,hex: function(a) {
-		var str = "";
-		var hex_chr = "0123456789abcdef";
+$hxClasses["haxe.crypto.BaseCode"] = haxe.crypto.BaseCode;
+haxe.crypto.BaseCode.__name__ = ["haxe","crypto","BaseCode"];
+haxe.crypto.BaseCode.prototype = {
+	initTable: function() {
+		var tbl = new Array();
 		var _g = 0;
-		while(_g < a.length) {
-			var num = a[_g];
-			++_g;
-			var _g1 = 0;
-			while(_g1 < 4) {
-				var j = _g1++;
-				str += hex_chr.charAt(num >> j * 8 + 4 & 15) + hex_chr.charAt(num >> j * 8 & 15);
+		while(_g < 256) {
+			var i = _g++;
+			tbl[i] = -1;
+		}
+		var _g1 = 0;
+		var _g2 = this.base.length;
+		while(_g1 < _g2) {
+			var i1 = _g1++;
+			tbl[this.base.b[i1]] = i1;
+		}
+		this.tbl = tbl;
+	}
+	,decodeBytes: function(b) {
+		var nbits = this.nbits;
+		var base = this.base;
+		if(this.tbl == null) this.initTable();
+		var tbl = this.tbl;
+		var size = b.length * nbits >> 3;
+		var out = haxe.io.Bytes.alloc(size);
+		var buf = 0;
+		var curbits = 0;
+		var pin = 0;
+		var pout = 0;
+		while(pout < size) {
+			while(curbits < 8) {
+				curbits += nbits;
+				buf <<= nbits;
+				var i = tbl[b.get(pin++)];
+				if(i == -1) throw "BaseCode : invalid encoded char";
+				buf |= i;
 			}
+			curbits -= 8;
+			out.set(pout++,buf >> curbits & 255);
 		}
-		return str;
+		return out;
 	}
-	,rol: function(num,cnt) {
-		return num << cnt | num >>> 32 - cnt;
-	}
-	,cmn: function(q,a,b,x,s,t) {
-		return this.addme(this.rol(this.addme(this.addme(a,q),this.addme(x,t)),s),b);
-	}
-	,ff: function(a,b,c,d,x,s,t) {
-		return this.cmn(this.bitOR(this.bitAND(b,c),this.bitAND(~b,d)),a,b,x,s,t);
-	}
-	,gg: function(a,b,c,d,x,s,t) {
-		return this.cmn(this.bitOR(this.bitAND(b,d),this.bitAND(c,~d)),a,b,x,s,t);
-	}
-	,hh: function(a,b,c,d,x,s,t) {
-		return this.cmn(this.bitXOR(this.bitXOR(b,c),d),a,b,x,s,t);
-	}
-	,ii: function(a,b,c,d,x,s,t) {
-		return this.cmn(this.bitXOR(c,this.bitOR(b,~d)),a,b,x,s,t);
-	}
-	,doEncode: function(x) {
-		var a = 1732584193;
-		var b = -271733879;
-		var c = -1732584194;
-		var d = 271733878;
-		var step;
-		var i = 0;
-		while(i < x.length) {
-			var olda = a;
-			var oldb = b;
-			var oldc = c;
-			var oldd = d;
-			step = 0;
-			a = this.ff(a,b,c,d,x[i],7,-680876936);
-			d = this.ff(d,a,b,c,x[i + 1],12,-389564586);
-			c = this.ff(c,d,a,b,x[i + 2],17,606105819);
-			b = this.ff(b,c,d,a,x[i + 3],22,-1044525330);
-			a = this.ff(a,b,c,d,x[i + 4],7,-176418897);
-			d = this.ff(d,a,b,c,x[i + 5],12,1200080426);
-			c = this.ff(c,d,a,b,x[i + 6],17,-1473231341);
-			b = this.ff(b,c,d,a,x[i + 7],22,-45705983);
-			a = this.ff(a,b,c,d,x[i + 8],7,1770035416);
-			d = this.ff(d,a,b,c,x[i + 9],12,-1958414417);
-			c = this.ff(c,d,a,b,x[i + 10],17,-42063);
-			b = this.ff(b,c,d,a,x[i + 11],22,-1990404162);
-			a = this.ff(a,b,c,d,x[i + 12],7,1804603682);
-			d = this.ff(d,a,b,c,x[i + 13],12,-40341101);
-			c = this.ff(c,d,a,b,x[i + 14],17,-1502002290);
-			b = this.ff(b,c,d,a,x[i + 15],22,1236535329);
-			a = this.gg(a,b,c,d,x[i + 1],5,-165796510);
-			d = this.gg(d,a,b,c,x[i + 6],9,-1069501632);
-			c = this.gg(c,d,a,b,x[i + 11],14,643717713);
-			b = this.gg(b,c,d,a,x[i],20,-373897302);
-			a = this.gg(a,b,c,d,x[i + 5],5,-701558691);
-			d = this.gg(d,a,b,c,x[i + 10],9,38016083);
-			c = this.gg(c,d,a,b,x[i + 15],14,-660478335);
-			b = this.gg(b,c,d,a,x[i + 4],20,-405537848);
-			a = this.gg(a,b,c,d,x[i + 9],5,568446438);
-			d = this.gg(d,a,b,c,x[i + 14],9,-1019803690);
-			c = this.gg(c,d,a,b,x[i + 3],14,-187363961);
-			b = this.gg(b,c,d,a,x[i + 8],20,1163531501);
-			a = this.gg(a,b,c,d,x[i + 13],5,-1444681467);
-			d = this.gg(d,a,b,c,x[i + 2],9,-51403784);
-			c = this.gg(c,d,a,b,x[i + 7],14,1735328473);
-			b = this.gg(b,c,d,a,x[i + 12],20,-1926607734);
-			a = this.hh(a,b,c,d,x[i + 5],4,-378558);
-			d = this.hh(d,a,b,c,x[i + 8],11,-2022574463);
-			c = this.hh(c,d,a,b,x[i + 11],16,1839030562);
-			b = this.hh(b,c,d,a,x[i + 14],23,-35309556);
-			a = this.hh(a,b,c,d,x[i + 1],4,-1530992060);
-			d = this.hh(d,a,b,c,x[i + 4],11,1272893353);
-			c = this.hh(c,d,a,b,x[i + 7],16,-155497632);
-			b = this.hh(b,c,d,a,x[i + 10],23,-1094730640);
-			a = this.hh(a,b,c,d,x[i + 13],4,681279174);
-			d = this.hh(d,a,b,c,x[i],11,-358537222);
-			c = this.hh(c,d,a,b,x[i + 3],16,-722521979);
-			b = this.hh(b,c,d,a,x[i + 6],23,76029189);
-			a = this.hh(a,b,c,d,x[i + 9],4,-640364487);
-			d = this.hh(d,a,b,c,x[i + 12],11,-421815835);
-			c = this.hh(c,d,a,b,x[i + 15],16,530742520);
-			b = this.hh(b,c,d,a,x[i + 2],23,-995338651);
-			a = this.ii(a,b,c,d,x[i],6,-198630844);
-			d = this.ii(d,a,b,c,x[i + 7],10,1126891415);
-			c = this.ii(c,d,a,b,x[i + 14],15,-1416354905);
-			b = this.ii(b,c,d,a,x[i + 5],21,-57434055);
-			a = this.ii(a,b,c,d,x[i + 12],6,1700485571);
-			d = this.ii(d,a,b,c,x[i + 3],10,-1894986606);
-			c = this.ii(c,d,a,b,x[i + 10],15,-1051523);
-			b = this.ii(b,c,d,a,x[i + 1],21,-2054922799);
-			a = this.ii(a,b,c,d,x[i + 8],6,1873313359);
-			d = this.ii(d,a,b,c,x[i + 15],10,-30611744);
-			c = this.ii(c,d,a,b,x[i + 6],15,-1560198380);
-			b = this.ii(b,c,d,a,x[i + 13],21,1309151649);
-			a = this.ii(a,b,c,d,x[i + 4],6,-145523070);
-			d = this.ii(d,a,b,c,x[i + 11],10,-1120210379);
-			c = this.ii(c,d,a,b,x[i + 2],15,718787259);
-			b = this.ii(b,c,d,a,x[i + 9],21,-343485551);
-			a = this.addme(a,olda);
-			b = this.addme(b,oldb);
-			c = this.addme(c,oldc);
-			d = this.addme(d,oldd);
-			i += 16;
-		}
-		return [a,b,c,d];
-	}
-	,__class__: haxe.crypto.Md5
+	,__class__: haxe.crypto.BaseCode
 };
 haxe.ds = {};
 haxe.ds.ArraySort = function() { };
@@ -1345,50 +652,6 @@ haxe.ds.ArraySort.swap = function(a,i,j) {
 	a[i] = a[j];
 	a[j] = tmp;
 };
-haxe.ds.IntMap = function() {
-	this.h = { };
-};
-$hxClasses["haxe.ds.IntMap"] = haxe.ds.IntMap;
-haxe.ds.IntMap.__name__ = ["haxe","ds","IntMap"];
-haxe.ds.IntMap.__interfaces__ = [IMap];
-haxe.ds.IntMap.prototype = {
-	set: function(key,value) {
-		this.h[key] = value;
-	}
-	,get: function(key) {
-		return this.h[key];
-	}
-	,keys: function() {
-		var a = [];
-		for( var key in this.h ) {
-		if(this.h.hasOwnProperty(key)) a.push(key | 0);
-		}
-		return HxOverrides.iter(a);
-	}
-	,__class__: haxe.ds.IntMap
-};
-haxe.ds.ObjectMap = function() {
-	this.h = { };
-	this.h.__keys__ = { };
-};
-$hxClasses["haxe.ds.ObjectMap"] = haxe.ds.ObjectMap;
-haxe.ds.ObjectMap.__name__ = ["haxe","ds","ObjectMap"];
-haxe.ds.ObjectMap.__interfaces__ = [IMap];
-haxe.ds.ObjectMap.prototype = {
-	set: function(key,value) {
-		var id = key.__id__ || (key.__id__ = ++haxe.ds.ObjectMap.count);
-		this.h[id] = value;
-		this.h.__keys__[id] = key;
-	}
-	,keys: function() {
-		var a = [];
-		for( var key in this.h.__keys__ ) {
-		if(this.h.hasOwnProperty(key)) a.push(this.h.__keys__[key]);
-		}
-		return HxOverrides.iter(a);
-	}
-	,__class__: haxe.ds.ObjectMap
-};
 haxe.ds.StringMap = function() {
 	this.h = { };
 };
@@ -1420,88 +683,6 @@ haxe.ds.StringMap.prototype = {
 	}
 	,__class__: haxe.ds.StringMap
 };
-haxe.io = {};
-haxe.io.Bytes = function(length,b) {
-	this.length = length;
-	this.b = b;
-};
-$hxClasses["haxe.io.Bytes"] = haxe.io.Bytes;
-haxe.io.Bytes.__name__ = ["haxe","io","Bytes"];
-haxe.io.Bytes.alloc = function(length) {
-	var a = new Array();
-	var _g = 0;
-	while(_g < length) {
-		var i = _g++;
-		a.push(0);
-	}
-	return new haxe.io.Bytes(length,a);
-};
-haxe.io.Bytes.ofString = function(s) {
-	var a = new Array();
-	var i = 0;
-	while(i < s.length) {
-		var c = StringTools.fastCodeAt(s,i++);
-		if(55296 <= c && c <= 56319) c = c - 55232 << 10 | StringTools.fastCodeAt(s,i++) & 1023;
-		if(c <= 127) a.push(c); else if(c <= 2047) {
-			a.push(192 | c >> 6);
-			a.push(128 | c & 63);
-		} else if(c <= 65535) {
-			a.push(224 | c >> 12);
-			a.push(128 | c >> 6 & 63);
-			a.push(128 | c & 63);
-		} else {
-			a.push(240 | c >> 18);
-			a.push(128 | c >> 12 & 63);
-			a.push(128 | c >> 6 & 63);
-			a.push(128 | c & 63);
-		}
-	}
-	return new haxe.io.Bytes(a.length,a);
-};
-haxe.io.Bytes.prototype = {
-	get: function(pos) {
-		return this.b[pos];
-	}
-	,set: function(pos,v) {
-		this.b[pos] = v & 255;
-	}
-	,sub: function(pos,len) {
-		if(pos < 0 || len < 0 || pos + len > this.length) throw haxe.io.Error.OutsideBounds;
-		return new haxe.io.Bytes(len,this.b.slice(pos,pos + len));
-	}
-	,setFloat: function(pos,v) {
-		throw "Not supported";
-	}
-	,getString: function(pos,len) {
-		if(pos < 0 || len < 0 || pos + len > this.length) throw haxe.io.Error.OutsideBounds;
-		var s = "";
-		var b = this.b;
-		var fcc = String.fromCharCode;
-		var i = pos;
-		var max = pos + len;
-		while(i < max) {
-			var c = b[i++];
-			if(c < 128) {
-				if(c == 0) break;
-				s += fcc(c);
-			} else if(c < 224) s += fcc((c & 63) << 6 | b[i++] & 127); else if(c < 240) {
-				var c2 = b[i++];
-				s += fcc((c & 31) << 12 | (c2 & 127) << 6 | b[i++] & 127);
-			} else {
-				var c21 = b[i++];
-				var c3 = b[i++];
-				var u = (c & 15) << 18 | (c21 & 127) << 12 | (c3 & 127) << 6 | b[i++] & 127;
-				s += fcc((u >> 10) + 55232);
-				s += fcc(u & 1023 | 56320);
-			}
-		}
-		return s;
-	}
-	,toString: function() {
-		return this.getString(0,this.length);
-	}
-	,__class__: haxe.io.Bytes
-};
 haxe.io.Eof = function() { };
 $hxClasses["haxe.io.Eof"] = haxe.io.Eof;
 haxe.io.Eof.__name__ = ["haxe","io","Eof"];
@@ -1511,7 +692,7 @@ haxe.io.Eof.prototype = {
 	}
 	,__class__: haxe.io.Eof
 };
-haxe.io.Error = $hxClasses["haxe.io.Error"] = { __ename__ : ["haxe","io","Error"], __constructs__ : ["Blocked","Overflow","OutsideBounds","Custom"] };
+haxe.io.Error = { __ename__ : ["haxe","io","Error"], __constructs__ : ["Blocked","Overflow","OutsideBounds","Custom"] };
 haxe.io.Error.Blocked = ["Blocked",0];
 haxe.io.Error.Blocked.toString = $estr;
 haxe.io.Error.Blocked.__enum__ = haxe.io.Error;
@@ -2187,663 +1368,6 @@ tannus.crypto.Tea.longsToStr = function(longs) {
 	}
 	return a;
 };
-tannus.db = {};
-tannus.db.tandb = {};
-tannus.db.tandb.Database = function(location) {
-	this.location = location;
-	this.validate();
-};
-$hxClasses["tannus.db.tandb.Database"] = tannus.db.tandb.Database;
-tannus.db.tandb.Database.__name__ = ["tannus","db","tandb","Database"];
-tannus.db.tandb.Database.defaultMetaData = function() {
-	return { name : "", root : "", schemas : [], users : []};
-};
-tannus.db.tandb.Database.create = function(dirname,dbname,rootpw) {
-	if(tannus.io.FileSystem.exists(dirname)) new tannus.utils.Folder(dirname).remove();
-	tannus.io.FileSystem.createDirectory(dirname);
-	var cfg_file_path = tannus.utils.PathTools.simplify(tannus.utils.PathTools.joinWith(dirname,[".__tandbconf__"]));
-	var new_db_meta = { name : "", root : "", schemas : [], users : []};
-	new_db_meta.name = dbname;
-	new_db_meta.root = haxe.crypto.Md5.encode(rootpw);
-	tannus.io.FileSystem.write(cfg_file_path,(function($this) {
-		var $r;
-		var chars = JSON.stringify(new_db_meta,null,"    ");
-		$r = (function($this) {
-			var $r;
-			var bytes = haxe.io.Bytes.ofString(chars);
-			$r = bytes;
-			return $r;
-		}($this));
-		return $r;
-	}(this)));
-	return new tannus.db.tandb.Database(dirname);
-};
-tannus.db.tandb.Database.prototype = {
-	validate: function() {
-		if(tannus.io.FileSystem.exists(this.location) && tannus.io.FileSystem.isDirectory(this.location)) {
-			var db_dir = new tannus.utils.Folder(this.location);
-			if(db_dir.hasChild(".__tandbconf__")) {
-				var db_config = db_dir.file(".__tandbconf__");
-				try {
-					var config_data = JSON.parse(tannus.io.FileSystem.read(db_config.name));
-					this.meta = config_data;
-				} catch( err ) {
-					if( js.Boot.__instanceof(err,String) ) {
-						throw "Database configuration improperly formatted at \"" + this.location + "\"";
-					} else throw(err);
-				}
-			} else throw "Database configuration could not be found at \"" + this.location + "\"";
-		} else throw "Cannot initialize Database instance at \"" + this.location + "\"";
-	}
-	,validateCredentials: function(username,password) {
-		if(username == "root") return haxe.crypto.Md5.encode(password) == this.meta.root; else {
-			var user = null;
-			var _g = 0;
-			var _g1 = this.meta.users;
-			while(_g < _g1.length) {
-				var reg_user = _g1[_g];
-				++_g;
-				if(reg_user.username == username) {
-					user = reg_user;
-					break;
-				}
-			}
-			if(user != null) return haxe.crypto.Md5.encode(password) == user.password; else return false;
-		}
-	}
-	,getUserData: function(info) {
-		if(info.username == "root" && haxe.crypto.Md5.encode(info.password) == this.meta.root) return { username : "root", password : this.meta.root, permissions : []}; else {
-			var _g = 0;
-			var _g1 = this.meta.users;
-			while(_g < _g1.length) {
-				var entry = _g1[_g];
-				++_g;
-				if(entry.username == info.username && haxe.crypto.Md5.encode(info.password) == entry.password) return entry;
-			}
-			return null;
-		}
-	}
-	,getUserByName: function(username) {
-		if(username == "root") return { username : "root", password : this.meta.root, permissions : new tannus.db.tandb.Permissions({ username : "root", password : this.meta.root, permissions : []}).pids}; else {
-			var _g = 0;
-			var _g1 = this.meta.users;
-			while(_g < _g1.length) {
-				var entry = _g1[_g];
-				++_g;
-				if(entry.username == username) return entry;
-			}
-			return null;
-		}
-	}
-	,sendAction: function(act,conn) {
-		var perm = conn.permissions;
-		switch(act[1]) {
-		case 0:
-			var pw = act[3];
-			var un = act[2];
-			var _g = 0;
-			var _g1 = this.meta.users;
-			while(_g < _g1.length) {
-				var entry = _g1[_g];
-				++_g;
-				if(entry.username == un) throw "TypeError: user \"" + un + "\" already exists";
-			}
-			if(Lambda.has(perm.pids,0)) this.meta.users.push({ username : un, password : haxe.crypto.Md5.encode(pw), permissions : []});
-			break;
-		case 2:
-			var schema_name = act[2];
-			if(Lambda.has(perm.pids,3)) {
-				if(!Lambda.has(this.meta.schemas,schema_name)) {
-					tannus.db.tandb.schemas.Schema.create(schema_name,this);
-					this.meta.schemas.push(schema_name);
-				} else throw "PreExistingSchemaError: Cannot re-create schema \"" + this.meta.name + "\".\"" + schema_name + "\"";
-			} else null;
-			break;
-		case 1:
-			var user_permissions = act[3];
-			var un1 = act[2];
-			if(Lambda.has(perm.pids,2)) {
-				var udata = this.getUserByName(un1);
-				if(udata != null) {
-					udata.permissions = user_permissions;
-					this.commit();
-				} else throw "NoSuchUserError: no user with username \"" + un1 + "\" could be accessed";
-			}
-			break;
-		}
-	}
-	,schema: function(name,conn) {
-		if(Lambda.has(this.meta.schemas,name)) return new tannus.db.tandb.schemas.Schema(this,conn,name); else throw "NoSuchSchemaError: schema \"" + this.meta.name + "\".\"" + name + "\" could not be read";
-	}
-	,commit: function() {
-		var config_file = new tannus.utils.File(tannus.utils.PathTools.simplify(tannus.utils.PathTools.joinWith(this.location,[".__tandbconf__"])));
-		config_file.set_content((function($this) {
-			var $r;
-			var chars = JSON.stringify($this.meta,null,"    ");
-			$r = (function($this) {
-				var $r;
-				var bytes = haxe.io.Bytes.ofString(chars);
-				$r = bytes;
-				return $r;
-			}($this));
-			return $r;
-		}(this)));
-	}
-	,__class__: tannus.db.tandb.Database
-};
-tannus.db.tandb.DatabaseConnection = function(ref,info) {
-	this.primed = false;
-	this.db = new tannus.db.tandb.Database(ref);
-	this.credentials = info;
-	var logged_in = this.db.validateCredentials(this.credentials.username,this.credentials.password);
-	if(logged_in) {
-		this.primed = true;
-		this.permissions = new tannus.db.tandb.Permissions(this.db.getUserData(this.credentials));
-	} else this.permissions = new tannus.db.tandb.Permissions({ username : "[rejected]", password : "", permissions : []});
-};
-$hxClasses["tannus.db.tandb.DatabaseConnection"] = tannus.db.tandb.DatabaseConnection;
-tannus.db.tandb.DatabaseConnection.__name__ = ["tannus","db","tandb","DatabaseConnection"];
-tannus.db.tandb.DatabaseConnection.permission_denied = function() {
-	throw "DataBaseError: Permission denied";
-};
-tannus.db.tandb.DatabaseConnection.prototype = {
-	createUser: function(username,password) {
-		if(Lambda.has(this.permissions.pids,0)) this.db.sendAction(tannus.db.tandb.actions.DatabaseAction.DBCreateUser(username,password),this); else throw "DataBaseError: Permission denied";
-	}
-	,setUserPermissions: function(username,usr_perms) {
-		if(Lambda.has(this.permissions.pids,2)) this.db.sendAction(tannus.db.tandb.actions.DatabaseAction.DBSetUserPermissions(username,usr_perms),this); else throw "DataBaseError: Permission denied";
-	}
-	,createSchema: function(name) {
-		if(Lambda.has(this.permissions.pids,3)) this.db.sendAction(tannus.db.tandb.actions.DatabaseAction.DBCreateSchema(name),this); else throw "DataBaseError: Permission denied";
-	}
-	,schema: function(name) {
-		return new tannus.db.tandb.schemas.SchemaConnection(this.db.schema(name,this));
-	}
-	,__class__: tannus.db.tandb.DatabaseConnection
-};
-tannus.db.tandb.Permissions = function(meta) {
-	this.user = meta;
-	var _g = [];
-	var _g1 = 0;
-	var _g2 = meta.permissions;
-	while(_g1 < _g2.length) {
-		var pid = _g2[_g1];
-		++_g1;
-		_g.push((function($this) {
-			var $r;
-			var i = Std.parseInt(pid == null?"null":"" + pid);
-			$r = i;
-			return $r;
-		}(this)));
-	}
-	this.pids = _g;
-	if(this.user.username == "root") this.pids = [0,1,2,3,4];
-};
-$hxClasses["tannus.db.tandb.Permissions"] = tannus.db.tandb.Permissions;
-tannus.db.tandb.Permissions.__name__ = ["tannus","db","tandb","Permissions"];
-tannus.db.tandb.Permissions.prototype = {
-	hasPid: function(pid) {
-		return Lambda.has(this.pids,pid);
-	}
-	,get_create_user: function() {
-		return Lambda.has(this.pids,0);
-	}
-	,get_remove_user: function() {
-		return Lambda.has(this.pids,1);
-	}
-	,get_update_user: function() {
-		return Lambda.has(this.pids,2);
-	}
-	,get_create_schema: function() {
-		return Lambda.has(this.pids,3);
-	}
-	,get_remove_schema: function() {
-		return Lambda.has(this.pids,4);
-	}
-	,__class__: tannus.db.tandb.Permissions
-	,__properties__: {get_remove_schema:"get_remove_schema",get_create_schema:"get_create_schema",get_update_user:"get_update_user",get_remove_user:"get_remove_user",get_create_user:"get_create_user"}
-};
-tannus.db.tandb.actions = {};
-tannus.db.tandb.actions.DatabaseAction = $hxClasses["tannus.db.tandb.actions.DatabaseAction"] = { __ename__ : ["tannus","db","tandb","actions","DatabaseAction"], __constructs__ : ["DBCreateUser","DBSetUserPermissions","DBCreateSchema"] };
-tannus.db.tandb.actions.DatabaseAction.DBCreateUser = function(username,password) { var $x = ["DBCreateUser",0,username,password]; $x.__enum__ = tannus.db.tandb.actions.DatabaseAction; $x.toString = $estr; return $x; };
-tannus.db.tandb.actions.DatabaseAction.DBSetUserPermissions = function(username,permissions) { var $x = ["DBSetUserPermissions",1,username,permissions]; $x.__enum__ = tannus.db.tandb.actions.DatabaseAction; $x.toString = $estr; return $x; };
-tannus.db.tandb.actions.DatabaseAction.DBCreateSchema = function(name) { var $x = ["DBCreateSchema",2,name]; $x.__enum__ = tannus.db.tandb.actions.DatabaseAction; $x.toString = $estr; return $x; };
-tannus.db.tandb.schemas = {};
-tannus.db.tandb.schemas.Schema = function(db,conn,name) {
-	this.database = db;
-	this.db_connection = conn;
-	this.location = tannus.utils.PathTools.simplify(tannus.utils.PathTools.joinWith(tannus.utils.PathTools.normalize(this.database.location),["schema_" + name]));
-	this.meta = new tannus.db.tandb.schemas.SchemaMetaData(this.location);
-};
-$hxClasses["tannus.db.tandb.schemas.Schema"] = tannus.db.tandb.schemas.Schema;
-tannus.db.tandb.schemas.Schema.__name__ = ["tannus","db","tandb","schemas","Schema"];
-tannus.db.tandb.schemas.Schema.create = function(name,parent) {
-	var schemaDirectory = tannus.utils.PathTools.simplify(tannus.utils.PathTools.joinWith(tannus.utils.PathTools.normalize(parent.location),["schema_" + name]));
-	if(tannus.io.FileSystem.exists(schemaDirectory) && tannus.io.FileSystem.isDirectory(schemaDirectory)) new tannus.utils.Folder(schemaDirectory).remove();
-	tannus.io.FileSystem.createDirectory(schemaDirectory);
-	tannus.io.FileSystem.createDirectory("." + tannus.utils.PathTools.normalize(tannus.utils.PathTools.joinWith(schemaDirectory,["tables"])));
-	var config_file_loc = tannus.utils.PathTools.simplify(tannus.utils.PathTools.joinWith(schemaDirectory,[".__tandb_schemaconf__"]));
-	tannus.io.FileSystem.write(config_file_loc,(function($this) {
-		var $r;
-		var chars = JSON.stringify((function($this) {
-			var $r;
-			var this1 = tannus.db.tandb.schemas.SchemaMetaData.defaults();
-			$r = this1;
-			return $r;
-		}($this)),null,"    ");
-		$r = (function($this) {
-			var $r;
-			var bytes = haxe.io.Bytes.ofString(chars);
-			$r = bytes;
-			return $r;
-		}($this));
-		return $r;
-	}(this)));
-	var schema_meta = new tannus.db.tandb.schemas.SchemaMetaData(schemaDirectory);
-	schema_meta.name = name;
-};
-tannus.db.tandb.schemas.Schema.prototype = {
-	sendAction: function(act,conn) {
-		{
-			var primary_key = act[3];
-			var tablename = act[2];
-			tannus.db.tandb.tables.Table.create(tablename,primary_key,conn);
-			this.meta.addTable(tablename);
-		}
-	}
-	,nosuchtable: function(name) {
-		var full_path = tannus.utils.PathTools.joinWith(tannus.utils.PathTools.normalize(this.location),["tables",name]) + "/";
-		throw "NoSuchTableError: \"" + this.meta.name + "\".\"" + name + "\" (" + full_path + ") does not exist";
-	}
-	,__class__: tannus.db.tandb.schemas.Schema
-};
-tannus.db.tandb.schemas.SchemaAction = $hxClasses["tannus.db.tandb.schemas.SchemaAction"] = { __ename__ : ["tannus","db","tandb","schemas","SchemaAction"], __constructs__ : ["SCCreateTable"] };
-tannus.db.tandb.schemas.SchemaAction.SCCreateTable = function(tablename,pkey) { var $x = ["SCCreateTable",0,tablename,pkey]; $x.__enum__ = tannus.db.tandb.schemas.SchemaAction; $x.toString = $estr; return $x; };
-tannus.db.tandb.schemas.SchemaConnection = function(ref) {
-	this.schema = ref;
-};
-$hxClasses["tannus.db.tandb.schemas.SchemaConnection"] = tannus.db.tandb.schemas.SchemaConnection;
-tannus.db.tandb.schemas.SchemaConnection.__name__ = ["tannus","db","tandb","schemas","SchemaConnection"];
-tannus.db.tandb.schemas.SchemaConnection.prototype = {
-	tables: function() {
-		return this.schema.meta.tables;
-	}
-	,hasTable: function(name) {
-		return Lambda.has(this.tables(),name);
-	}
-	,assertTableExists: function(name) {
-		if(!this.hasTable(name)) this.schema.nosuchtable(name);
-	}
-	,createTable: function(name,pkey) {
-		this.schema.sendAction(tannus.db.tandb.schemas.SchemaAction.SCCreateTable(name,pkey),this);
-	}
-	,table: function(name) {
-		return new tannus.db.tandb.tables.TableConnection(name,this);
-	}
-	,__class__: tannus.db.tandb.schemas.SchemaConnection
-};
-tannus.db.tandb.schemas.SchemaMetaData = function(ref) {
-	this.location = ref;
-	this.config_file = new tannus.utils.File(tannus.utils.PathTools.simplify(tannus.utils.PathTools.joinWith(this.location,[".__tandb_schemaconf__"])));
-	if(tannus.io.FileSystem.exists(this.config_file.name)) {
-		var raw = JSON.parse(tannus.io.FileSystem.read(this.config_file.name));
-		this.name = raw.name;
-		this.tables = raw.tables;
-	} else {
-		this.name = "[un-named]";
-		this.tables = new Array();
-	}
-};
-$hxClasses["tannus.db.tandb.schemas.SchemaMetaData"] = tannus.db.tandb.schemas.SchemaMetaData;
-tannus.db.tandb.schemas.SchemaMetaData.__name__ = ["tannus","db","tandb","schemas","SchemaMetaData"];
-tannus.db.tandb.schemas.SchemaMetaData.defaults = function() {
-	return { name : "[un-named]", tables : []};
-};
-tannus.db.tandb.schemas.SchemaMetaData.prototype = {
-	sync: function() {
-		this.config_file.set_content((function($this) {
-			var $r;
-			var chars = JSON.stringify({ name : $this.name, tables : $this.tables});
-			$r = (function($this) {
-				var $r;
-				var bytes = haxe.io.Bytes.ofString(chars);
-				$r = bytes;
-				return $r;
-			}($this));
-			return $r;
-		}(this)));
-	}
-	,addTable: function(name) {
-		this.tables.push(name);
-		this.sync();
-	}
-	,__class__: tannus.db.tandb.schemas.SchemaMetaData
-};
-tannus.db.tandb.tables = {};
-tannus.db.tandb.tables._Column = {};
-tannus.db.tandb.tables._Column.Column_Impl_ = function() { };
-$hxClasses["tannus.db.tandb.tables._Column.Column_Impl_"] = tannus.db.tandb.tables._Column.Column_Impl_;
-tannus.db.tandb.tables._Column.Column_Impl_.__name__ = ["tannus","db","tandb","tables","_Column","Column_Impl_"];
-tannus.db.tandb.tables._Column.Column_Impl_.__properties__ = {get_type:"get_type",get_name:"get_name",get_self:"get_self"}
-tannus.db.tandb.tables._Column.Column_Impl_._new = function(col) {
-	if(col != null) return col; else return new Array();
-};
-tannus.db.tandb.tables._Column.Column_Impl_.get_name = function(this1) {
-	return this1[0];
-};
-tannus.db.tandb.tables._Column.Column_Impl_.get_type = function(this1) {
-	return this1[1];
-};
-tannus.db.tandb.tables._Column.Column_Impl_.validate = function(this1) {
-	if(!(this1.length >= 2)) {
-		throw "InvalidColumnDeclarationError: (" + this1.join(", ") + ")";
-		return this1;
-	} else return this1;
-};
-tannus.db.tandb.tables._Column.Column_Impl_.get_self = function(this1) {
-	return this1;
-};
-tannus.db.tandb.tables._Column.Column_Impl_.create = function(name,type) {
-	return tannus.db.tandb.tables._Column.Column_Impl_.fromArray([name,type]);
-};
-tannus.db.tandb.tables._Column.Column_Impl_.fromArray = function(arr) {
-	var this1;
-	if(arr != null) this1 = arr; else this1 = new Array();
-	if(!(this1.length >= 2)) {
-		throw "InvalidColumnDeclarationError: (" + this1.join(", ") + ")";
-		return this1;
-	} else return this1;
-};
-tannus.db.tandb.tables.RecordFormatter = function(meta) {
-	this.meta = meta;
-	var bytes = haxe.io.Bytes.alloc(0);
-	this.output = bytes;
-};
-$hxClasses["tannus.db.tandb.tables.RecordFormatter"] = tannus.db.tandb.tables.RecordFormatter;
-tannus.db.tandb.tables.RecordFormatter.__name__ = ["tannus","db","tandb","tables","RecordFormatter"];
-tannus.db.tandb.tables.RecordFormatter.load = function(filename) {
-	var raw_rows = new Array();
-	if(tannus.io.FileSystem.exists(filename)) {
-		var content;
-		var this1 = tannus.io.FileSystem.read(filename);
-		content = this1.toString();
-		try {
-			raw_rows = js.Boot.__cast(haxe.Unserializer.run(content) , Array);
-		} catch( err ) {
-			if( js.Boot.__instanceof(err,String) ) {
-				null;
-			} else throw(err);
-		}
-	}
-	var _g = [];
-	var _g1 = 0;
-	while(_g1 < raw_rows.length) {
-		var row = raw_rows[_g1];
-		++_g1;
-		_g.push(row);
-	}
-	return _g;
-};
-tannus.db.tandb.tables.RecordFormatter.prototype = {
-	format: function(rs) {
-		var rows = new Array();
-		var _g = 0;
-		var _g1 = rs.records;
-		while(_g < _g1.length) {
-			var record = _g1[_g];
-			++_g;
-			rows.push((function($this) {
-				var $r;
-				var this1 = record.getValue();
-				$r = this1;
-				return $r;
-			}(this)));
-		}
-		var chars = haxe.Serializer.run(rows);
-		var bytes = haxe.io.Bytes.ofString(chars);
-		this.output = bytes;
-	}
-	,formatRow: function(row) {
-		var colnames;
-		var _g = [];
-		var _g1 = 0;
-		var _g2 = this.meta.columns;
-		while(_g1 < _g2.length) {
-			var col = _g2[_g1];
-			++_g1;
-			_g.push(col[0]);
-		}
-		colnames = _g;
-		var values = new Array();
-		var _g11 = 0;
-		while(_g11 < colnames.length) {
-			var name = colnames[_g11];
-			++_g11;
-			values.push((function($this) {
-				var $r;
-				var this1;
-				{
-					var key;
-					var this2;
-					if(tannus.utils.Types.basictype(name) == "StringMap") this2 = tannus.utils.MapTools.toDynamic(name); else this2 = name;
-					key = this2;
-					var obj = Reflect.getProperty(row,key);
-					var this3;
-					if(tannus.utils.Types.basictype(obj) == "StringMap") this3 = tannus.utils.MapTools.toDynamic(obj); else this3 = obj;
-					this1 = this3;
-				}
-				$r = this1;
-				return $r;
-			}(this)));
-		}
-		var chars = haxe.Serializer.run(values);
-		var bytes = haxe.io.Bytes.ofString(chars);
-		return bytes;
-	}
-	,__class__: tannus.db.tandb.tables.RecordFormatter
-};
-tannus.db.tandb.tables.RecordSet = function(tabl) {
-	this.table = tabl;
-	this.indices = new Array();
-	this.records = new Array();
-	var myfilepath = "." + tannus.utils.PathTools.normalize(tannus.utils.PathTools.joinWith(this.table.location,[".tandb_records"]));
-	this.file = new tannus.utils.File(myfilepath);
-	if(tannus.io.FileSystem.exists(this.file.name)) {
-		var raw_records = tannus.db.tandb.tables.RecordFormatter.load(myfilepath);
-		var _g = [];
-		var _g1 = 0;
-		while(_g1 < raw_records.length) {
-			var record = [raw_records[_g1]];
-			++_g1;
-			_g.push(new tannus.utils.CPointer((function(record) {
-				return function() {
-					return record[0];
-				};
-			})(record)));
-		}
-		this.records = _g;
-	}
-	var _g2 = [];
-	var _g11 = 0;
-	var _g21 = this.table.meta.columns;
-	while(_g11 < _g21.length) {
-		var col = _g21[_g11];
-		++_g11;
-		_g2.push(col[0]);
-	}
-	this.column_order = _g2;
-};
-$hxClasses["tannus.db.tandb.tables.RecordSet"] = tannus.db.tandb.tables.RecordSet;
-tannus.db.tandb.tables.RecordSet.__name__ = ["tannus","db","tandb","tables","RecordSet"];
-tannus.db.tandb.tables.RecordSet.prototype = {
-	iterator: function() {
-		return HxOverrides.iter(this.records);
-	}
-	,addRecord: function(row) {
-		if((function($this) {
-			var $r;
-			var key;
-			{
-				var obj = $this.table.meta.primary_key;
-				var this1;
-				if(tannus.utils.Types.basictype(obj) == "StringMap") this1 = tannus.utils.MapTools.toDynamic(obj); else this1 = obj;
-				key = this1;
-			}
-			$r = (function($this) {
-				var $r;
-				var obj1 = Reflect.getProperty(row,key);
-				$r = (function($this) {
-					var $r;
-					var this2;
-					if(tannus.utils.Types.basictype(obj1) == "StringMap") this2 = tannus.utils.MapTools.toDynamic(obj1); else this2 = obj1;
-					$r = this2;
-					return $r;
-				}($this));
-				return $r;
-			}($this));
-			return $r;
-		}(this)) == null) throw "ConstraintViolationError: Primary Key cannot be null";
-		var ptr = new tannus.utils.CPointer(function() {
-			return row;
-		});
-		this.records.push(ptr);
-		this.sync();
-	}
-	,removeRecord: function(index) {
-		HxOverrides.remove(this.records,this.records[index]);
-	}
-	,sync: function() {
-		var formatter = new tannus.db.tandb.tables.RecordFormatter(this.table.meta);
-		formatter.format(this);
-		var out = formatter.output;
-		tannus.io.FileSystem.write(this.file.name,out);
-		out;
-	}
-	,__class__: tannus.db.tandb.tables.RecordSet
-};
-tannus.db.tandb.tables.Table = function(path,conn) {
-	this.parent = conn;
-	this.location = path;
-	var meta_file_path = "." + tannus.utils.PathTools.normalize(tannus.utils.PathTools.joinWith(path,[".tablerc"]));
-	this.meta = tannus.db.tandb.tables.TableMetaData.fromMetaFile(meta_file_path);
-	this.records = new tannus.db.tandb.tables.RecordSet(this);
-};
-$hxClasses["tannus.db.tandb.tables.Table"] = tannus.db.tandb.tables.Table;
-tannus.db.tandb.tables.Table.__name__ = ["tannus","db","tandb","tables","Table"];
-tannus.db.tandb.tables.Table.create = function(name,pkey,parent) {
-	var table_dir = "." + tannus.utils.PathTools.normalize(tannus.utils.PathTools.joinWith(tannus.utils.PathTools.normalize(parent.schema.location),["tables",name]));
-	if(tannus.io.FileSystem.exists(table_dir)) tannus.io.FileSystem.remove(table_dir);
-	tannus.io.FileSystem.createDirectory(table_dir);
-	var tablMeta = new tannus.db.tandb.tables.TableMetaData(name);
-	tablMeta.primary_key = pkey;
-	tablMeta.toMetaFile("." + tannus.utils.PathTools.joinWith(table_dir,[".tablerc"]));
-};
-tannus.db.tandb.tables.Table.prototype = {
-	getColumn: function(name) {
-		var _g = 0;
-		var _g1 = this.meta.columns;
-		while(_g < _g1.length) {
-			var column = _g1[_g];
-			++_g;
-			if(column[0] == name) return column;
-		}
-		return null;
-	}
-	,addColumn: function(name,type) {
-		this.meta.addColumn(name,type);
-	}
-	,addRow: function(row) {
-		this.records.addRecord(row);
-	}
-	,select: function(query) {
-		return this.getMatches(query);
-	}
-	,getMatches: function(sel) {
-		var predicate = tannus.ore.ObjectRegEx.getFunc(sel);
-		var matches = new Array();
-		var $it0 = this.records.iterator();
-		while( $it0.hasNext() ) {
-			var row = $it0.next();
-			if(predicate((function($this) {
-				var $r;
-				var this1 = row.getValue();
-				$r = this1;
-				return $r;
-			}(this)))) matches.push(row.getValue());
-		}
-		return matches;
-	}
-	,sync: function() {
-		this.meta.toMetaFile("." + tannus.utils.PathTools.joinWith("." + tannus.utils.PathTools.normalize(tannus.utils.PathTools.joinWith(tannus.utils.PathTools.normalize(this.parent.schema.location),["tables",this.meta.name])),[".tablerc"]));
-	}
-	,__class__: tannus.db.tandb.tables.Table
-};
-tannus.db.tandb.tables.TableConnection = function(name,parent) {
-	if(!parent.hasTable(name)) parent.schema.nosuchtable(name);
-	var table_location = tannus.utils.PathTools.joinWith(tannus.utils.PathTools.normalize(parent.schema.location),["tables",name]);
-	this.table = new tannus.db.tandb.tables.Table(table_location,parent);
-};
-$hxClasses["tannus.db.tandb.tables.TableConnection"] = tannus.db.tandb.tables.TableConnection;
-tannus.db.tandb.tables.TableConnection.__name__ = ["tannus","db","tandb","tables","TableConnection"];
-tannus.db.tandb.tables.TableConnection.prototype = {
-	addColumn: function(name,type) {
-		this.table.addColumn(name,type);
-	}
-	,insert: function(row) {
-		this.table.addRow(row);
-	}
-	,select: function(sel) {
-		return this.table.select(sel);
-	}
-	,__class__: tannus.db.tandb.tables.TableConnection
-};
-tannus.db.tandb.tables.TableMetaData = function(name) {
-	this.name = name;
-	this.columns = new Array();
-	this.last_pkey = 0;
-	this.primary_key = "";
-};
-$hxClasses["tannus.db.tandb.tables.TableMetaData"] = tannus.db.tandb.tables.TableMetaData;
-tannus.db.tandb.tables.TableMetaData.__name__ = ["tannus","db","tandb","tables","TableMetaData"];
-tannus.db.tandb.tables.TableMetaData.fromMetaFile = function(path) {
-	var vals = JSON.parse((function($this) {
-		var $r;
-		var this1 = tannus.io.FileSystem.read(path);
-		$r = this1.toString();
-		return $r;
-	}(this)));
-	var newmeta = new tannus.db.tandb.tables.TableMetaData(Std.string(vals.name) + "");
-	newmeta.primary_key = vals.primary_key;
-	return newmeta;
-};
-tannus.db.tandb.tables.TableMetaData.prototype = {
-	getColumn: function(name) {
-		var _g = 0;
-		var _g1 = this.columns;
-		while(_g < _g1.length) {
-			var col = _g1[_g];
-			++_g;
-			if(col[0] == name) return col;
-		}
-		return null;
-	}
-	,hasColumn: function(name) {
-		return this.getColumn(name) != null;
-	}
-	,addColumn: function(name,type) {
-		if(!this.hasColumn(name)) this.columns.push(tannus.db.tandb.tables._Column.Column_Impl_.create(name,type)); else throw "PreExistingColumnError: Cannot re-create column [" + name + "]";
-	}
-	,toMetaFile: function(path) {
-		var repr = JSON.stringify(this);
-		tannus.io.FileSystem.write(path,(function($this) {
-			var $r;
-			var bytes = haxe.io.Bytes.ofString(repr);
-			$r = bytes;
-			return $r;
-		}(this)));
-	}
-	,__class__: tannus.db.tandb.tables.TableMetaData
-};
 tannus.io = {};
 tannus.io._Byte = {};
 tannus.io._Byte.Byte_Impl_ = function() { };
@@ -2926,10 +1450,38 @@ tannus.io._ByteArray.ByteArray_Impl_.toBuffer = function(this1) {
 };
 tannus.io._ByteArray.ByteArray_Impl_.toByteArray = function(this1) {
 	var _g = [];
-	var $it0 = this1.buffer;
+	var $it0 = (function($this) {
+		var $r;
+		var buf = this1.buffer;
+		var i = -1;
+		var iter = { next : function() {
+			i++;
+			try {
+				return buf.b[i];
+			} catch( err ) {
+				if( js.Boot.__instanceof(err,String) ) {
+					return null;
+				} else throw(err);
+			}
+		}, hasNext : function() {
+			return i <= buf.length - 1 && (function($this) {
+				var $r;
+				try {
+					$r = buf.b[i + 1];
+				} catch( err1 ) {
+					if( js.Boot.__instanceof(err1,String) ) {
+						$r = null;
+					} else throw(err1);
+				}
+				return $r;
+			}(this)) != null;
+		}};
+		$r = iter;
+		return $r;
+	}(this));
 	while( $it0.hasNext() ) {
-		var i = $it0.next();
-		_g.push(i);
+		var i1 = $it0.next();
+		_g.push(i1);
 	}
 	return _g;
 };
@@ -3113,49 +1665,6 @@ tannus.io.IByteArray.prototype = {
 	}
 	,__class__: tannus.io.IByteArray
 	,__properties__: {get_length:"get_length"}
-};
-tannus.io.FileSystem = function() { };
-$hxClasses["tannus.io.FileSystem"] = tannus.io.FileSystem;
-tannus.io.FileSystem.__name__ = ["tannus","io","FileSystem"];
-tannus.io.FileSystem.exists = function(path) {
-	return tannus.serverside.NodeFileSystem.exists(path);
-};
-tannus.io.FileSystem.isFile = function(path) {
-	return tannus.serverside.NodeFileSystem.isFile(path);
-};
-tannus.io.FileSystem.isDirectory = function(path) {
-	return tannus.serverside.NodeFileSystem.isDirectory(path);
-};
-tannus.io.FileSystem.createDirectory = function(path) {
-	console.log(path);
-	tannus.serverside.NodeFileSystem.createDirectory(path);
-};
-tannus.io.FileSystem.removeDirectory = function(path) {
-	if(tannus.io.FileSystem.readDirectory(path).length == 0) tannus.serverside.NodeFileSystem.removeDirectory(path); else new tannus.utils.Folder(path).remove();
-};
-tannus.io.FileSystem.removeFile = function(path) {
-	tannus.serverside.NodeFileSystem.removeFile(path);
-};
-tannus.io.FileSystem.remove = function(path) {
-	try {
-		if(tannus.io.FileSystem.isDirectory(path)) tannus.io.FileSystem.removeDirectory(path); else tannus.io.FileSystem.removeFile(path);
-	} catch( err ) {
-		if( js.Boot.__instanceof(err,String) ) {
-			tannus.io.FileSystem.removeDirectory(path);
-		} else throw(err);
-	}
-};
-tannus.io.FileSystem.readDirectory = function(path) {
-	return tannus.serverside.NodeFileSystem.readDirectory(path);
-};
-tannus.io.FileSystem.rename = function(oldPath,newPath) {
-	return tannus.serverside.NodeFileSystem.rename(oldPath,newPath);
-};
-tannus.io.FileSystem.read = function(path) {
-	return tannus.serverside.NodeFileSystem.read(path);
-};
-tannus.io.FileSystem.write = function(path,content) {
-	tannus.serverside.NodeFileSystem.write(path,content);
 };
 tannus.mvc = {};
 tannus.mvc.Controller = function(app) {
@@ -3946,7 +2455,7 @@ tannus.ore.Parser.prototype = {
 	}
 	,__class__: tannus.ore.Parser
 };
-tannus.ore.SelOp = $hxClasses["tannus.ore.SelOp"] = { __ename__ : ["tannus","ore","SelOp"], __constructs__ : ["IdTest","BoolPropTest","HelperFunctionCall","ClassTest","LooseClassTest","Negate","PropExists","PropValueIs","PropValueSortaIs","PropValueIsnt","PropValueBoolOp","PropValueMatches","PropClassIs","Or","And","Ternary","Group","Any"] };
+tannus.ore.SelOp = { __ename__ : ["tannus","ore","SelOp"], __constructs__ : ["IdTest","BoolPropTest","HelperFunctionCall","ClassTest","LooseClassTest","Negate","PropExists","PropValueIs","PropValueSortaIs","PropValueIsnt","PropValueBoolOp","PropValueMatches","PropClassIs","Or","And","Ternary","Group","Any"] };
 tannus.ore.SelOp.IdTest = function(id) { var $x = ["IdTest",0,id]; $x.__enum__ = tannus.ore.SelOp; $x.toString = $estr; return $x; };
 tannus.ore.SelOp.BoolPropTest = function(id) { var $x = ["BoolPropTest",1,id]; $x.__enum__ = tannus.ore.SelOp; $x.toString = $estr; return $x; };
 tannus.ore.SelOp.HelperFunctionCall = function(id,args) { var $x = ["HelperFunctionCall",2,id,args]; $x.__enum__ = tannus.ore.SelOp; $x.toString = $estr; return $x; };
@@ -4018,7 +2527,7 @@ tannus.ore.Selection.prototype = {
 	}
 	,__class__: tannus.ore.Selection
 };
-tannus.ore.Token = $hxClasses["tannus.ore.Token"] = { __ename__ : ["tannus","ore","Token"], __constructs__ : ["TNumber","TString","TIdent","TGroup","TTuple","TAny","THash","TDot","TNeg","TOr","TAnd","TDoubleDot","TColon","TComma","TQuestion","TOpenBracket","TCloseBracket","TEquals","TNEquals","TDEquals","TArrow","TSemiEquals","TBooleanOperator"] };
+tannus.ore.Token = { __ename__ : ["tannus","ore","Token"], __constructs__ : ["TNumber","TString","TIdent","TGroup","TTuple","TAny","THash","TDot","TNeg","TOr","TAnd","TDoubleDot","TColon","TComma","TQuestion","TOpenBracket","TCloseBracket","TEquals","TNEquals","TDEquals","TArrow","TSemiEquals","TBooleanOperator"] };
 tannus.ore.Token.TNumber = function(num) { var $x = ["TNumber",0,num]; $x.__enum__ = tannus.ore.Token; $x.toString = $estr; return $x; };
 tannus.ore.Token.TString = function(str) { var $x = ["TString",1,str]; $x.__enum__ = tannus.ore.Token; $x.toString = $estr; return $x; };
 tannus.ore.Token.TIdent = function(id) { var $x = ["TIdent",2,id]; $x.__enum__ = tannus.ore.Token; $x.toString = $estr; return $x; };
@@ -4141,87 +2650,6 @@ tannus.ore.Utils.smallest = function(list) {
 	return smallest;
 };
 tannus.serverside = {};
-tannus.serverside.NodeFileSystem = function() { };
-$hxClasses["tannus.serverside.NodeFileSystem"] = tannus.serverside.NodeFileSystem;
-tannus.serverside.NodeFileSystem.__name__ = ["tannus","serverside","NodeFileSystem"];
-tannus.serverside.NodeFileSystem.exists = function(path) {
-	return tannus.serverside.NodeFileSystem.fs.existsSync(path) == true;
-};
-tannus.serverside.NodeFileSystem.grabstats = function(path) {
-	return tannus.serverside.NodeFileSystem.fs.statSync(path);
-};
-tannus.serverside.NodeFileSystem.isDirectory = function(path) {
-	return tannus.serverside.NodeFileSystem.exists(path) && tannus.serverside.NodeFileSystem.grabstats(path).isDirectory() == true;
-};
-tannus.serverside.NodeFileSystem.isFile = function(path) {
-	return tannus.serverside.NodeFileSystem.grabstats(path).isFile() == true;
-};
-tannus.serverside.NodeFileSystem.createDirectory = function(path) {
-	tannus.serverside.NodeFileSystem.fs.mkdirSync(path);
-};
-tannus.serverside.NodeFileSystem.removeDirectory = function(path) {
-	try {
-		tannus.serverside.NodeFileSystem.fs.rmdirSync(path);
-	} catch( err ) {
-		if( js.Boot.__instanceof(err,String) ) {
-			console.log(err);
-		} else throw(err);
-	}
-};
-tannus.serverside.NodeFileSystem.removeFile = function(path) {
-	try {
-		tannus.serverside.NodeFileSystem.fs.unlinkSync(path);
-	} catch( err ) {
-		if( js.Boot.__instanceof(err,String) ) {
-			console.log(err);
-		} else throw(err);
-	}
-};
-tannus.serverside.NodeFileSystem.readDirectory = function(path) {
-	var _g = [];
-	var _g1 = 0;
-	var _g2;
-	_g2 = js.Boot.__cast(tannus.serverside.NodeFileSystem.fs.readdirSync(tannus.utils.PathTools.simplify(path)) , Array);
-	while(_g1 < _g2.length) {
-		var item = _g2[_g1];
-		++_g1;
-		_g.push(js.Boot.__cast(item , String));
-	}
-	return _g;
-};
-tannus.serverside.NodeFileSystem.rename = function(oldPath,newPath) {
-	try {
-		tannus.serverside.NodeFileSystem.fs.renameSync(oldPath,newPath);
-		return true;
-	} catch( err ) {
-		if( js.Boot.__instanceof(err,String) ) {
-			return false;
-		} else throw(err);
-	}
-};
-tannus.serverside.NodeFileSystem.read = function(path) {
-	var nodebuffer = tannus.serverside.NodeFileSystem.fs.readFileSync(path);
-	var buff;
-	var len = Std.parseInt(Std.string(nodebuffer.length));
-	var bitlist = new Array();
-	var _g = 0;
-	while(_g < len) {
-		var i = _g++;
-		bitlist.push(nodebuffer[i]);
-	}
-	var bytes = haxe.io.Bytes.alloc(bitlist.length);
-	var _g1 = 0;
-	var _g2 = bitlist.length;
-	while(_g1 < _g2) {
-		var i1 = _g1++;
-		bytes.b[i1] = bitlist[i1] & 255;
-	}
-	buff = bytes;
-	return buff;
-};
-tannus.serverside.NodeFileSystem.write = function(path,content) {
-	tannus.serverside.NodeFileSystem.fs.writeFileSync(path,tannus.utils._Buffer.Buffer_Impl_.toNodeBuffer(content));
-};
 tannus.serverside.socks = {};
 tannus.serverside.socks.Utils = function() { };
 $hxClasses["tannus.serverside.socks.Utils"] = tannus.serverside.socks.Utils;
@@ -4541,64 +2969,24 @@ tannus.utils._Buffer.Buffer_Impl_.split = function(this1,delimiter) {
 			chunk = bytes1;
 		} else {
 			var other;
-			var buf1;
 			try {
-				buf1 = buf.b[index];
+				other = buf.b[index];
 			} catch( err1 ) {
 				if( js.Boot.__instanceof(err1,String) ) {
-					buf1 = null;
+					other = null;
 				} else throw(err1);
 			}
-			var len = Std.parseInt(Std.string(buf1.length));
-			var bitlist = new Array();
-			var _g = 0;
-			while(_g < len) {
-				var i = _g++;
-				bitlist.push(buf1[i]);
-			}
-			var bytes2 = haxe.io.Bytes.alloc(bitlist.length);
-			var _g1 = 0;
-			var _g2 = bitlist.length;
-			while(_g1 < _g2) {
-				var i1 = _g1++;
-				bytes2.b[i1] = bitlist[i1] & 255;
-			}
-			other = bytes2;
-			var one = chunk;
-			var other1 = other;
-			other1 = js.Boot.__cast(other1 , haxe.io.Bytes);
-			one = js.Boot.__cast(one , haxe.io.Bytes);
-			var sum;
-			var bits = haxe.io.Bytes.alloc(one.length + other1.length);
-			sum = bits;
-			var i2 = 0;
-			while(i2 < one.length) {
-				var val;
-				try {
-					val = one.b[i2];
-				} catch( err2 ) {
-					if( js.Boot.__instanceof(err2,String) ) {
-						val = null;
-					} else throw(err2);
-				}
-				sum.b[i2] = val & 255;
-				val;
-				i2++;
-			}
-			while(i2 < one.length + other1.length) {
-				var val1;
-				try {
-					val1 = other1.b[i2 - one.length];
-				} catch( err3 ) {
-					if( js.Boot.__instanceof(err3,String) ) {
-						val1 = null;
-					} else throw(err3);
-				}
-				sum.b[i2] = val1 & 255;
-				val1;
-				i2++;
-			}
-			chunk = sum;
+			var copy;
+			var this2 = chunk;
+			var end = null;
+			if(end == null) end = this2.length;
+			if(end < 0) end = this2.length - end;
+			var len = end - 1;
+			var bytes2 = this2.sub(0,len);
+			copy = bytes2;
+			copy.b[copy.length] = other & 255;
+			other;
+			chunk = copy;
 		}
 		index++;
 	}
@@ -4730,28 +3118,20 @@ tannus.utils._Buffer.Buffer_Impl_.toArray = function(this1) {
 	}
 	return set;
 };
-tannus.utils._Buffer.Buffer_Impl_.toNodeBuffer = function(this1) {
-	var len = this1.length;
-	var cl = Buffer;
-	var buf = Type.createInstance(cl,[(function($this) {
-		var $r;
-		var this2 = this1;
-		var set = new Array();
-		var i = 0;
-		while(i < this2.length) {
-			set.push(this2.b[i]);
-			i++;
-		}
-		$r = set;
-		return $r;
-	}(this))]);
-	return buf;
-};
 tannus.utils._Buffer.Buffer_Impl_.fromBytes = function(bits) {
 	return bits;
 };
 tannus.utils._Buffer.Buffer_Impl_.fromString = function(chars) {
 	var bytes = haxe.io.Bytes.ofString(chars);
+	return bytes;
+};
+tannus.utils._Buffer.Buffer_Impl_.fromBase64String = function(encoded) {
+	var bytes = haxe.crypto.Base64.decode(encoded);
+	return bytes;
+};
+tannus.utils._Buffer.Buffer_Impl_.fromDataURI = function(uri) {
+	var b64 = uri.substring(uri.indexOf(",") + 1);
+	var bytes = haxe.crypto.Base64.decode(b64);
 	return bytes;
 };
 tannus.utils._Buffer.Buffer_Impl_.fromIntArray = function(set) {
@@ -4771,23 +3151,6 @@ tannus.utils._Buffer.Buffer_Impl_.fromFloatArray = function(set) {
 	while(_g1 < _g) {
 		var i = _g1++;
 		bytes.setFloat(i,set[i]);
-	}
-	return bytes;
-};
-tannus.utils._Buffer.Buffer_Impl_.fromNodeBuffer = function(buf) {
-	var len = Std.parseInt(Std.string(buf.length));
-	var bitlist = new Array();
-	var _g = 0;
-	while(_g < len) {
-		var i = _g++;
-		bitlist.push(buf[i]);
-	}
-	var bytes = haxe.io.Bytes.alloc(bitlist.length);
-	var _g1 = 0;
-	var _g2 = bitlist.length;
-	while(_g1 < _g2) {
-		var i1 = _g1++;
-		bytes.b[i1] = bitlist[i1] & 255;
 	}
 	return bytes;
 };
@@ -4831,95 +3194,6 @@ tannus.utils.CompileTimeClassList.initialise = function() {
 			tannus.utils.CompileTimeClassList.lists.set(listID,list);
 		}
 	}
-};
-tannus.utils.File = function(ref) {
-	this.name = ref;
-};
-$hxClasses["tannus.utils.File"] = tannus.utils.File;
-tannus.utils.File.__name__ = ["tannus","utils","File"];
-tannus.utils.File.prototype = {
-	remove: function() {
-		tannus.io.FileSystem.remove(this.name);
-	}
-	,toJSON: function() {
-		try {
-			return JSON.parse((function($this) {
-				var $r;
-				var this1 = tannus.io.FileSystem.read($this.name);
-				$r = this1.toString();
-				return $r;
-			}(this)));
-		} catch( err ) {
-			if( js.Boot.__instanceof(err,String) ) {
-				return null;
-			} else throw(err);
-		}
-	}
-	,get_content: function() {
-		return tannus.io.FileSystem.read(this.name);
-	}
-	,set_content: function(newContent) {
-		tannus.io.FileSystem.write(this.name,newContent);
-		return newContent;
-	}
-	,get_type: function() {
-		return tannus.utils.MimeTypes.getMimeType(tannus.utils.PathTools.extname(tannus.utils.PathTools.simplify(this.name)));
-	}
-	,get_size: function() {
-		return tannus.io.FileSystem.read(this.name).length;
-	}
-	,get_exists: function() {
-		return tannus.io.FileSystem.exists(this.name);
-	}
-	,__class__: tannus.utils.File
-	,__properties__: {get_exists:"get_exists",get_size:"get_size",set_content:"set_content",get_content:"get_content",get_type:"get_type"}
-};
-tannus.utils.Folder = function(path) {
-	if(!tannus.io.FileSystem.exists(path) || !tannus.io.FileSystem.isDirectory(path)) tannus.io.FileSystem.createDirectory(path);
-	this.location = path;
-	this.set_name(tannus.utils.PathTools.basename(path));
-};
-$hxClasses["tannus.utils.Folder"] = tannus.utils.Folder;
-tannus.utils.Folder.__name__ = ["tannus","utils","Folder"];
-tannus.utils.Folder.prototype = {
-	remove: function() {
-		var entries = this.childNames();
-		var _g = 0;
-		while(_g < entries.length) {
-			var child = entries[_g];
-			++_g;
-			var full = tannus.utils.PathTools.normalize(tannus.utils.PathTools.joinWith(this.location,[child]));
-			if(tannus.io.FileSystem.isDirectory(full)) this.subdir(child).remove(); else this.file(child).remove();
-		}
-		tannus.io.FileSystem.remove(this.location);
-	}
-	,childNames: function() {
-		return tannus.io.FileSystem.readDirectory(tannus.utils.PathTools.normalize(this.location));
-	}
-	,hasChild: function(path) {
-		return tannus.io.FileSystem.exists(tannus.utils.PathTools.simplify(tannus.utils.PathTools.joinWith(this.location,[path])));
-	}
-	,file: function(filename) {
-		var path = tannus.utils.PathTools.simplify(tannus.utils.PathTools.joinWith(this.location,[filename]));
-		return new tannus.utils.File(path);
-	}
-	,subdir: function(dirname) {
-		var path = tannus.utils.PathTools.simplify(tannus.utils.PathTools.joinWith(this.location,[dirname]));
-		return new tannus.utils.Folder(path);
-	}
-	,get_parent: function() {
-		return new tannus.utils.Folder(tannus.utils.PathTools.dirname(this.location));
-	}
-	,set_name: function(newname) {
-		var oldPath = this.location;
-		var newPath = tannus.utils.PathTools.normalize(tannus.utils.PathTools.dirname(this.location) + "/" + newname);
-		var worked = tannus.io.FileSystem.rename(oldPath,this.location);
-		if(worked) this.location = newPath;
-		this.name = tannus.utils.PathTools.basename(this.location);
-		return this.name;
-	}
-	,__class__: tannus.utils.Folder
-	,__properties__: {set_name:"set_name",get_parent:"get_parent"}
 };
 tannus.utils.MapTools = function() { };
 $hxClasses["tannus.utils.MapTools"] = tannus.utils.MapTools;
@@ -4973,29 +3247,6 @@ tannus.utils.MapTools.merge = function(props,others) {
 		if(!res.exists(key)) res.set(key,others.get(key));
 	}
 	return res;
-};
-tannus.utils.MimeTypes = $hx_exports.tannus.utils.MimeTypes = function() { };
-$hxClasses["tannus.utils.MimeTypes"] = tannus.utils.MimeTypes;
-tannus.utils.MimeTypes.__name__ = ["tannus","utils","MimeTypes"];
-tannus.utils.MimeTypes.getMimeType = function(ext) {
-	var all_mimes = Reflect.fields(tannus.utils.MimeTypes.primitive_known_types);
-	var _g = 0;
-	while(_g < all_mimes.length) {
-		var mime = all_mimes[_g];
-		++_g;
-		var _exts = Reflect.getProperty(tannus.utils.MimeTypes.primitive_known_types,mime);
-		var extensions;
-		var _g1 = [];
-		var _g2 = 0;
-		while(_g2 < _exts.length) {
-			var x = _exts[_g2];
-			++_g2;
-			_g1.push(js.Boot.__cast(x , String));
-		}
-		extensions = _g1;
-		if(Lambda.has(extensions,ext)) return mime;
-	}
-	return null;
 };
 tannus.utils.PathTools = function() { };
 $hxClasses["tannus.utils.PathTools"] = tannus.utils.PathTools;
@@ -5103,45 +3354,10 @@ tannus.utils.PathTools.extname = function(path) {
 		return bits.pop();
 	} else return "";
 };
-tannus.utils._Pointer = {};
-tannus.utils._Pointer.Pointer_Impl_ = function() { };
-$hxClasses["tannus.utils._Pointer.Pointer_Impl_"] = tannus.utils._Pointer.Pointer_Impl_;
-tannus.utils._Pointer.Pointer_Impl_.__name__ = ["tannus","utils","_Pointer","Pointer_Impl_"];
-tannus.utils._Pointer.Pointer_Impl_._new = function(getter) {
-	return new tannus.utils.CPointer(getter);
-};
-tannus.utils._Pointer.Pointer_Impl_.get = function(this1) {
-	return this1.getValue();
-};
-tannus.utils._Pointer.Pointer_Impl_.reassignToValue = function(this1,other) {
-	this1.getter = function() {
-		return other;
-	};
-};
-tannus.utils._Pointer.Pointer_Impl_.getter = function(gtr) {
-	return new tannus.utils.CPointer(gtr);
-};
-tannus.utils.CPointer = function(gtr) {
-	this.getter = gtr;
-};
-$hxClasses["tannus.utils.CPointer"] = tannus.utils.CPointer;
-tannus.utils.CPointer.__name__ = ["tannus","utils","CPointer"];
-tannus.utils.CPointer.prototype = {
-	rerouteToGetter: function(ngtr) {
-		this.getter = ngtr;
-	}
-	,rerouteToPointer: function(ptr) {
-		this.getter = ptr.getter;
-	}
-	,rerouteToValue: function(val) {
-		this.getter = function() {
-			return val;
-		};
-	}
-	,getValue: function() {
-		return this.getter();
-	}
-	,__class__: tannus.utils.CPointer
+tannus.utils.PathTools.toAbsolute = function(path) {
+	var result = tannus.utils.PathTools.normalize(path);
+	if(result.substring(0,1) != "/") result = "/" + result;
+	return result;
 };
 tannus.utils._RegEx = {};
 tannus.utils._RegEx.RegEx_Impl_ = function() { };
@@ -5559,13 +3775,11 @@ String.prototype.__class__ = $hxClasses.String = String;
 String.__name__ = ["String"];
 $hxClasses.Array = Array;
 Array.__name__ = ["Array"];
-Date.prototype.__class__ = $hxClasses.Date = Date;
-Date.__name__ = ["Date"];
 var Int = $hxClasses.Int = { __name__ : ["Int"]};
 var Dynamic = $hxClasses.Dynamic = { __name__ : ["Dynamic"]};
 var Float = $hxClasses.Float = Number;
 Float.__name__ = ["Float"];
-var Bool = $hxClasses.Bool = Boolean;
+var Bool = Boolean;
 Bool.__ename__ = ["Bool"];
 var Class = $hxClasses.Class = { __name__ : ["Class"]};
 var Enum = { };
@@ -5582,49 +3796,14 @@ if(Array.prototype.filter == null) Array.prototype.filter = function(f1) {
 };
 tannus.ore.Compiler.OpFunctions = new haxe.ds.StringMap();
 tannus.ore.Compiler.BoolOperators = new haxe.ds.StringMap();
-tannus.utils.MimeTypes.known_types = new haxe.ds.StringMap();
-var all_mimes = Reflect.fields(tannus.utils.MimeTypes.primitive_known_types);
-var _g = 0;
-while(_g < all_mimes.length) {
-	var mime = all_mimes[_g];
-	++_g;
-	var _exts = Reflect.getProperty(tannus.utils.MimeTypes.primitive_known_types,mime);
-	var extensions;
-	var _g1 = [];
-	var _g2 = 0;
-	while(_g2 < _exts.length) {
-		var x = _exts[_g2];
-		++_g2;
-		_g1.push(js.Boot.__cast(x , String));
-	}
-	extensions = _g1;
-	tannus.utils.MimeTypes.known_types.set(mime,extensions);
-	extensions;
-}
-haxe.Serializer.USE_CACHE = false;
-haxe.Serializer.USE_ENUM_INDEX = false;
-haxe.Serializer.BASE64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789%:";
-haxe.Unserializer.DEFAULT_RESOLVER = Type;
-haxe.Unserializer.BASE64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789%:";
-haxe.ds.ObjectMap.count = 0;
-tannus.db.tandb.Database.DB_CONFIG_FILE = ".__tandbconf__";
-tannus.db.tandb.Permissions.CREATE_USER = 0;
-tannus.db.tandb.Permissions.REMOVE_USER = 1;
-tannus.db.tandb.Permissions.UPDATE_USER = 2;
-tannus.db.tandb.Permissions.CREATE_SCHEMA = 3;
-tannus.db.tandb.Permissions.REMOVE_SCHEMA = 4;
-tannus.db.tandb.schemas.Schema.SCHEMA_CONFIG_FILE = ".__tandb_schemaconf__";
-tannus.db.tandb.schemas.SchemaMetaData.SCHEMA_CONFIG_FILE = ".__tandb_schemaconf__";
-tannus.db.tandb.tables.RecordSet.RECORD_SET_FILE = ".tandb_records";
-tannus.db.tandb.tables.Table.TABLE_META_FILE = ".tablerc";
+haxe.crypto.Base64.CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+haxe.crypto.Base64.BYTES = haxe.io.Bytes.ofString(haxe.crypto.Base64.CHARS);
 tannus.ore.ObjectRegEx.selectors = new haxe.ds.StringMap();
 tannus.ore.ObjectRegEx.helpers = new haxe.ds.StringMap();
 tannus.ore.ObjectRegEx.memoize = true;
-tannus.serverside.NodeFileSystem.fs = require("fs");
 tannus.serverside.socks.Utils.current_unid = 0;
 tannus.utils._Buffer.Buffer_Impl_.__meta__ = { statics : { fromFloatArray : { from : null}}};
 tannus.utils.CompileTimeClassList.__meta__ = { obj : { classLists : [["null,true,tannus.core.promises.Promise",""]]}};
-tannus.utils.MimeTypes.primitive_known_types = { 'application/pkix-attr-cert' : ["ac"], 'application/vnd.ahead.space' : ["ahead"], 'application/vnd.powerbuilder75-s' : [], 'application/moss-keys' : [], 'application/vnd.oma.bcast.drm-trigger+xml' : [], 'application/activemessage' : [], 'audio/atrac3' : [], 'application/vnd.rs-274x' : [], 'audio/amr-wb+' : [], 'application/vnd.groove-account' : ["gac"], 'application/wordperfect5.1' : [], 'application/x-chess-pgn' : ["pgn"], 'application/cdmi-container' : ["cdmic"], 'image/vnd.dvb.subtitle' : ["sub"], 'audio/vnd.celp' : [], 'application/xop+xml' : ["xop"], 'application/x-dtbresource+xml' : ["res"], 'text/prs.fallenstein.rst' : [], 'audio/3gpp' : [], 'application/vnd.openxmlformats-officedocument.wordprocessingml.endnotes+xml' : [], 'application/vnd.software602.filler.form+xml' : [], 'application/vnd.fujixerox.docuworks.binder' : ["xbd"], 'application/x-cdlink' : ["vcd"], 'audio/gsm-efr' : [], 'application/vnd.dolby.mlp' : ["mlp"], 'application/cdmi-queue' : ["cdmiq"], 'application/vnd.arastra.swi' : [], 'application/x-apple-diskimage' : ["dmg"], 'application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml' : [], 'application/vnd.radisys.moml+xml' : [], 'application/x-msterminal' : ["trm"], 'video/mpeg4-generic' : [], 'application/vnd.groove-help' : ["ghf"], 'application/remote-printing' : [], 'application/vnd.eudora.data' : [], 'application/vnd.liberty-request+xml' : [], 'application/x-stuffitx' : ["sitx"], 'application/vnd.ms-officetheme' : ["thmx"], 'application/rls-services+xml' : ["rs"], 'audio/dsr-es202212' : [], 'audio/dsr-es202211' : [], 'audio/dsr-es202050' : [], 'application/vnd.quark.quarkxpress' : ["qxd","qxt","qwd","qwt","qxl","qxb"], 'application/vnd.pocketlearn' : ["plf"], 'application/x-netcdf' : ["nc","cdf"], 'multipart/parallel' : [], 'application/vnd.immervision-ivu' : ["ivu"], 'application/vnd.immervision-ivp' : ["ivp"], 'application/vnd.dir-bi.plate-dl-nosuffix' : [], 'application/vnd.openxmlformats-package.digital-signature-xmlsignature+xml' : [], 'application/edi-x12' : [], 'application/thraud+xml' : ["tfi"], 'application/vnd.lotus-1-2-3' : ["123"], 'audio/dsr-es201108' : [], 'application/vnd.netfpx' : [], 'text/turtle' : ["ttl"], 'application/vnd.sailingtracker.track' : ["st"], 'application/vnd.iptc.g2.newsmessage+xml' : [], 'application/vnd.openxmlformats-package.relationships+xml' : [], 'application/vnd.informedcontrol.rms+xml' : [], 'application/vnd.etsi.sci+xml' : [], 'application/timestamp-query' : [], 'application/vnd.etsi.iptvsad-npvr+xml' : [], 'application/vnd.tao.intent-module-archive' : ["tao"], 'text/vnd.curl.scurl' : ["scurl"], 'application/vnd.fints' : [], 'message/vnd.si.simp' : [], 'image/x-xwindowdump' : ["xwd"], 'application/vnd.marlin.drm.license+xml' : [], 'application/wsdl+xml' : ["wsdl"], 'application/vnd.americandynamics.acc' : ["acc"], 'application/widget' : ["wgt"], 'application/vnd.openxmlformats-officedocument.presentationml.handoutmaster+xml' : [], 'application/vnd.dvb.ipdcesgaccess' : [], 'application/vnd.japannet-directory-service' : [], 'application/vnd.ms-works' : ["wps","wks","wcm","wdb"], 'application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml' : [], 'audio/dat12' : [], 'application/vnd.syncml.dm+wbxml' : ["bdm"], 'application/vnd.mediastation.cdkey' : ["cdkey"], 'application/vnd.motorola.flexsuite' : [], 'application/lost+xml' : ["lostxml"], 'audio/vnd.dlna.adts' : [], 'application/x-ms-shortcut' : ["lnk"], 'application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml' : [], 'application/vnd.ms-artgalry' : ["cil"], 'application/vnd.ffsns' : [], 'image/x-portable-graymap' : ["pgm"], 'application/onenote' : ["onetoc","onetoc2","onetmp","onepkg"], 'application/vnd.kde.kchart' : ["chrt"], 'video/x-msvideo' : ["avi"], 'application/index.vnd' : [], 'application/index.obj' : [], 'audio/evrc-qcp' : [], 'application/index.cmd' : [], 'application/watcherinfo+xml' : [], 'video/vnd.directv.mpeg-tts' : [], 'application/vnd.flographit' : ["gph"], 'application/vnd.yamaha.openscoreformat' : ["osf"], 'application/vnd.japannet-verification-wakeup' : [], 'application/cdmi-domain' : ["cdmid"], 'application/vnd.medcalcdata' : ["mc1"], 'application/relax-ng-compact-syntax' : ["rnc"], 'application/vnd.geometry-explorer' : ["gex","gre"], 'application/x-mswrite' : ["wri"], 'text/xml' : [], 'text/x-c' : ["c","cc","cxx","cpp","h","hh","dic"], 'text/rtx' : [], 'text/rtf' : [], 'text/red' : [], 'text/dns' : [], 'text/csv' : ["csv"], 'text/css' : ["css"], 'application/vnd.acucobol' : ["acu"], 'application/vnd.pwg-multiplexed' : [], 'audio/amr-wb' : [], 'application/xcap-el+xml' : [], 'application/vnd.ms-powerpoint' : ["ppt","pps","pot"], 'application/vnd.uplanet.listcmd' : [], 'application/vnd.sun.xml.writer' : ["sxw"], 'audio/qcelp' : [], 'application/vnd.kde.kivio' : ["flw"], 'application/vnd.micrografx.igx' : ["igx"], 'application/vnd.micrografx.flo' : ["flo"], 'application/x-ms-wmz' : ["wmz"], 'application/x-ms-wmd' : ["wmd"], 'application/vnd.pawaafile' : ["paw"], 'application/vnd.llamagraphics.life-balance.exchange+xml' : ["lbe"], 'application/vnd.wolfram.mathematica' : [], 'application/vnd.ms-wpl' : ["wpl"], 'application/vnd.ms-lrm' : ["lrm"], 'application/vnd.ms-ims' : ["ims"], 'application/vnd.ms-asf' : [], 'application/vnd.ms-htmlhelp' : ["chm"], 'application/vnd.oasis.opendocument.presentation-template' : ["otp"], 'application/vnd.seemail' : ["see"], 'application/jsonml+json' : ["jsonml"], 'application/x-cfs-compressed' : ["cfs"], 'application/vnd.hcl-bireports' : [], 'application/vnd.radisys.msml-dialog-base+xml' : [], 'application/vnd.oasis.opendocument.chart' : ["odc"], 'application/vnd.openxmlformats-officedocument.spreadsheetml.revisionheaders+xml' : [], 'application/vnd.intertrust.nncp' : [], 'application/simplesymbolcontainer' : [], 'text/vnd.fly' : ["fly"], 'text/vnd.abc' : [], 'application/prs.nprend' : [], 'application/vnd.sss-ntf' : [], 'application/vnd.sss-dtf' : [], 'application/vnd.sss-cod' : [], 'application/xproc+xml' : ["xpl"], 'application/vnd.minisoft-hp3000-save' : [], 'application/vq-rtcpxr' : [], 'application/vnd.adobe.air-application-installer-package+zip' : ["air"], 'application/mathml+xml' : ["mathml"], 'application/vnd.uiq.theme' : ["utz"], 'application/x-research-info-systems' : ["ris"], 'application/vnd.dece.data' : ["uvf","uvvf","uvd","uvvd"], 'application/poc-settings+xml' : [], 'application/rpki-roa' : ["roa"], 'application/vnd.geospace' : ["g3w"], 'image/vnd.microsoft.icon' : [], 'application/vnd.openxmlformats-officedocument.drawingml.diagramstyle+xml' : [], 'application/vnd.sun.xml.calc.template' : ["stc"], 'application/prs.alvestrand.titrax-sheet' : [], 'application/vnd.meridian-slingshot' : [], 'application/vnd.oma.bcast.simple-symbol-container' : [], 'audio/32kadpcm' : [], 'audio/x-pn-realaudio-plugin' : ["rmp"], 'application/mathematica' : ["ma","nb","mb"], 'application/x-envoy' : ["evy"], 'application/held+xml' : [], 'application/tamp-apex-update-confirm' : [], 'application/vnd.ms-powerpoint.template.macroenabled.12' : ["potm"], 'application/hyperstudio' : ["stk"], 'application/vnd.wolfram.mathematica.package' : [], 'application/vnd.openxmlformats-officedocument.presentationml.slidemaster+xml' : [], 'application/x-latex' : ["latex"], 'application/vnd.xfdl' : ["xfdl"], 'application/vnd.xara' : ["xar"], 'text/vnd.sun.j2me.app-descriptor' : ["jad"], 'video/3gpp2' : ["3g2"], 'application/vnd.uplanet.bearer-choice' : [], 'application/octet-stream' : ["bin","dms","lrf","mar","so","dist","distz","pkg","bpk","dump","elc","deploy"], 'video/ulpfec' : [], 'application/vnd.sealedmedia.softseal.html' : [], 'application/vnd.airzip.filesecure.azs' : ["azs"], 'application/vnd.airzip.filesecure.azf' : ["azf"], 'application/vnd.nokia.conml+wbxml' : [], 'application/framework-attributes+xml' : [], 'image/vnd.sealed.png' : [], 'application/vnd.stardivision.math' : ["smf"], 'video/quicktime' : ["qt","mov"], 'application/vnd.uplanet.listcmd-wbxml' : [], 'application/vnd.motorola.iprm' : [], 'application/ulpfec' : [], 'application/vnd.llamagraphics.life-balance.desktop' : ["lbd"], 'application/vnd.oipf.dae.xhtml+xml' : [], 'application/vnd.ms-word.template.macroenabled.12' : ["dotm"], 'application/vnd.ufdl' : ["ufd","ufdl"], 'application/vnd.wmf.bootstrap' : [], 'application/vnd.etsi.iptvsad-cod+xml' : [], 'application/vnd.las.las+xml' : ["lasxml"], 'application/vnd.motorola.flexsuite.adsi' : [], 'application/vnd.framemaker' : ["fm","frame","maker","book"], 'application/vnd.hal+xml' : ["hal"], 'application/rpki-manifest' : ["mft"], 'application/vnd.recordare.musicxml+xml' : ["musicxml"], 'application/pkix-cert' : ["cer"], 'application/vnd.ezpix-package' : ["ez3"], 'application/vnd.solent.sdkm+xml' : ["sdkm","sdkd"], 'audio/atrac-x' : [], 'application/vnd.dvb.pfr' : [], 'application/vnd.dvb.ait' : ["ait"], 'application/vnd.etsi.cug+xml' : [], 'application/vnd.smaf' : ["mmf"], 'application/vnd.semf' : ["semf"], 'application/vnd.semd' : ["semd"], 'application/vnd.sema' : ["sema"], 'application/vnd.oipf.spdlist+xml' : [], 'model/vnd.parasolid.transmit.text' : [], 'application/vnd.oasis.opendocument.text-web' : ["oth"], 'multipart/mixed' : [], 'application/x-lzh-compressed' : ["lzh","lha"], 'application/vnd.ntt-local.sip-ta_tcp_stream' : [], 'application/vnd.cups-postscript' : [], 'application/rpki-ghostbusters' : ["gbr"], 'audio/vnd.dece.audio' : ["uva","uvva"], 'application/vnd.oasis.opendocument.image' : ["odi"], 'application/vnd.acucorp' : ["atc","acutc"], 'audio/vnd.cmles.radio-events' : [], 'audio/example' : [], 'application/mac-compactpro' : ["cpt"], 'application/vnd.font-fontforge-sfd' : [], 'application/vnd.palm' : ["pdb","pqa","oprc"], 'application/x-xpinstall' : ["xpi"], 'application/sbml+xml' : ["sbml"], 'application/x-font-framemaker' : [], 'text/vnd.ms-mediapackage' : [], 'application/kpml-response+xml' : [], 'application/vnd.oipf.dae.svg+xml' : [], 'application/vnd.music-niff' : [], 'video/jpeg2000' : [], 'application/vnd.intercon.formnet' : ["xpw","xpx"], 'application/vnd.nitf' : ["ntf","nitf"], 'application/vnd.iptc.g2.planningitem+xml' : [], 'application/vnd.stardivision.draw' : ["sda"], 'application/vnd.webturbo' : ["wtb"], 'image/prs.btif' : ["btif"], 'message/tracking-status' : [], 'multipart/encrypted' : [], 'application/vnd.recordare.musicxml' : ["mxl"], 'application/vnd.mseq' : ["mseq"], 'application/vnd.commonspace' : ["csp"], 'application/vnd.mfmp' : ["mfm"], 'application/vnd.mfer' : ["mwf"], 'video/vnd.uvvu.mp4' : ["uvu","uvvu"], 'application/vcard+xml' : [], 'application/andrew-inset' : ["ez"], 'application/vnd.openxmlformats-officedocument.presentationml.slideupdateinfo+xml' : [], 'application/vnd.stardivision.calc' : ["sdc"], 'application/marcxml+xml' : ["mrcx"], 'application/vnd.dece.unspecified' : ["uvx","uvvx"], 'application/vnd.osgi.bundle' : [], 'audio/x-mpegurl' : ["m3u"], 'application/mbms-deregister+xml' : [], 'image/x-cmu-raster' : ["ras"], 'application/vnd.openxmlformats-officedocument.theme+xml' : [], 'application/vnd.groove-identity-message' : ["gim"], 'application/vnd.koan' : ["skp","skd","skt","skm"], 'application/vnd.ms-office.activex+xml' : [], 'application/mbms-msk-response+xml' : [], 'image/vnd.fujixerox.edmics-rlc' : ["rlc"], 'image/vnd.fujixerox.edmics-mmr' : ["mmr"], 'application/news-transmission' : [], 'application/javascript' : ["js"], 'application/vnd.uplanet.cacheop-wbxml' : [], 'application/tamp-status-response' : [], 'application/vnd.jisp' : ["jisp"], 'application/x-tex-tfm' : ["tfm"], 'video/webm' : ["webm"], 'application/calendar+xml' : [], 'model/x3d+vrml' : ["x3dv","x3dvz"], 'application/vnd.oasis.opendocument.text-master' : ["odm"], 'application/vnd.handheld-entertainment+xml' : ["zmm"], 'application/vnd.sun.xml.impress.template' : ["sti"], 'application/simple-filter+xml' : [], 'text/vnd.iptc.nitf' : [], 'application/vnd.etsi.aoc+xml' : [], 'application/news-groupinfo' : [], 'application/oebps-package+xml' : ["opf"], 'application/vnd.hbci' : ["hbci"], 'application/vnd.noblenet-sealer' : ["nns"], 'application/mets+xml' : ["mets"], 'application/xml-dtd' : ["dtd"], 'application/vnd.3gpp2.bcmcsinfo+xml' : [], 'application/vnd.pg.osasli' : ["ei6"], 'text/uri-list' : ["uri","uris","urls"], 'application/vnd.radisys.msml-audit-stream+xml' : [], 'image/x-portable-bitmap' : ["pbm"], 'application/vnd.lotus-organizer' : ["org"], 'audio/vnd.ms-playready.media.pya' : ["pya"], 'application/vnd.kde.kontour' : ["kon"], 'application/vnd.openxmlformats-officedocument.wordprocessingml.websettings+xml' : [], 'application/vnd.dvb.notif-init+xml' : [], 'application/inkml+xml' : ["ink","inkml"], 'application/vnd.cloanto.rp9' : ["rp9"], 'application/vnd.dart' : ["dart"], 'application/vnd.oasis.opendocument.spreadsheet-template' : ["ots"], 'application/dskpp+xml' : [], 'application/vnd.oipf.contentaccessstreaming+xml' : [], 'application/vnd.curl' : [], 'application/vnd.mitsubishi.misty-guard.trustweb' : [], 'model/vrml' : ["wrl","vrml"], 'application/patch-ops-error+xml' : ["xer"], 'audio/clearmode' : [], 'audio/vnd.cisco.nse' : [], 'application/vnd.etsi.iptvcommand+xml' : [], 'application/x-font-ttf' : ["ttf","ttc"], 'application/x-font-snf' : ["snf"], 'application/vnd.piaccess.application-licence' : [], 'application/x-font-pcf' : ["pcf"], 'application/x-font-otf' : ["otf"], 'application/vnd.innopath.wamp.notification' : [], 'application/x-font-dos' : [], 'application/x-font-bdf' : ["bdf"], 'video/vnd.fvt' : ["fvt"], 'image/x-portable-anymap' : ["pnm"], 'audio/evrcwb1' : [], 'audio/evrcwb0' : [], 'image/prs.pti' : [], 'audio/ulpfec' : [], 'audio/vnd.nokia.mobile-xmf' : [], 'application/edi-consent' : [], 'application/vnd.openxmlformats-officedocument.spreadsheetml.chartsheet+xml' : [], 'video/vnd.dvb.file' : ["dvb"], 'application/vnd.openxmlformats-officedocument.drawingml.chartshapes+xml' : [], 'application/vnd.sun.xml.impress' : ["sxi"], 'image/x-mrsid-image' : ["sid"], 'application/x-dgc-compressed' : ["dgc"], 'application/vnd.apple.installer+xml' : ["mpkg"], 'application/vnd.cups-raw' : [], 'application/vnd.cups-ppd' : ["ppd"], 'application/vnd.cups-pdf' : [], 'application/x-xfig' : ["fig"], 'application/ocsp-response' : [], 'application/vnd.yamaha.remote-setup' : [], 'application/vnd.muvee.style' : ["msty"], 'application/vnd.oma.bcast.notification+xml' : [], 'audio/mobile-xmf' : [], 'video/mpeg' : ["mpeg","mpg","mpe","m1v","m2v"], 'video/mp2t' : [], 'video/mp2p' : [], 'video/mp1s' : [], 'application/vnd.triscape.mxs' : ["mxs"], 'application/x-t3vm-image' : ["t3"], 'application/vnd.irepository.package+xml' : ["irp"], 'application/x-ms-xbap' : ["xbap"], 'application/xaml+xml' : ["xaml"], 'application/vnd.globalplatform.card-content-mgt-response' : [], 'application/vnd.chipnuts.karaoke-mmd' : ["mmd"], 'application/vnd.ms-excel.template.macroenabled.12' : ["xltm"], 'application/cdmi-object' : ["cdmio"], 'application/tamp-update-confirm' : [], 'application/vnd.ibm.minipay' : ["mpy"], 'application/vnd.motorola.flexsuite.gotap' : [], 'application/vnd.chemdraw+xml' : ["cdxml"], 'application/mbms-register-response+xml' : [], 'application/xhtml+xml' : ["xhtml","xht"], 'video/jpeg' : ["jpgv"], 'application/vnd.openxmlformats-officedocument.presentationml.commentauthors+xml' : [], 'application/scvp-vp-response' : ["spp"], 'application/x-tgif' : ["obj"], 'application/x-tads' : ["gam"], 'text/n3' : ["n3"], 'application/vnd.rapid' : [], 'application/vnd.syncml.ds.notification' : [], 'application/prs.rdf-xml-crypt' : [], 'application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml' : [], 'application/mbms-msk+xml' : [], 'application/x-shar' : ["shar"], 'application/vnd.zul' : ["zir","zirz"], 'application/vnd.wqd' : ["wqd"], 'application/vnd.wmc' : [], 'application/vnd.vsf' : ["vsf"], 'application/vnd.vcx' : ["vcx"], 'application/vnd.svd' : ["svd"], 'application/vnd.obn' : [], 'application/vnd.mif' : ["mif"], 'application/vnd.mcd' : ["mcd"], 'application/vnd.jam' : ["jam"], 'application/vnd.gmx' : ["gmx"], 'application/vnd.fdf' : ["fdf"], 'application/vnd.dxr' : [], 'application/vnd.dna' : ["dna"], 'application/vnd.bmi' : ["bmi"], 'application/vnd.stardivision.impress' : ["sdd"], 'application/vnd.autopackage' : [], 'image/vnd.adobe.photoshop' : ["psd"], 'text/vnd.net2phone.commcenter.command' : [], 'application/vnd.eszigno3+xml' : ["es3","et3"], 'application/vnd.ms-playready.initiator+xml' : [], 'application/postscript' : ["ai","eps","ps"], 'video/h264' : ["h264"], 'video/h263' : ["h263"], 'video/h261' : ["h261"], 'application/rdf+xml' : ["rdf"], 'application/tamp-community-update-confirm' : [], 'audio/vmr-wb' : [], 'model/mesh' : ["msh","mesh","silo"], 'video/vnd.iptvforum.1dparityfec-2005' : [], 'application/vnd.is-xpr' : ["xpr"], 'multipart/related' : [], 'application/vnd.ms-xpsdocument' : ["xps"], 'message/news' : [], 'application/vnd.openxmlformats-officedocument.presentationml.presentation' : ["pptx"], 'image/vnd.globalgraphics.pgb' : [], 'application/vnd.wap.wbxml' : ["wbxml"], 'image/vnd.fastbidsheet' : ["fbs"], 'application/vnd.httphone' : [], 'video/vnd.iptvforum.1dparityfec-1010' : [], 'application/vnd.etsi.iptvueprofile+xml' : [], 'application/vnd.kinar' : ["kne","knp"], 'application/vnd.ezpix-album' : ["ez2"], 'application/x-gnumeric' : ["gnumeric"], 'application/vnd.openxmlformats-officedocument.drawingml.diagramdata+xml' : [], 'application/vnd.openxmlformats-officedocument.spreadsheetml.pivottable+xml' : [], 'application/vnd.ms-opentype' : [], 'application/vnd.oma.cab-feature-handler+xml' : [], 'application/vnd.dvb.notif-aggregate-root+xml' : [], 'audio/x-wav' : ["wav"], 'audio/x-tta' : [], 'audio/x-caf' : ["caf"], 'audio/x-aac' : ["aac"], 'application/vnd.ms-tnef' : [], 'application/vnd.dvb.notif-generic+xml' : [], 'text/richtext' : ["rtx"], 'application/vnd.ctct.ws+xml' : [], 'application/vnd.ms-powerpoint.addin.macroenabled.12' : ["ppam"], 'application/x-font-linux-psf' : ["psf"], 'application/vnd.ms-excel.addin.macroenabled.12' : ["xlam"], 'application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml' : [], 'video/pointer' : [], 'video/rtp-enc-aescm128' : [], 'video/celb' : [], 'model/iges' : ["igs","iges"], 'application/vnd.oftn.l10n+json' : [], 'application/vnd.etsi.overload-control-policy-dataset+xml' : [], 'application/x-mscardfile' : ["crd"], 'application/vnd.hal+json' : [], 'application/vnd.oma.cab-pcc+xml' : [], 'text/vnd.dvb.subtitle' : ["sub"], 'application/vnd.openxmlformats-officedocument.wordprocessingml.template.main+xml' : [], 'application/mads+xml' : ["mads"], 'application/font-woff' : ["woff"], 'application/vnd.kde.kpresenter' : ["kpr","kpt"], 'application/vnd.openxmlformats-officedocument.spreadsheetml.template.main+xml' : [], 'multipart/voice-message' : [], 'application/vnd.ms-pki.stl' : ["stl"], 'video/vnd.motorola.videop' : [], 'application/vnd.yamaha.hv-script' : ["hvs"], 'application/mbms-register+xml' : [], 'application/rss+xml' : ["rss"], 'chemical/x-xyz' : ["xyz"], 'chemical/x-pdb' : [], 'application/vnd.kde.karbon' : ["karbon"], 'chemical/x-cml' : ["cml"], 'chemical/x-cif' : ["cif"], 'chemical/x-cdx' : ["cdx"], 'application/vnd.ntt-local.sip-ta_remote' : [], 'message/http' : [], 'application/vnd.blueice.multipass' : ["mpm"], 'application/vnd.shana.informed.formdata' : ["ifm"], 'application/vnd.ecowin.series' : [], 'application/xcap-att+xml' : [], 'text/vnd.curl.dcurl' : ["dcurl"], 'application/vnd.oma.bcast.sgboot' : [], 'application/vnd.verimatrix.vcas' : [], 'application/cals-1840' : [], 'application/vnd.etsi.iptvprofile+xml' : [], 'application/vnd.iptc.g2.conceptitem+xml' : [], 'application/cybercash' : [], 'text/vnd.esmertec.theme-descriptor' : [], 'model/vnd.moml+xml' : [], 'application/xcon-conference-info+xml' : [], 'application/vnd.hzn-3d-crossword' : [], 'application/pics-rules' : ["prf"], 'application/vnd.umajin' : ["umj"], 'audio/vnd.dvb.file' : [], 'image/t38' : [], 'image/sgi' : ["sgi"], 'image/png' : ["png"], 'image/ktx' : ["ktx"], 'image/jpx' : [], 'image/jpm' : [], 'image/jp2' : [], 'image/ief' : ["ief"], 'image/gif' : ["gif"], 'image/cgm' : ["cgm"], 'image/bmp' : ["bmp"], 'application/vnd.rim.cod' : ["cod"], 'application/vnd.oma.bcast.smartcard-trigger+xml' : [], 'application/vnd.openxmlformats-officedocument.spreadsheetml.pivotcacherecords+xml' : [], 'application/vnd.intu.qfx' : ["qfx"], 'application/vnd.intu.qbo' : ["qbo"], 'application/vnd.etsi.iptvdiscovery+xml' : [], 'application/x-futuresplash' : ["spl"], 'application/vnd.ecowin.chart' : ["mag"], 'application/x-gzip' : [], 'application/x-gtar' : ["gtar"], 'application/vnd.fujitsu.oasysprs' : ["bh2"], 'application/vnd.oma.group-usage-list+xml' : [], 'application/pidf+xml' : [], 'application/vnd.oma.drm.risd+xml' : [], 'audio/vnd.qcelp' : [], 'application/samlassertion+xml' : [], 'message/cpim' : [], 'application/mikey' : [], 'application/vnd.3m.post-it-notes' : ["pwn"], 'text/vnd.si.uricatalogue' : [], 'application/vnd.dvb.notif-ia-msglist+xml' : [], 'application/kpml-request+xml' : [], 'image/x-tga' : ["tga"], 'image/x-rgb' : ["rgb"], 'image/x-pcx' : ["pcx"], 'image/x-cmx' : ["cmx"], 'application/vnd.macports.portpkg' : ["portpkg"], 'image/x-3ds' : ["3ds"], 'application/x-doom' : ["wad"], 'application/3gpp-ims+xml' : [], 'audio/mp4a-latm' : [], 'application/scvp-cv-request' : ["scq"], 'application/xmpp+xml' : [], 'application/x-cpio' : ["cpio"], 'application/pkcs10' : ["p10"], 'application/x-chat' : ["chat"], 'application/vnd.s3sms' : [], 'application/vnd.visionary' : ["vis"], 'video/vnd.directv.mpeg' : [], 'video/vnd.dlna.mpeg-tts' : [], 'application/x-bzip' : ["bz"], 'audio/rtp-midi' : [], 'application/vnd.route66.link66+xml' : ["link66"], 'audio/vnd.3gpp.iufp' : [], 'application/x-msschedule' : ["scd"], 'audio/basic' : ["au","snd"], 'text/x-fortran' : ["f","for","f77","f90"], 'application/im-iscomposing+xml' : [], 'video/vnd.nokia.interleaved-multimedia' : [], 'application/vnd.genomatix.tuxedo' : ["txd"], 'application/vnd.dvb.ipdcdftnotifaccess' : [], 'audio/musepack' : [], 'application/vnd.anser-web-funds-transfer-initiation' : ["fti"], 'application/vnd.xmpie.xlim' : [], 'application/mosskey-data' : [], 'text/plain' : ["txt","text","conf","def","list","log","in"], 'message/external-body' : [], 'application/vnd.ibm.secure-container' : ["sc"], 'application/vnd.jcp.javame.midlet-rms' : ["rms"], 'application/vnd.marlin.drm.mdcf' : [], 'application/vnd.hp-jlyt' : ["jlt"], 'application/vnd.ah-barcode' : [], 'application/dca-rft' : [], 'application/tei+xml' : ["tei","teicorpus"], 'application/vnd.groove-tool-template' : ["tpl"], 'application/vnd.adobe.xdp+xml' : ["xdp"], 'application/vnd.oma.cab-address-book+xml' : [], 'application/samlmetadata+xml' : [], 'application/vnd.openxmlformats-officedocument.presentationml.tags+xml' : [], 'multipart/appledouble' : [], 'application/vnd.multiad.creator' : [], 'application/scvp-cv-response' : ["scs"], 'application/vnd.hp-hpid' : ["hpid"], 'application/vnd.hp-hpgl' : ["hpgl"], 'application/vnd.hhe.lesson-player' : ["les"], 'application/ccmp+xml' : [], 'audio/telephone-event' : [], 'application/java-serialized-object' : ["ser"], 'text/vnd.in3d.spot' : ["spot"], 'application/vnd.hp-pclxl' : ["pclxl"], 'application/vnd.openxmlformats-officedocument.presentationml.notesslide+xml' : [], 'application/epp+xml' : [], 'application/vnd.ibm.modcap' : ["afp","listafp","list3820"], 'application/x-msmetafile' : ["wmf","wmz","emf","emz"], 'audio/uemclip' : [], 'application/sparql-query' : ["rq"], 'application/mbms-reception-report+xml' : [], 'application/vnd.oma.xcap-directory+xml' : [], 'application/vnd.yellowriver-custom-menu' : ["cmp"], 'application/vnd.syncml.dm.notification' : [], 'application/vnd.openxmlformats-officedocument.spreadsheetml.revisionlog+xml' : [], 'audio/vnd.dolby.pulse.1' : [], 'multipart/header-set' : [], 'application/vnd.epson.quickanime' : ["qam"], 'video/vnd.sealedmedia.softseal.mov' : [], 'application/vnd.nokia.n-gage.data' : ["ngdat"], 'application/vnd.enliven' : ["nml"], 'application/vnd.openxmlformats-officedocument.presentationml.template' : ["potx"], 'application/vnd.fujixerox.hbpl' : [], 'application/vnd.oma-scws-http-response' : [], 'application/atomcat+xml' : ["atomcat"], 'application/dialog-info+xml' : [], 'audio/vnd.audiokoz' : [], 'application/vnd.crick.clicker.palette' : ["clkp"], 'application/prs.plucker' : [], 'application/vnd.intergeo' : ["i2g"], 'text/vnd.latex-z' : [], 'message/example' : [], 'application/vnd.publishare-delta-tree' : ["qps"], 'application/vnd.xmpie.ppkg' : [], 'application/vnd.xmpie.plan' : [], 'application/vnd.oasis.opendocument.database' : ["odb"], 'application/x-install-instructions' : ["install"], 'application/vnd.software602.filler.form-xml-zip' : [], 'text/vnd.graphviz' : ["gv"], 'text/vnd.radisys.msml-basic-layout' : [], 'audio/vnd.dolby.pl2z' : [], 'audio/vnd.dolby.pl2x' : [], 'application/vnd.omads-file+xml' : [], 'text/vnd.trolltech.linguist' : [], 'audio/vnd.dts.hd' : ["dtshd"], 'application/vnd.wrq-hp3000-labelled' : [], 'application/slate' : [], 'image/example' : [], 'application/vnd.openxmlformats-officedocument.wordprocessingml.template' : ["dotx"], 'image/vnd.dece.graphic' : ["uvi","uvvi","uvg","uvvg"], 'application/vnd.oma-scws-config' : [], 'application/vnd.kahootz' : ["ktz","ktr"], 'text/enriched' : [], 'application/vnd.easykaraoke.cdgdownload' : [], 'text/x-vcard' : ["vcf"], 'application/vnd.uplanet.alert-wbxml' : [], 'application/resource-lists-diff+xml' : ["rld"], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml' : [], 'application/mac-binhex40' : ["hqx"], 'multipart/digest' : [], 'application/vnd.novadigm.ext' : ["ext"], 'application/vnd.novadigm.edx' : ["edx"], 'application/vnd.novadigm.edm' : ["edm"], 'application/vnd.openxmlformats-officedocument.spreadsheetml.querytable+xml' : [], 'application/ecmascript' : ["ecma"], 'application/batch-smtp' : [], 'application/vnd.ecowin.seriesupdate' : [], 'application/sieve' : [], 'application/vnd.stepmania.stepchart' : ["sm"], 'multipart/signed' : [], 'application/vnd.oasis.opendocument.graphics' : ["odg"], 'application/vnd.openxmlformats-officedocument.presentationml.slideshow' : ["ppsx"], 'application/vnd.oasis.opendocument.formula-template' : ["odft"], 'application/msword' : ["doc","dot"], 'application/vnd.yamaha.smaf-audio' : ["saf"], 'application/vnd.fujixerox.art4' : [], 'application/vnd.omaloc-supl-init' : [], 'message/global-disposition-notification' : [], 'application/vnd.crick.clicker.template' : ["clkt"], 'application/vnd.oma.bcast.sgdd+xml' : [], 'application/vnd.3gpp2.tcap' : ["tcap"], 'audio/x-flac' : ["flac"], 'application/vnd.openxmlformats-officedocument.presentationml.presprops+xml' : [], 'application/vnd.ds-keypoint' : ["kpxx"], 'video/vnd.iptvforum.ttsavc' : [], 'video/3gpp-tt' : [], 'application/vnd.ncd.reference' : [], 'application/vnd.oasis.opendocument.image-template' : ["oti"], 'application/ocsp-request' : [], 'application/vnd.japannet-registration-wakeup' : [], 'application/vnd.groove-vcard' : ["vcg"], 'application/mathml-presentation+xml' : [], 'application/vnd.pmi.widget' : ["wg"], 'application/ibe-pkg-reply+xml' : [], 'application/applefile' : [], 'application/vnd.lotus-notes' : ["nsf"], 'application/vnd.oma.bcast.imd+xml' : [], 'application/vnd.omads-folder+xml' : [], 'application/vnd.nokia.conml+xml' : [], 'application/vnd.lotus-approach' : ["apr"], 'text/1d-interleaved-parityfec' : [], 'application/vnd.amazon.ebook' : ["azw"], 'application/vnd.etsi.tsl.der' : [], 'audio/3gpp2' : [], 'application/vnd.proteus.magazine' : ["mgz"], 'application/vnd.nokia.n-gage.ac+xml' : [], 'application/vnd.geoplan' : ["g2w"], 'application/vnd.osa.netdeploy' : [], 'application/vnd.lotus-wordpro' : ["lwp"], 'video/h264-rcdo' : [], 'application/vnd.quobject-quoxdocument' : [], 'audio/vnd.dolby.pl2' : [], 'audio/vnd.dolby.mps' : [], 'audio/vnd.dolby.mlp' : [], 'application/vnd.nokia.pcd+wbxml' : [], 'audio/1d-interleaved-parityfec' : [], 'application/vnd.clonk.c4group' : ["c4g","c4d","c4f","c4p","c4u"], 'video/mp4v-es' : [], 'audio/x-matroska' : ["mka"], 'application/vnd.geonext' : ["gxt"], 'audio/x-aiff' : ["aif","aiff","aifc"], 'application/news-checkgroups' : [], 'application/vnd.etsi.tsl+xml' : [], 'application/x-mspublisher' : ["pub"], 'message/global-delivery-status' : [], 'application/mpeg4-generic' : [], 'application/vnd.dvb.iptv.alfec-enhancement' : [], 'application/vnd.openxmlformats-officedocument.presentationml.slidelayout+xml' : [], 'application/vnd.xmpie.dpkg' : [], 'application/vnd.adobe.xfdf' : ["xfdf"], 'application/vnd.geocube+xml' : [], 'application/vnd.sun.xml.writer.global' : ["sxg"], 'application/conference-info+xml' : [], 'application/vnd.fujixerox.ddd' : ["ddd"], 'application/vnd.oma.poc.detailed-progress-report+xml' : [], 'application/vnd.xmpie.cpkg' : [], 'application/cstadata+xml' : [], 'application/vnd.amiga.ami' : ["ami"], 'application/vnd.anser-web-certificate-issue-initiation' : ["cii"], 'application/vnd.wv.ssp+xml' : [], 'application/pkixcmp' : ["pki"], 'text/x-sfv' : ["sfv"], 'text/x-nfo' : ["nfo"], 'multipart/byteranges' : [], 'application/vnd.openxmlformats-package.core-properties+xml' : [], 'text/x-asm' : ["s","asm"], 'application/vnd.yamaha.hv-voice' : ["hvp"], 'application/vnd.informix-visionary' : [], 'application/vnd.openxmlformats-officedocument.spreadsheetml.volatiledependencies+xml' : [], 'application/pkcs7-signature' : ["p7s"], 'application/vnd.ms-wmdrm.meter-chlg-req' : [], 'application/xhtml-voice+xml' : [], 'application/sru+xml' : ["sru"], 'model/vnd.collada+xml' : ["dae"], 'application/vnd.vd-study' : [], 'application/vnd.ibm.rights-management' : ["irm"], 'image/vnd.sealedmedia.softseal.jpg' : [], 'image/vnd.sealedmedia.softseal.gif' : [], 'application/vnd.trid.tpt' : ["tpt"], 'application/vnd.openofficeorg.extension' : ["oxt"], 'application/vnd.radisys.msml-dialog-fax-detect+xml' : [], 'video/x-ms-wvx' : ["wvx"], 'video/x-ms-wmx' : ["wmx"], 'video/x-ms-wmv' : ["wmv"], 'video/x-ms-vob' : ["vob"], 'video/x-ms-asf' : ["asf","asx"], 'application/vnd.insors.igm' : ["igm"], 'application/vnd.audiograph' : ["aep"], 'application/vnd.radisys.msml-dialog-transform+xml' : [], 'application/vnd.ms-project' : ["mpp","mpt"], 'audio/adpcm' : ["adp"], 'application/vnd.openxmlformats-officedocument.customxmlproperties+xml' : [], 'application/vnd.cups-raster' : [], 'application/msc-mixer+xml' : [], 'text/vnd.fmi.flexstor' : ["flx"], 'application/vnd.openxmlformats-officedocument.presentationml.comments+xml' : [], 'application/x-msaccess' : ["mdb"], 'application/spirits-event+xml' : [], 'application/eshop' : [], 'audio/vnd.rhetorex.32kadpcm' : [], 'image/x-xpixmap' : ["xpm"], 'text/vcard' : ["vcard"], 'application/vnd.radisys.msml-dialog-group+xml' : [], 'application/vnd.epson.salt' : ["slt"], 'text/x-java-source' : ["java"], 'audio/vnd.rip' : ["rip"], 'application/vnd.dece.zip' : ["uvz","uvvz"], 'audio/vnd.dts' : ["dts"], 'audio/vnd.dra' : ["dra"], 'application/x-msmediaview' : ["mvb","m13","m14"], 'application/vnd.ruckus.download' : [], 'audio/evrcwb' : [], 'audio/evrcb1' : [], 'audio/evrcb0' : [], 'audio/vnd.4sb' : [], 'application/vnd.ms-excel.sheet.macroenabled.12' : ["xlsm"], 'application/x-bzip2' : ["bz2","boz"], 'application/vnd.uplanet.list' : [], 'application/emma+xml' : ["emma"], 'application/vnd.nokia.radio-preset' : ["rpst"], 'application/vnd.osgeo.mapguide.package' : ["mgp"], 'application/x-rar-compressed' : ["rar"], 'application/vnd.apple.mpegurl' : ["m3u8"], 'application/vnd.oma.pal+xml' : [], 'application/vnd.sun.xml.writer.template' : ["stw"], 'application/xenc+xml' : ["xenc"], 'application/vnd.simtech-mindmapper' : ["twd","twds"], 'application/tamp-status-query' : [], 'application/vnd.fujitsu.oasys3' : ["oa3"], 'application/vnd.fujitsu.oasys2' : ["oa2"], 'audio/pcmu-wb' : [], 'application/vnd.sealedmedia.softseal.pdf' : [], 'audio/vnd.sealedmedia.softseal.mpeg' : [], 'application/gpx+xml' : ["gpx"], 'application/vnd.intertrust.digibox' : [], 'video/vnd.mpegurl' : ["mxu","m4u"], 'application/set-registration' : [], 'application/pkcs7-mime' : ["p7m","p7c"], 'application/ibe-key-request+xml' : [], 'application/vnd.globalplatform.card-content-mgt' : [], 'application/vnd.radisys.msml-conf+xml' : [], 'application/vnd.uplanet.channel-wbxml' : [], 'application/vnd.hp-pcl' : ["pcl"], 'application/vnd.hp-hps' : ["hps"], 'text/xml-external-parsed-entity' : [], 'application/xcon-conference-info-diff+xml' : [], 'application/rpki-updown' : [], 'application/x-ms-application' : ["application"], 'application/vnd.businessobjects' : ["rep"], 'application/resource-lists+xml' : ["rl"], 'application/vnd.dvb.iptv.alfec-base' : [], 'application/vnd.oasis.opendocument.graphics-template' : ["otg"], 'application/vnd.infotech.project+xml' : [], 'application/xcap-error+xml' : [], 'application/metalink+xml' : ["metalink"], 'application/vnd.ericsson.quickcall' : [], 'application/vnd.yamaha.hv-dic' : ["hvd"], 'application/vnd.openxmlformats-officedocument.spreadsheetml.connections+xml' : [], 'application/vnd.ecowin.fileupdate' : [], 'text/vnd.motorola.reflex' : [], 'video/vnd.vivo' : ["viv"], 'video/h264-svc' : [], 'application/vnd.fsc.weblaunch' : ["fsc"], 'application/vnd.oma.poc.invocation-descriptor+xml' : [], 'application/vnd.syncml+xml' : ["xsm"], 'audio/vnd.dolby.heaac.2' : [], 'audio/vnd.dolby.heaac.1' : [], 'video/3gpp' : ["3gp"], 'model/x3d+xml' : ["x3d","x3dz"], 'application/tamp-apex-update' : [], 'audio/vnd.nuera.ecelp9600' : ["ecelp9600"], 'model/vnd.gs.gdl' : [], 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' : ["docx"], 'application/vnd.openxmlformats-officedocument.spreadsheetml.calcchain+xml' : [], 'application/vnd.openxmlformats-officedocument.spreadsheetml.usernames+xml' : [], 'application/java-archive' : ["jar"], 'application/vnd.commerce-battelle' : [], 'application/vnd.uplanet.channel' : [], 'model/vnd.gs-gdl' : [], 'application/vnd.adobe.partial-upload' : [], 'application/vnd.japannet-payment-wakeup' : [], 'audio/smv-qcp' : [], 'application/vnd.sun.wadl+xml' : [], 'audio/vnd.nuera.ecelp7470' : ["ecelp7470"], 'application/pls+xml' : ["pls"], 'application/vnd.symbian.install' : ["sis","sisx"], 'image/vnd.ms-modi' : ["mdi"], 'audio/vorbis-config' : [], 'application/vnd.etsi.mcid+xml' : [], 'video/vnd.dece.sd' : ["uvs","uvvs"], 'video/vnd.dece.pd' : ["uvp","uvvp"], 'video/vnd.dece.hd' : ["uvh","uvvh"], 'application/set-registration-initiation' : ["setreg"], 'application/vnd.poc.group-advertisement+xml' : [], 'application/vnd.shana.informed.interchange' : ["iif"], 'application/x-wais-source' : ["src"], 'application/commonground' : [], 'application/x-font-libgrx' : [], 'application/java-vm' : ["class"], 'audio/vnd.nuera.ecelp4800' : ["ecelp4800"], 'application/vnd.nokia.landmark+xml' : [], 'application/pgp-signature' : ["asc","sig"], 'application/xv+xml' : ["mxml","xhvml","xvml","xvm"], 'application/beep+xml' : [], 'application/vnd.shana.informed.formtemplate' : ["itp"], 'application/vnd.spotfire.sfs' : ["sfs"], 'application/vnd.spotfire.dxp' : ["dxp"], 'application/x-gramps-xml' : ["gramps"], 'application/x-blorb' : ["blb","blorb"], 'application/vnd.ms-wmdrm.lic-chlg-req' : [], 'application/vnd.fujitsu.oasysgp' : ["fg5"], 'application/rsd+xml' : ["rsd"], 'application/tve-trigger' : [], 'application/vnd.nokia.landmarkcollection+xml' : [], 'application/vnd.oma.push' : [], 'application/vnd.yamaha.through-ngn' : [], 'application/vnd.collection+json' : [], 'application/vnd.otps.ct-kip+xml' : [], 'application/vnd.amundsen.maze+xml' : [], 'application/vnd.openxmlformats-officedocument.wordprocessingml.comments+xml' : [], 'application/vnd.dvb.ipdcroaming' : [], 'video/h263-2000' : [], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : ["xlsx"], 'application/vnd.oipf.pae.gem' : [], 'application/vnd.iptc.g2.newsitem+xml' : [], 'application/vnd.ms-package.obfuscated-opentype' : [], 'video/x-sgi-movie' : ["movie"], 'video/h263-1998' : [], 'application/vnd.openxmlformats-officedocument.custom-properties+xml' : [], 'application/vnd.stardivision.writer-global' : ["sgl"], 'application/vnd.radisys.msml-audit-conn+xml' : [], 'application/vnd.sbm.cid' : [], 'application/x-msmoney' : ["mny"], 'video/parityfec' : [], 'application/vnd.yamaha.tunnel-udpencap' : [], 'image/x-pict' : ["pic","pct"], 'video/vnd.ms-playready.media.pyv' : ["pyv"], 'application/vnd.google-earth.kml+xml' : ["kml"], 'application/vnd.ms-word.document.macroenabled.12' : ["docm"], 'application/vnd.openxmlformats-officedocument.extended-properties+xml' : [], 'application/vnd.oma.cab-user-prefs+xml' : [], 'application/atom+xml' : ["atom"], 'message/partial' : [], 'application/vnd.previewsystems.box' : ["box"], 'application/vnd.ibm.electronic-media' : [], 'application/vnd.tcpdump.pcap' : ["pcap","cap","dmp"], 'application/x-pkcs12' : ["p12","pfx"], 'application/vnd.oasis.opendocument.presentation' : ["odp"], 'application/vnd.musician' : ["mus"], 'application/whoispp-query' : [], 'application/vnd.fut-misnet' : [], 'text/ulpfec' : [], 'message/sipfrag' : [], 'application/x-zmachine' : ["z1","z2","z3","z4","z5","z6","z7","z8"], 'application/vnd.openxmlformats-officedocument.drawingml.diagramcolors+xml' : [], 'application/vnd.rig.cryptonote' : ["cryptonote"], 'image/vnd.wap.wbmp' : ["wbmp"], 'application/vnd.3gpp2.sms' : [], 'application/fastinfoset' : [], 'image/vnd.radiance' : [], 'application/vnd.powerbuilder7' : [], 'application/vnd.powerbuilder6' : ["pbd"], 'application/vnd.visio' : ["vsd","vst","vss","vsw"], 'application/vnd.uoml+xml' : ["uoml"], 'application/media_control+xml' : [], 'application/vividence.scriptfile' : [], 'application/vnd.vectorworks' : [], 'application/x-compress' : [], 'audio/pcma-wb' : [], 'application/mpeg4-iod-xmt' : [], 'application/vnd.isac.fcs' : ["fcs"], 'application/timestamped-data' : ["tsd"], 'application/x-bcpio' : ["bcpio"], 'audio/fwdred' : [], 'application/x-debian-package' : ["deb","udeb"], 'audio/vnd.vmx.cvsd' : [], 'application/x-x509-ca-cert' : ["der","crt"], 'application/tamp-update' : [], 'application/vnd.oma.poc.optimized-progress-report+xml' : [], 'application/vnd.iptc.g2.packageitem+xml' : [], 'application/vnd.ibm.afplinedata' : [], 'application/vnd.ms-powerpoint.slide.macroenabled.12' : ["sldm"], 'application/vnd.openxmlformats-officedocument.themeoverride+xml' : [], 'image/x-icon' : ["ico"], 'application/ssml+xml' : ["ssml"], 'video/vnd.cctv' : [], 'application/vnd.openxmlformats-officedocument.spreadsheetml.pivotcachedefinition+xml' : [], 'application/vnd.uplanet.signal' : [], 'application/tamp-sequence-adjust' : [], 'application/x-java-jnlp-file' : ["jnlp"], 'application/vnd.wap.slc' : [], 'application/vnd.wap.sic' : [], 'application/cpl+xml' : [], 'application/vnd.igloader' : ["igl"], 'message/s-http' : [], 'application/vnd.oma.dcdc' : [], 'application/vnd.ms-excel.sheet.binary.macroenabled.12' : ["xlsb"], 'video/vnd.objectvideo' : [], 'application/vnd.dvb.notif-container+xml' : [], 'application/vnd.canon-lips' : [], 'message/global-headers' : [], 'audio/vnd.everad.plj' : [], 'application/atomicmail' : [], 'application/vnd.oasis.opendocument.formula' : ["odf"], 'application/x-conference' : ["nsc"], 'model/example' : [], 'application/x-abiword' : ["abw"], 'video/1d-interleaved-parityfec' : [], 'application/vnd.japannet-verification' : [], 'application/vnd.dvb.esgcontainer' : [], 'message/global' : [], 'application/x-ustar' : ["ustar"], 'application/vnd.dynageo' : ["geo"], 'video/vnd.dece.mobile' : ["uvm","uvvm"], 'application/x-dtbncx+xml' : ["ncx"], 'application/vnd.ms-wmdrm.lic-resp' : [], 'audio/webm' : ["weba"], 'application/vnd.marlin.drm.conftoken+xml' : [], 'application/x-font-sunos-news' : [], 'audio/vnd.octel.sbc' : [], 'application/auth-policy+xml' : [], 'application/vnd.openxmlformats-officedocument.vmldrawing' : [], 'application/vnd.criticaltools.wbs+xml' : ["wbs"], 'audio/vdvi' : [], 'application/vnd.ipunplugged.rcprofile' : ["rcprofile"], 'application/vnd.nokia.iptv.config+xml' : [], 'application/vnd.wv.csp+xml' : [], 'image/vnd.xiff' : ["xif"], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sharedstrings+xml' : [], 'application/vnd.pvi.ptid1' : ["ptid"], 'application/xcap-diff+xml' : ["xdf"], 'application/vnd.iptc.g2.knowledgeitem+xml' : [], 'audio/tone' : [], 'application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml' : [], 'application/vnd.oasis.opendocument.chart-template' : ["otc"], 'application/vnd.kidspiration' : ["kia"], 'text/javascript' : [], 'application/x-stuffit' : ["sit"], 'application/vnd.oasis.opendocument.text' : ["odt"], 'audio/smv0' : [], 'application/sgml-open-catalog' : [], 'audio/silk' : ["sil"], 'application/vnd.3gpp.sms' : [], 'audio/rtp-enc-aescm128' : [], 'application/vnd.etsi.iptvsad-bc+xml' : [], 'application/vnd.rn-realmedia-vbr' : ["rmvb"], 'audio/xm' : ["xm"], 'audio/l8' : [], 'audio/dv' : [], 'audio/cn' : [], 'application/x-xliff+xml' : ["xlf"], 'application/scvp-vp-request' : ["spq"], 'text/x-vcalendar' : ["vcs"], 'application/vnd.nervana' : [], 'message/sip' : [], 'application/vnd.canon-cpdl' : [], 'application/vnd.nokia.radio-presets' : ["rpss"], 'text/vnd.iptc.newsml' : [], 'application/vnd.openxmlformats-officedocument.presentationml.template.main+xml' : [], 'application/vnd.curl.car' : ["car"], 'application/pgp-keys' : [], 'application/vnd.openxmlformats-officedocument.presentationml.slideshow.main+xml' : [], 'application/x-subrip' : ["srt"], 'audio/vnd.digital-winds' : ["eol"], 'application/srgs+xml' : ["grxml"], 'audio/pcmu' : [], 'audio/pcma' : [], 'application/dicom' : [], 'audio/speex' : [], 'application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml' : [], 'application/vnd.dvb.notif-ia-registration-response+xml' : [], 'application/vnd.dvb.ipdcesgpdd' : [], 'application/vnd.shana.informed.package' : ["ipk"], 'application/vnd.android.package-archive' : ["apk"], 'audio/opus' : [], 'application/vnd.marlin.drm.actiontoken+xml' : [], 'application/nasdata' : [], 'application/vnd.infotech.project' : [], 'application/vnd.aether.imp' : [], 'application/ibe-pp-data' : [], 'application/x-dtbook+xml' : ["dtb"], 'application/vnd.radisys.msml-audit+xml' : [], 'text/vnd.in3d.3dml' : ["3dml"], 'application/vnd.cluetrust.cartomobile-config' : ["c11amc"], 'application/vnd.ms-pki.seccat' : ["cat"], 'image/x-xbitmap' : ["xbm"], 'audio/mpeg' : ["mpga","mp2","mp2a","mp3","m2a","m3a"], 'image/naplps' : [], 'audio/midi' : ["mid","midi","kar","rmi"], 'text/vnd.wap.wml' : ["wml"], 'text/prs.lines.tag' : ["dsc"], 'application/vnd.crick.clicker.wordbank' : ["clkw"], 'application/vnd.gridmp' : [], 'application/vnd.ms-wmdrm.meter-resp' : [], 'application/xml-external-parsed-entity' : [], 'image/x-freehand' : ["fh","fhc","fh4","fh5","fh7"], 'video/vnd.iptvforum.2dparityfec-2005' : [], 'application/vnd.oipf.mippvcontrolmessage+xml' : [], 'application/vnd.paos.xml' : [], 'application/vnd.radisys.msml+xml' : [], 'application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml' : [], 'audio/ip-mr_v2.5' : [], 'text/troff' : ["t","tr","roff","man","me","ms"], 'video/vnd.iptvforum.2dparityfec-1010' : [], 'application/vnd.aristanetworks.swi' : ["swi"], 'application/vnd.kde.kspread' : ["ksp"], 'text/rtp-enc-aescm128' : [], 'application/vnd.dolby.mobile.2' : [], 'application/vnd.dolby.mobile.1' : [], 'application/vnd.fdsn.mseed' : ["mseed"], 'application/vnd.radisys.msml-dialog+xml' : [], 'application/x-msbinder' : ["obd"], 'text/t140' : [], 'application/vnd.cirpack.isdn-ext' : [], 'application/vnd.ms-excel' : ["xls","xlm","xla","xlc","xlt","xlw"], 'application/vnd.scribus' : [], 'application/vnd.noblenet-directory' : ["nnd"], 'text/sgml' : ["sgml","sgm"], 'audio/parityfec' : [], 'audio/isac' : [], 'audio/ilbc' : [], 'application/edifact' : [], 'application/vnd.openxmlformats-officedocument.wordprocessingml.fonttable+xml' : [], 'application/vnd.oma.scidm.messages+xml' : [], 'application/vnd.unity' : ["unityweb"], 'application/gml+xml' : ["gml"], 'application/vnd.yamaha.openscoreformat.osfpvg+xml' : ["osfpvg"], 'application/vnd.omads-email+xml' : [], 'application/vnd.eprints.data+xml' : [], 'application/prs.cww' : ["cww"], 'application/vnd.oipf.ueprofile+xml' : [], 'application/vnd.rainstor.data' : [], 'audio/g729' : [], 'audio/g728' : [], 'audio/g723' : [], 'audio/g722' : [], 'audio/g719' : [], 'text/example' : [], 'application/x-bittorrent' : ["torrent"], 'application/shf+xml' : ["shf"], 'application/msc-ivr+xml' : [], 'model/vnd.parasolid.transmit.binary' : [], 'application/mods+xml' : ["mods"], 'application/xcap-caps+xml' : [], 'application/vnd.3gpp.pic-bw-small' : ["psb"], 'application/vnd.fujixerox.art-ex' : [], 'application/vnd.iccprofile' : ["icc","icm"], 'application/vnd.oipf.contentaccessdownload+xml' : [], 'image/vnd.svf' : [], 'image/vnd.mix' : [], 'image/vnd.fst' : ["fst"], 'image/vnd.fpx' : ["fpx"], 'image/vnd.dxf' : ["dxf"], 'image/vnd.dwg' : ["dwg"], 'audio/evrc' : [], 'application/vnd.emclient.accessrequest+xml' : [], 'audio/eac3' : [], 'audio/vnd.cns.inf1' : [], 'application/x-msdownload' : ["exe","dll","com","bat","msi"], 'application/vnd.grafeq' : ["gqf","gqs"], 'application/x-pkcs7-certreqresp' : ["p7r"], 'application/whoispp-response' : [], 'application/vnd.zzazz.deck+xml' : ["zaz"], 'text/x-setext' : ["etx"], 'application/vnd.smart.teacher' : ["teacher"], 'audio/dvi4' : [], 'application/set-payment-initiation' : ["setpay"], 'text/x-opml' : ["opml"], 'application/prs.xsf+xml' : [], 'application/x-font-vfont' : [], 'application/vnd.ctc-posml' : ["pml"], 'application/vnd.oma.bcast.sprov+xml' : [], 'application/vnd.ms-powerpoint.slideshow.macroenabled.12' : ["ppsm"], 'application/vnd.vidsoft.vidconference' : [], 'application/vnd.openxmlformats-officedocument.presentationml.notesmaster+xml' : [], 'application/vnd.tmobile-livetv' : ["tmo"], 'text/x-pascal' : ["p","pas"], 'audio/bv32' : [], 'audio/bv16' : [], 'application/vnd.bluetooth.ep.oob' : [], 'application/x-iso9660-image' : ["iso"], 'application/vnd.etsi.iptvsync+xml' : [], 'application/vnd.uplanet.list-wbxml' : [], 'image/vnd.djvu' : ["djvu","djv"], 'text/tab-separated-values' : ["tsv"], 'application/vnd.openxmlformats-officedocument.drawing+xml' : [], 'application/vnd.joost.joda-archive' : ["joda"], 'application/vnd.fdsn.seed' : ["seed","dataless"], 'application/vnd.openxmlformats-officedocument.presentationml.viewprops+xml' : [], 'application/vnd.japannet-setstore-wakeup' : [], 'application/vnd.cluetrust.cartomobile-config-pkg' : ["c11amz"], 'application/vnd.oma.poc.final-report+xml' : [], 'application/mediaservercontrol+xml' : ["mscml"], 'application/x-sv4crc' : ["sv4crc"], 'application/vnd.motorola.flexsuite.wem' : [], 'multipart/form-data' : [], 'application/vnd.motorola.flexsuite.ttc' : [], 'application/vnd.motorola.flexsuite.kmr' : [], 'application/smil+xml' : ["smi","smil"], 'application/vnd.motorola.flexsuite.fis' : [], 'video/smpte292m' : [], 'application/vnd.ms-fontobject' : ["eot"], 'application/vnd.oma.bcast.associated-procedure-parameter+xml' : [], 'multipart/report' : [], 'application/yin+xml' : ["yin"], 'application/vnd.sbm.mid2' : [], 'message/delivery-status' : [], 'audio/evrcb' : [], 'audio/evrc1' : [], 'audio/evrc0' : [], 'text/html' : ["html","htm"], 'audio/vnd.nortel.vbk' : [], 'application/x-msclip' : ["clp"], 'application/mbms-associated-procedure-description+xml' : [], 'video/vc1' : [], 'application/vnd.wolfram.player' : ["nbp"], 'video/rtx' : [], 'video/raw' : [], 'video/ogg' : ["ogv"], 'video/mpv' : [], 'video/mp4' : ["mp4","mp4v","mpg4"], 'video/mj2' : ["mj2","mjp2"], 'video/jpm' : ["jpm","jpgm"], 'application/vnd.japannet-jpnstore-wakeup' : [], 'application/vnd.xmi+xml' : [], 'application/vnd.openxmlformats-officedocument.spreadsheetml.externallink+xml' : [], 'application/cdmi-capability' : ["cdmia"], 'application/vnd.powerbuilder75' : [], 'audio/vnd.cns.anp1' : [], 'application/vnd.ms-color.iccprofile' : [], 'video/vnd.dece.video' : ["uvv","uvvv"], 'application/vnd.openxmlformats-officedocument.presentationml.slide+xml' : [], 'application/vnd.preminet' : [], 'application/pkix-pkipath' : ["pkipath"], 'application/ccxml+xml' : ["ccxml"], 'application/vnd.adobe.formscentral.fcdt' : ["fcdt"], 'application/vnd.openxmlformats-officedocument.drawingml.diagramlayout+xml' : [], 'application/vnd.data-vision.rdz' : ["rdz"], 'application/vnd.oma.dd2+xml' : ["dd2"], 'application/mosskey-request' : [], 'application/parityfec' : [], 'application/davmount+xml' : ["davmount"], 'application/cnrp+xml' : [], 'application/cellml+xml' : [], 'application/vnd.radisys.msml-audit-conf+xml' : [], 'application/vnd.fujixerox.docuworks' : ["xdw"], 'application/mbms-protection-description+xml' : [], 'application/xcap-ns+xml' : [], 'application/yang' : ["yang"], 'application/vnd.realvnc.bed' : ["bed"], 'application/vnd.ms-cab-compressed' : ["cab"], 'application/vnd.cinderella' : ["cdy"], 'video/nv' : [], 'video/dv' : [], 'application/vnd.noblenet-web' : ["nnw"], 'application/rlmi+xml' : [], 'image/tiff-fx' : [], 'application/vnd.oipf.cspg-hexbinary' : [], 'application/vnd.geogebra.tool' : ["ggt"], 'audio/g729e' : [], 'audio/g729d' : [], 'audio/g7291' : [], 'audio/g7221' : [], 'application/vnd.accpac.simply.imp' : ["imp"], 'application/x-xz' : ["xz"], 'application/x-sh' : ["sh"], 'application/vnd.accpac.simply.aso' : ["aso"], 'image/webp' : ["webp"], 'application/vnd.kodak-descriptor' : ["sse"], 'application/vnd.oma-scws-http-request' : [], 'application/vnd.olpc-sugar' : ["xo"], 'application/x-glulx' : ["ulx"], 'application/omdoc+xml' : ["omdoc"], 'application/vnd.xfdl.webform' : [], 'application/wita' : [], 'audio/vnd.lucent.voice' : ["lvp"], 'multipart/alternative' : [], 'application/vnd.denovo.fcselayout-link' : ["fe_launch"], 'application/zip' : ["zip"], 'application/vnd.ms-printing.printticket+xml' : [], 'application/xml' : ["xml","xsl"], 'application/vnd.openxmlformats-officedocument.presentationml.tablestyles+xml' : [], 'application/sdp' : ["sdp"], 'application/rtx' : [], 'application/rtf' : ["rtf"], 'application/pdf' : ["pdf"], 'text/vnd.wap.wmlscript' : ["wmls"], 'application/ogg' : ["ogx"], 'application/oda' : ["oda"], 'application/nss' : [], 'application/mxf' : ["mxf"], 'application/mp4' : ["mp4s"], 'application/ipp' : [], 'application/gxf' : ["gxf"], 'application/exi' : ["exi"], 'application/dns' : [], 'application/cfw' : [], 'text/rfc822-headers' : [], 'application/vnd.cosmocaller' : ["cmc"], 'application/vnd.dpgraph' : ["dpg"], 'message/rfc822' : ["eml","mime"], 'image/tiff' : ["tiff","tif"], 'application/vnd.cendio.thinlinc.clientconf' : [], 'application/x-authorware-seg' : ["aas"], 'application/ssdl+xml' : ["ssdl"], 'application/x-authorware-map' : ["aam"], 'application/vnd.radisys.msml-dialog-fax-sendrecv+xml' : [], 'application/x-authorware-bin' : ["aab","x32","u32","vox"], 'application/vnd.dvb.dvbj' : [], 'application/index.response' : [], 'application/vnd.google-earth.kmz' : ["kmz"], 'application/vnd.ntt-local.file-transfer' : [], 'application/vnd.wv.csp+wbxml' : [], 'application/srgs' : ["gram"], 'application/smil' : [], 'application/sgml' : [], 'video/x-ms-wm' : ["wm"], 'application/vnd.uplanet.bearer-choice-wbxml' : [], 'application/vnd.uplanet.alert' : [], 'audio/t38' : [], 'audio/smv' : [], 'audio/s3m' : ["s3m"], 'audio/rtx' : [], 'audio/red' : [], 'audio/ogg' : ["oga","ogg","spx"], 'audio/mpa' : [], 'audio/mp4' : ["mp4a"], 'audio/lpc' : [], 'audio/l24' : [], 'audio/l20' : [], 'audio/l16' : [], 'audio/gsm' : [], 'audio/dls' : [], 'audio/asc' : [], 'audio/amr' : [], 'audio/ac3' : [], 'application/vnd.oipf.spdiscovery+xml' : [], 'application/vnd.lotus-freelance' : ["pre"], 'application/vnd.groove-injector' : ["grv"], 'application/vnd.ecdis-update' : [], 'application/set-payment' : [], 'message/imdn+xml' : [], 'application/vnd.stepmania.package' : ["smzip"], 'application/vnd.qualcomm.brew-app-res' : [], 'application/docbook+xml' : ["dbk"], 'application/vnd.fluxtime.clip' : ["ftc"], 'application/qsig' : [], 'application/vnd.mophun.application' : ["mpn"], 'application/vnd.etsi.simservs+xml' : [], 'application/dec-dx' : [], 'application/csta+xml' : [], 'application/vnd.japannet-registration' : [], 'audio/x-ms-wma' : ["wma"], 'audio/x-ms-wax' : ["wax"], 'application/cea-2018+xml' : [], 'application/vnd.sun.xml.draw.template' : ["std"], 'application/vnd.fuzzysheet' : ["fzs"], 'application/vnd.pwg-xhtml-print+xml' : [], 'application/oxps' : ["oxps"], 'application/vnd.avistar+xml' : [], 'application/soap+fastinfoset' : [], 'application/vnd.openxmlformats-officedocument.wordprocessingml.document.glossary+xml' : [], 'application/vnd.stardivision.writer' : ["sdw","vor"], 'application/vnd.dece.ttml+xml' : ["uvt","uvvt"], 'application/x400-bp' : [], 'application/vnd.sun.xml.math' : ["sxm"], 'application/x-director' : ["dir","dcr","dxr","cst","cct","cxt","w3d","fgd","swa"], 'application/mbms-user-service-description+xml' : [], 'application/vnd.3gpp.pic-bw-var' : ["pvb"], 'application/x-7z-compressed' : ["7z"], 'application/mp21' : ["m21","mp21"], 'application/pkcs8' : ["p8"], 'application/mbox' : ["mbox"], 'application/marc' : ["mrc"], 'text/parityfec' : [], 'application/vnd.smart.notebook' : [], 'application/vnd.ecowin.filerequest' : [], 'application/vnd.oma.bcast.stkm' : [], 'application/vnd.nokia.catalogs' : [], 'application/vnd.oma.bcast.sgdu' : [], 'application/vnd.dvb.ipdcesgaccess2' : [], 'application/vnd.wap.wmlc' : ["wmlc"], 'text/directory' : [], 'audio/t140c' : [], 'application/vnd.uplanet.cacheop' : [], 'application/vnd.3gpp.pic-bw-large' : ["plb"], 'application/x-pkcs7-certificates' : ["p7b","spc"], 'application/vnd.oma.poc.groups+xml' : [], 'application/x-silverlight-app' : ["xap"], 'text/calendar' : ["ics","ifb"], 'application/x-texinfo' : ["texinfo","texi"], 'application/x-gca-compressed' : ["gca"], 'image/vnd.ms-photo' : ["wdp"], 'image/jpeg' : ["jpeg","jpg","jpe"], 'application/applixware' : ["aw"], 'video/vnd.nokia.videovoip' : [], 'image/g3fax' : ["g3"], 'application/vnd.syncml.dm+xml' : ["xdm"], 'application/json' : ["json"], 'application/vnd.geogebra.file' : ["ggb"], 'video/example' : [], 'audio/sp-midi' : [], 'application/vnd.osgi.subsystem' : ["esa"], 'application/vnd.cybank' : [], 'application/isup' : [], 'application/iotp' : [], 'application/vnd.multiad.creator.cif' : [], 'application/pgp-encrypted' : ["pgp"], 'application/iges' : [], 'video/vnd.hns.video' : [], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheetmetadata+xml' : [], 'application/vnd.lotus-screencam' : ["scm"], 'x-conference/x-cooltalk' : ["ice"], 'audio/vnd.hns.audio' : [], 'message/disposition-notification' : [], 'application/x-font-speedo' : [], 'image/svg+xml' : ["svg","svgz"], 'audio/g726-40' : [], 'audio/g726-32' : [], 'audio/g726-24' : [], 'audio/g726-16' : [], 'application/vnd.rn-realmedia' : ["rm"], 'application/vnd.wordperfect' : ["wpd"], 'application/vnd.mynfc' : ["taglet"], 'application/http' : [], 'application/h224' : [], 'application/vnd.oasis.opendocument.spreadsheet' : ["ods"], 'text/x-uuencode' : ["uu"], 'application/vnd.nokia.ncd' : [], 'application/macwriteii' : [], 'audio/mpeg4-generic' : [], 'text/vnd.dmclientscript' : [], 'image/fits' : [], 'application/vnd.nokia.isds-radio-presets' : [], 'application/dssc+xml' : ["xdssc"], 'application/ipfix' : ["ipfix"], 'application/dssc+der' : ["dssc"], 'application/vnd.osgi.dp' : ["dp"], 'application/vnd.radisys.msml-dialog-speech+xml' : [], 'application/fits' : [], 'application/sparql-results+xml' : ["srx"], 'application/mbms-envelope+xml' : [], 'application/vnd.fujitsu.oasys' : ["oas"], 'application/vnd.dvb.notif-ia-registration-request+xml' : [], 'application/vnd.oma.bcast.ltkm' : [], 'application/vnd.radisys.msml-audit-dialog+xml' : [], 'multipart/example' : [], 'application/vnd.renlearn.rlprint' : [], 'application/fastsoap' : [], 'video/vnd.dece.mp4' : [], 'application/xspf+xml' : ["xspf"], 'application/vnd.openxmlformats-officedocument.drawingml.chart+xml' : [], 'application/tamp-sequence-adjust-confirm' : [], 'application/vnd.ecowin.seriesrequest' : [], 'application/vnd.sun.xml.draw' : ["sxd"], 'application/vnd.picsel' : ["efif"], 'application/vnd.mozilla.xul+xml' : ["xul"], 'application/vnd.wfa.wsc' : [], 'application/vnd.antix.game-component' : ["atx"], 'application/tamp-community-update' : [], 'application/index' : [], 'application/dvcs' : [], 'application/vnd.oma.dcd' : [], 'application/wspolicy+xml' : ["wspolicy"], 'application/vnd.claymore' : ["cla"], 'text/ecmascript' : [], 'application/x-shockwave-flash' : ["swf"], 'application/vnd.sun.xml.calc' : ["sxc"], 'application/example' : [], 'application/vnd.frogans.ltf' : ["ltf"], 'application/vnd.epson.ssf' : ["ssf"], 'application/vnd.frogans.fnc' : ["fnc"], 'application/vnd.epson.msf' : ["msf"], 'application/vnd.epson.esf' : ["esf"], 'text/cache-manifest' : ["appcache"], 'application/vnd.openxmlformats-officedocument.spreadsheetml.dialogsheet+xml' : [], 'application/vnd.wt.stf' : ["stf"], 'video/vnd.motorola.video' : [], 'application/vnd.pg.format' : ["str"], 'application/soap+xml' : [], 'application/vnd.msign' : [], 'video/x-matroska' : ["mkv","mk3d","mks"], 'application/vnd.etsi.iptvservice+xml' : [], 'video/bt656' : [], 'model/x3d+binary' : ["x3db","x3dbz"], 'application/vnd.street-stream' : [], 'application/x-freearc' : ["arc"], 'application/vnd.ubisoft.webplayer' : [], 'application/vnd.adobe.fxp' : ["fxp","fxpl"], 'application/vnd.nokia.landmark+wbxml' : [], 'video/vnd.sealed.swf' : [], 'application/vnd.crick.clicker' : ["clkx"], 'application/vnd.wap.wmlscriptc' : ["wmlsc"], 'application/pskc+xml' : ["pskcxml"], 'application/vnd.swiftview-ics' : [], 'application/vnd.curl.pcurl' : ["pcurl"], 'application/vnd.oma.bcast.provisioningtrigger' : [], 'application/vnd.oasis.opendocument.text-template' : ["ott"], 'application/metalink4+xml' : ["meta4"], 'application/vnd.sus-calendar' : ["sus","susp"], 'application/vnd.ncd.control' : [], 'application/pkix-crl' : ["crl"], 'audio/mpa-robust' : [], 'application/simple-message-summary' : [], 'application/vnd.neurolanguage.nlu' : ["nlu"], 'text/vnd.curl.mcurl' : ["mcurl"], 'application/vnd.contact.cmsg' : ["cdbcmsg"], 'application/vnd.dvb.service' : ["svc"], 'application/x-sv4cpio' : ["sv4cpio"], 'application/vnd.oipf.userprofile+xml' : [], 'chemical/x-csml' : ["csml"], 'application/vnd.kenameaapp' : ["htke"], 'chemical/x-cmdf' : ["cmdf"], 'application/x-ace-compressed' : ["ace"], 'audio/atrac-advanced-lossless' : [], 'application/vnd.yamaha.smaf-phrase' : ["spf"], 'application/cu-seeme' : ["cu"], 'application/pidf-diff+xml' : [], 'application/vnd.nokia.pcd+xml' : [], 'text/vnd.curl' : ["curl"], 'application/vnd.openxmlformats-officedocument.presentationml.slide' : ["sldx"], 'application/mathml-content+xml' : [], 'text/vnd.wap.sl' : [], 'text/vnd.wap.si' : [], 'application/vnd.astraea-software.iota' : ["iota"], 'application/vnd.powerbuilder7-s' : [], 'application/vnd.powerbuilder6-s' : [], 'application/vnd.f-secure.mobile' : [], 'application/x-mobipocket-ebook' : ["prc","mobi"], 'application/mpeg4-iod' : [], 'video/x-smv' : ["smv"], 'video/x-mng' : ["mng"], 'video/x-m4v' : ["m4v"], 'application/vnd.groove-tool-message' : ["gtm"], 'video/x-flv' : ["flv"], 'video/x-fli' : ["fli"], 'video/x-f4v' : ["f4v"], 'application/vnd.3gpp.bsf+xml' : [], 'application/vnd.openxmlformats-officedocument.spreadsheetml.tablesinglecells+xml' : [], 'message/feedback-report' : [], 'application/x-font-ghostscript' : ["gsf"], 'audio/x-pn-realaudio' : ["ram","ra"], 'application/vnd.vividence.scriptfile' : [], 'video/bmpeg' : [], 'application/vnd.crick.clicker.keyboard' : ["clkk"], 'application/vnd.mophun.certificate' : ["mpc"], 'application/riscos' : [], 'application/timestamp-reply' : [], 'audio/vorbis' : [], 'application/x-font-type1' : ["pfa","pfb","pfm","afm"], 'application/reginfo+xml' : ["rif"], 'application/vnd.cab-jscript' : [], 'application/vnd.ms-powerpoint.presentation.macroenabled.12' : ["pptm"], 'application/vnd.mobius.txf' : ["txf"], 'application/vnd.mobius.plc' : ["plc"], 'application/vnd.mobius.msl' : ["msl"], 'application/vnd.mobius.mqy' : ["mqy"], 'application/vnd.mobius.mbk' : ["mbk"], 'application/vnd.mobius.dis' : ["dis"], 'application/vnd.mobius.daf' : ["daf"], 'application/x-tex' : ["tex"], 'application/x-tcl' : ["tcl"], 'application/x-tar' : ["tar"], 'application/x-sql' : ["sql"], 'application/x-nzb' : ["nzb"], 'application/x-mie' : ["mie"], 'application/voicexml+xml' : ["vxml"], 'audio/prs.sid' : [], 'application/x-hdf' : ["hdf"], 'application/x-eva' : ["eva"], 'application/x-dvi' : ["dvi"], 'application/x-csh' : ["csh"], 'application/x-cbr' : ["cbr","cba","cbt","cbz","cb7"], 'application/x-amf' : [], 'application/vnd.truedoc' : [], 'application/vnd.trueapp' : ["tra"], 'model/vnd.flatland.3dml' : [], 'application/vnd.openxmlformats-officedocument.spreadsheetml.comments+xml' : [], 'application/vnd.sealed.xls' : [], 'application/vnd.sealed.ppt' : [], 'application/vnd.sealed.net' : [], 'application/vnd.sealed.mht' : [], 'application/vnd.sealed.eml' : [], 'application/vnd.sealed.doc' : [], 'application/vnd.sealed.csf' : [], 'application/atomsvc+xml' : ["atomsvc"], 'application/vnd.dreamfactory' : ["dfac"], 'application/vnd.sealed.3df' : [], 'audio/gsm-hr-08' : [], 'application/moss-signature' : [], 'application/vnd.openxmlformats-officedocument.spreadsheetml.template' : ["xltx"], 'application/epub+zip' : ["epub"], 'application/tamp-error' : [], 'video/vnd.iptvforum.ttsmpeg2' : [], 'application/xslt+xml' : ["xslt"], 'application/vnd.kde.kformula' : ["kfo"], 'video/vnd.sealed.mpeg4' : [], 'video/vnd.sealed.mpeg1' : [], 'application/vnd.openxmlformats-officedocument.wordprocessingml.footnotes+xml' : [], 'application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml' : [], 'application/1d-interleaved-parityfec' : [], 'application/vemmi' : [], 'application/vnd.sealed.tiff' : [], 'application/winhlp' : ["hlp"], 'image/vnd.net-fpx' : ["npx"], 'model/vnd.vtu' : ["vtu"], 'model/vnd.mts' : ["mts"], 'model/vnd.gtw' : ["gtw"], 'model/vnd.gdl' : ["gdl"], 'model/vnd.dwf' : ["dwf"], 'image/vnd.cns.inf2' : [], 'text/fwdred' : [], 'application/font-tdpfr' : ["pfr"], 'image/x-portable-pixmap' : ["ppm"], 'application/vnd.kde.kword' : ["kwd","kwt"]};
 tannus.utils.PathTools.PATH_DELIMITER = "/";
 tannus.utils.SearchEngine.CASE_OFFSET = 1.5;
 tannus.utils.SearchEngine.CONTAINS_OFFSET = 0.8;

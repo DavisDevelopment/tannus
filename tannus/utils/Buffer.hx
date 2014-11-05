@@ -245,6 +245,19 @@ abstract Buffer(Bytes) {
 	}
 #end
 
+#if (client || js)
+	@:to
+	public function toInt32Array():js.html.Int32Array {
+		return new js.html.Int32Array(self.toArray());
+	}
+
+	public function toClientBlob(?mime_type:String):js.html.Blob {
+		return new js.html.Blob([self.toInt32Array()], {
+			'type' : (mime_type != null ? mime_type : 'application/octet-stream')
+		});
+	}
+#end
+
 	@:from
 	public static inline function fromBytes(bits : Bytes):Buffer {
 		return new Buffer(bits);
@@ -261,6 +274,58 @@ abstract Buffer(Bytes) {
 	public static inline function fromString(chars:String):Buffer {
 		return new Buffer(Bytes.ofString(chars));
 	}
+
+/**
+  * ====================================== *
+  * == Base64 / DataURI Related Methods == *
+  * ====================================== *
+  */
+
+
+#if javascript
+	
+	/*
+	 * convert Buffer object to JavaScript Blob object
+	 */
+	
+	@:to
+	 public inline function toBlob(?mimeType : String):js.html.Blob {
+		var typedArray:js.html.Int32Array = new js.html.Int32Array(self.toArray());
+		if (mimeType == null)
+			mimeType = 'application/octet-stream';
+
+		return new js.html.Blob([typedArray], {
+			'type' : mimeType
+		});
+	 }
+	
+
+#end
+	/*
+	 *
+	 */
+	 public inline function toDataURI(mimeType:String):String {
+		var encoded:String = haxe.crypto.Base64.encode(this);
+		return 'data:$mimeType;base64,$encoded';
+	 }
+
+
+  	/*
+  	 * Get a Buffer object from a Base64-encoded String
+  	 */
+	public static inline function fromBase64String(encoded : String):Buffer {
+		return new Buffer(haxe.crypto.Base64.decode(encoded));
+	}
+
+	/*
+	 * Gets a Buffer object from a DataURI
+	 */
+	 public static inline function fromDataURI(uri : String):Buffer {
+		//var mimeType:String = (uri.substring(uri.indexOf(':')+1, uri.indexOf(';')));
+		var b64:String = (uri.substring(uri.indexOf(',')+1));
+
+		return Buffer.fromBase64String(b64);
+	 }
 
 	@:from
 	public static inline function fromIntArray(set:Array<Int>):Buffer {
