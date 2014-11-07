@@ -99,7 +99,7 @@ class Canvas extends EventDispatcher {
 			});
 		}
 		
-		var events:Array<String> = ['click', 'mousemove', 'mousedown', 'mouseup'];
+		var events:Array<String> = ['click', 'mousemove', 'mousedown', 'mouseup', 'mouseenter', 'mouseleave'];
 		var self:JQuery = JQuery.select(component);
 		for (ename in events) {
 			self.on(ename, handler.bind(ename, _));

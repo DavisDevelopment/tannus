@@ -5,9 +5,12 @@ import tannus.display.Entity;
 import tannus.display.Image;
 import tannus.display.CropCorner;
 import tannus.ui.Canvas;
+import tannus.display.Button;
 
+import tannus.math.TMath;
 import tannus.io.Color;
 import tannus.utils.Pointer;
+import tannus.utils.Orientation;
 import tannus.geom.Point;
 import tannus.geom.Rectangle;
 import tannus.geom.Line;
@@ -119,7 +122,6 @@ class Cropbox extends Entity {
 		// now, bind the relevant events to control dragging the "crop rectangle" itself
 
 		this.bindBoxEvents();
-
 	}
 	
 	/*
@@ -137,6 +139,26 @@ class Cropbox extends Entity {
 				var pos:Point = dragOffset.relativeTo(stage.mouse);
 				me.box.x = pos.x;
 				me.box.y = pos.y;
+				
+				var imr = me.image.rect();
+				
+				// ensure that the box is still "inside" the image
+				if (me.box.x + me.box.width > imr.x + imr.width) {
+					me.box.x = (imr.x + imr.width - me.box.width);
+				}
+				
+				else if (me.box.x < imr.x) {
+					me.box.x = imr.x;
+				}
+
+				if (me.box.y + me.box.height > imr.y + imr.height) {
+					me.box.y = (imr.y + imr.height - me.box.height);
+				}
+
+				else if (me.box.y < imr.y) {
+
+					me.box.y = imr.y;
+				}
 			}
 		});
 
@@ -153,13 +175,100 @@ class Cropbox extends Entity {
 		});
 	}
 
+	/*
+	 * Creates and Initializes all Control-Bar Buttons
+	 */
+	public function initButtons():Void {
+		addButton('icons/check.light.png', function(e) {
+			
+			var chunk = image.crop(box);
+
+			trace(chunk.toDataURI());
+
+		});
+	}
+
+	public function addButton(imageSrc:String, onClick:Dynamic):Void {
+		var btn = new Button();
+		btn.z = 1000;
+		btn.setImage(imageSrc);
+		btn.on('click', onClick);
+
+		var size:Pointer<Float> = Pointer.literal(
+			TMath.clamp((box.width/3), 25, 50)		
+		);
+		btn.bindPointer('width', size);
+		btn.bindPointer('height', size);
+
+		var padding:Float = 8;
+
+		var bx:Pointer<Float> = Pointer.getter(function():Float {
+			if (!(((box.x + box.width) - (stage.width)) < (padding + size.get()))) {
+				return (box.x + box.width + padding);
+			} else {
+				return (20);
+			}
+		});
+
+		btn.bindPointer('x', bx);
+
+		var by:Pointer<Float> = Pointer.literal(
+			(box.y + 5)
+		);
+		btn.bindPointer('y', by);
+
+		addAsset(btn);
+		stage.add(btn);
+	}
+
 	public function initImage():Void {
 		this.box = new Rectangle(0, 0, 100, 100);
 		
-		image.width = stage.width;
-		image.height = stage.height;
-		this.width = image.width;
-		this.height = image.height;
+		// Determine how to scale the image, based on it's orientation
+		switch (image.orientation) {
+			//
+			case Orientation.OLandscape:
+				var rel:Float = (image.originalSize.height / image.originalSize.width);
+				image.width = stage.width;
+				image.height = (stage.height * rel);
+
+				image.y = (stage.height/2 - image.height/2);
+
+			case Orientation.OPortrait:
+				var rel:Float = (image.originalSize.width / image.originalSize.height);
+				image.width = (stage.width * rel);
+				image.height = stage.height;
+
+				image.x = (stage.width/2 - image.height/2);
+
+			case Orientation.OSquare:
+				var myorient:Orientation = (new Rectangle(0, 0, stage.width, stage.height).orientation());
+				switch (myorient) {
+					case Orientation.OLandscape:
+						image.height = stage.height;
+						image.width = image.height;
+
+						image.x = (stage.width/2 - image.width/2);
+
+					case Orientation.OPortrait:
+						image.width = stage.width;
+						image.height = image.width;
+
+						image.y = (stage.height/2 - image.height/2);
+
+					case Orientation.OSquare:
+						image.width = stage.width;
+						image.height = stage.height;
+						image.x = 0;
+						image.y = 0;
+				}
+
+			default:
+				throw 'WeinerSphitzl!';
+		}
+
+		this.width = stage.width;
+		this.height = stage.height;
 		
 		box.x = (image.width/2 - box.width/2);
 		box.y = (image.height/2 - box.height/2);
@@ -200,6 +309,42 @@ class Cropbox extends Entity {
 	}
 
 	override public function update(stage:Stage, c:Dynamic):Void {
+		if (box.width > image.width) {
+			box.width = image.width;
+		}
 
+		else if (box.height > image.height) {
+			box.height = image.height;
+		}
+
+		var me = this;
+		var imr = me.image.rect();
+		
+		// ensure that the box is still "inside" the image
+		if (me.box.x + me.box.width > imr.x + imr.width) {
+			me.box.x = (imr.x + imr.width - me.box.width);
+		}
+		
+		else if (me.box.x < imr.x) {
+			me.box.x = imr.x;
+		}
+
+		if (me.box.y + me.box.height > imr.y + imr.height) {
+			me.box.y = (imr.y + imr.height - me.box.height);
+		}
+
+		else if (me.box.y < imr.y) {
+			me.box.y = imr.y;
+		}
+	}
+
+	public function crop():Void {
+		var subImage:Canvas = this.image.crop(this.box);
+		
+		var widget:Null<Entity> = stage.get('.CropWidget').get(0);
+
+		if (widget != null) {
+			widget.emit('accept', subImage);
+		}
 	}
 }

@@ -39,23 +39,8 @@ class Exposer {
 			'Canvas' : tannus.ui.Canvas,
 			'Stage' : tannus.display.Stage
 		};
-		tannus.display.CropWidget;
+		new tannus.display.CropWidget('', null);
 		
-		var canvas = tannus.ui.JQuery.select('#stage').at(0);
-		var stage = new Stage(canvas);
-		stage.width = 640;
-		stage.height = 480;
-
-		var ent = new tannus.display.CropWidget('#img');
-		stage.add(ent);
-
-		ent.on('ready', function(e) {
-			ent.width = stage.width;
-			ent.height = stage.height;
-			trace(ent.rect() + '');
-		});
-
-		ent.bindToInput('#file');
 
 		initHelpers();
 	}

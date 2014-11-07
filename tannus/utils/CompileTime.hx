@@ -66,6 +66,24 @@ class CompileTime
         return toExpr(obj);
     }
 
+    /** Embeds the file as Bytes */
+    macro public static function embedBinaryFile(path:String):ExprOf<tannus.utils.Pointer<tannus.utils.Buffer>> {
+	var bsf:String = haxe.crypto.Base64.encode(sys.io.File.getBytes(path));
+	var bsfe = toExpr(bsf);
+
+	return macro tannus.utils.Pointer.getter((function():Void->tannus.utils.Buffer {
+		var buf:Null<tannus.utils.Buffer> = null;
+
+		return function():tannus.utils.Buffer {
+			if (buf == null) {
+				return new tannus.utils.Buffer(haxe.crypto.Base64.decode($bsfe));
+			} else {	
+				return buf;
+			}
+		};
+	}()));
+    }
+
     /** Same as readFile, but checks that the file is valid Xml */
     macro public static function readXmlFile(path:String):ExprOf<String> {
         var content = loadFileAsString(path);

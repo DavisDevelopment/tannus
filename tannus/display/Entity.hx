@@ -2,8 +2,10 @@ package tannus.display;
 
 import tannus.core.EventDispatcher;
 import tannus.core.Destructible;
+import tannus.core.Object;
 import tannus.geom.Point;
 import tannus.geom.Rectangle;
+import tannus.utils.Pointer;
 
 import tannus.display.Stage;
 
@@ -16,7 +18,8 @@ class Entity extends EventDispatcher implements Destructible {
 	public var width:Float;
 	public var height:Float;
 	public var id:String;
-	
+
+	public var _pointerBindings:Map<String, Pointer<Dynamic>>;
 	public var _remove:Bool;
 	public var _cached:Bool;
 	public var _hidden:Bool;
@@ -33,7 +36,8 @@ class Entity extends EventDispatcher implements Destructible {
 		this.width = 0;
 		this.height = 0;
 		this.stage = null;
-
+		
+		this._pointerBindings = new Map();
 		this._remove = false;
 		this._hidden = false;
 		this._cached = false;
@@ -62,6 +66,9 @@ class Entity extends EventDispatcher implements Destructible {
 	 */
 	public function update(stage:Stage, surface:Dynamic):Void {
 		super.emit('update', this);
+		for (fieldName in _pointerBindings.keys()) {
+			(new Object(this))[fieldName] = _pointerBindings[fieldName].get();	
+		}
 	}
 	
 	/*
@@ -101,6 +108,10 @@ class Entity extends EventDispatcher implements Destructible {
 	 */
 	public function show():Void {
 		this._hidden = false;
+	}
+
+	public function bindPointer(field:String, valuePointer:Pointer<Dynamic>):Void {
+		this._pointerBindings[field] = valuePointer;
 	}
 
 	/*

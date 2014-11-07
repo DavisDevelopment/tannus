@@ -1,6 +1,7 @@
 package tannus.geom;
 
 import tannus.geom.Point;
+import tannus.geom.Line;
 
 @:expose
 class Rectangle {
@@ -18,6 +19,10 @@ class Rectangle {
 
 	public function clone():Rectangle {
 		return new Rectangle(this.x, this.y, this.width, this.height);
+	}
+
+	public function area():Float {
+		return (this.width * this.height);
 	}
 
 	public function equals(other:Rectangle):Bool {
@@ -38,6 +43,22 @@ class Rectangle {
 		points.push(new Point(this.x, this.y+this.height));
 
 		return points;
+	}
+
+	public function topLeft():Point {
+		return new Point(this.x, this.y);
+	}
+
+	public function topRight():Point {
+		return new Point((this.x + this.width), this.y);
+	}
+
+	public function bottomLeft():Point {
+		return new Point(this.x, (this.y + this.height));
+	}
+
+	public function bottomRight():Point {
+		return new Point((this.x + this.width), (this.y + this.height));
 	}
 
 	public function contains(cx:Float, cy:Float):Bool {
@@ -69,12 +90,58 @@ class Rectangle {
 		return false;
 	}
 
+	public function relationshipTo(other:Rectangle):Rectangle {
+		return new Rectangle(
+			(this.x / other.width),
+			(this.y / other.height),
+			(this.width / other.width),
+			(this.height / other.height)
+		);
+	}
+
+	public function relateTo(pt:Point):Point {
+		var rx:Float = pt.x;
+		var ry:Float = pt.y;
+		rx = (rx / this.width);
+		ry = (ry / this.height);
+
+		return new Point(rx, ry);
+	}
+
 	public function isEmpty():Bool {
 		return (
 			(this.x == 0) &&
 			(this.y == 0) &&
 			(this.width == 0) &&
 			(this.height == 0)
+		);
+	}
+
+	public function orientation():tannus.utils.Orientation {
+		if (width > height) {
+			return tannus.utils.Orientation.OLandscape;
+		}
+		else if (width < height) {
+			return tannus.utils.Orientation.OPortrait;
+		}
+		else if (width == height) {
+			return tannus.utils.Orientation.OSquare;
+		}
+		else {
+			throw 'WhatTheFuck: $this';
+		}
+	}
+
+	public function toString():String {
+		return 'Rectangle($x, $y, $width, $height)';
+	}
+
+	public static function fromRelationship(vect:Rectangle, rect:Rectangle):Rectangle {
+		return new Rectangle(
+			(rect.width * vect.x),
+			(rect.height * vect.y),
+			(rect.width * vect.width),
+			(rect.height * vect.height)
 		);
 	}
 }

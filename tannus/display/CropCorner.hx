@@ -60,9 +60,34 @@ class CropCorner extends Entity {
 				this.x = (stage.mouse.x - this.width/2);
 				this.y = (stage.mouse.y - this.height/2);
 
+				var image:Image = cast stage.get('.Image').get(0);
+				if (this.x+(width/2) > image.x + image.width) {
+					this.x = (image.x + image.width - this.width/2);
+				}
+
+				else if (this.x+(width/2) < image.x) {
+					this.x = image.x - this.width/2;
+				}
+
+				if (this.y-(height/2) > image.y + image.height) {
+					this.y = (image.y + image.height + this.height/2);
+				}
+
+				else if (this.y-(height/2) < image.y) {
+					this.y = image.y + this.height/2;
+				}
+				
+				if (!image.rect().containsPoint(stage.mouse)) {
+					followMouse = false;
+				}
+
 				var newPoint = new Point((this.x + this.width/2), (this.y + this.height/2));
 				me.emit('drag', newPoint);
 			}
+		});
+
+		stage.on('mouseleave', function(e:Dynamic):Void {
+			followMouse = false;
 		});
 	}
 

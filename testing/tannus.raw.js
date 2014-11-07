@@ -174,19 +174,7 @@ Exposer.main = function() {
 	if(tannus.utils.Types.basictype(obj6) == "StringMap") this17 = tannus.utils.MapTools.toDynamic(obj6); else this17 = obj6;
 	value4 = this17;
 	Reflect.setProperty(envir,name4,value4);
-	tannus.display.CropWidget;
-	var canvas = tannus.ui.JQuery.select("#stage").at(0);
-	var stage = new tannus.display.Stage(canvas);
-	stage.width = 640;
-	stage.height = 480;
-	var ent = new tannus.display.CropWidget("#img");
-	stage.add(ent);
-	ent.on("ready",function(e) {
-		ent.width = stage.width;
-		ent.height = stage.height;
-		console.log(Std.string(ent.rect()) + "");
-	});
-	ent.bindToInput("#file");
+	new tannus.display.CropWidget("",null);
 	Exposer.initHelpers();
 };
 Exposer.initHelpers = function() {
@@ -1442,6 +1430,7 @@ tannus.display.Entity = $hx_exports.tannus.display.Entity = function() {
 	this.width = 0;
 	this.height = 0;
 	this.stage = null;
+	this._pointerBindings = new haxe.ds.StringMap();
 	this._remove = false;
 	this._hidden = false;
 	this._cached = false;
@@ -1465,6 +1454,26 @@ tannus.display.Entity.prototype = $extend(tannus.core.EventDispatcher.prototype,
 	}
 	,update: function(stage,surface) {
 		tannus.core.EventDispatcher.prototype.emit.call(this,"update",this);
+		var $it0 = this._pointerBindings.keys();
+		while( $it0.hasNext() ) {
+			var fieldName = $it0.next();
+			var this1;
+			var this2;
+			if(tannus.utils.Types.basictype(this) == "StringMap") this2 = tannus.utils.MapTools.toDynamic(this); else this2 = this;
+			this1 = this2;
+			var name;
+			var this3;
+			if(tannus.utils.Types.basictype(fieldName) == "StringMap") this3 = tannus.utils.MapTools.toDynamic(fieldName); else this3 = fieldName;
+			name = this3;
+			var value;
+			var obj;
+			var this4 = this._pointerBindings.get(fieldName);
+			obj = this4.getValue();
+			var this5;
+			if(tannus.utils.Types.basictype(obj) == "StringMap") this5 = tannus.utils.MapTools.toDynamic(obj); else this5 = obj;
+			value = this5;
+			Reflect.setProperty(this1,name,value);
+		}
 	}
 	,destroy: function() {
 		var _g = 0;
@@ -1488,6 +1497,10 @@ tannus.display.Entity.prototype = $extend(tannus.core.EventDispatcher.prototype,
 	}
 	,show: function() {
 		this._hidden = false;
+	}
+	,bindPointer: function(field,valuePointer) {
+		this._pointerBindings.set(field,valuePointer);
+		valuePointer;
 	}
 	,getPoint: function() {
 		return new tannus.geom.Point(this.x,this.y,this.z);
@@ -1527,6 +1540,57 @@ tannus.display.Entity.prototype = $extend(tannus.core.EventDispatcher.prototype,
 		});
 	}
 	,__class__: tannus.display.Entity
+});
+tannus.display.Button = function() {
+	tannus.display.Entity.call(this);
+	this.icon = null;
+	this.text = null;
+	this.image = null;
+	this.mouseOver = false;
+	this.previous = null;
+	this.on("activate",(function(f) {
+		return function() {
+			return f();
+		};
+	})($bind(this,this.init)));
+};
+$hxClasses["tannus.display.Button"] = tannus.display.Button;
+tannus.display.Button.__name__ = ["tannus","display","Button"];
+tannus.display.Button.__super__ = tannus.display.Entity;
+tannus.display.Button.prototype = $extend(tannus.display.Entity.prototype,{
+	init: function() {
+		console.log("Button Initialized");
+	}
+	,setIcon: function(src,onload) {
+		var _g = this;
+		var img = new tannus.display.Image("<img src=\"" + src + "\"></img>");
+		img.on("ready",function(e) {
+			if(onload != null) onload(img);
+			_g.icon = img;
+		});
+	}
+	,setImage: function(src,onload) {
+		var _g = this;
+		var img = new tannus.display.Image("<img src=\"" + src + "\"></img>",false);
+		img.on("ready",function(e) {
+			if(onload != null) onload(img);
+			_g.image = img;
+		});
+	}
+	,render: function(stage,c) {
+		if(this.image != null) {
+			c.drawImage(this.image.canvas.component,0,0,this.image.canvas.component.width,this.image.canvas.component.height,this.x,this.y,this.width,this.height);
+			if(this.mouseOver) {
+				c.strokeStyle = "#666666";
+				c.strokeRect(this.x,this.y,this.width,this.height);
+			}
+		}
+	}
+	,update: function(stage,c) {
+		tannus.display.Entity.prototype.update.call(this,stage,c);
+		if(stage.mouse != null) this.mouseOver = this.rect().containsPoint(stage.mouse);
+	}
+	,__class__: tannus.display.Button
 });
 tannus.display.CropCorner = $hx_exports.tannus.display.CropCorner = function(x,y) {
 	tannus.display.Entity.call(this);
@@ -1568,9 +1632,16 @@ tannus.display.CropCorner.prototype = $extend(tannus.display.Entity.prototype,{
 			if(_g.followMouse) {
 				_g.x = _g.stage.mouse.x - _g.width / 2;
 				_g.y = _g.stage.mouse.y - _g.height / 2;
+				var image = _g.stage.get(".Image").get(0);
+				if(_g.x + _g.width / 2 > image.x + image.width) _g.x = image.x + image.width - _g.width / 2; else if(_g.x + _g.width / 2 < image.x) _g.x = image.x - _g.width / 2;
+				if(_g.y - _g.height / 2 > image.y + image.height) _g.y = image.y + image.height + _g.height / 2; else if(_g.y - _g.height / 2 < image.y) _g.y = image.y + _g.height / 2;
+				if(!image.rect().containsPoint(_g.stage.mouse)) _g.followMouse = false;
 				var newPoint1 = new tannus.geom.Point(_g.x + _g.width / 2,_g.y + _g.height / 2);
 				me.emit("drag",newPoint1);
 			}
+		});
+		this.stage.on("mouseleave",function(e3) {
+			_g.followMouse = false;
 		});
 	}
 	,render: function(stage,c) {
@@ -1605,23 +1676,46 @@ tannus.display.CropCorner.prototype = $extend(tannus.display.Entity.prototype,{
 });
 tannus.display.CropWidget = function(ref,options) {
 	tannus.display.Entity.call(this);
-	this.image = new tannus.display.Image(ref);
-	this.addAsset(this.image);
-	this.box = new tannus.display.Cropbox(this.image);
-	this.addAsset(this.box);
+	if(options == null) options = new tannus.display._CropWidget.CropWidgetOptions();
+	this.options = options;
+	if(tannus.ui.JQuery.select(ref).at(0) != null) {
+		this.image = new tannus.display.Image(ref);
+		this.addAsset(this.image);
+		this.box = new tannus.display.Cropbox(this.image);
+		this.addAsset(this.box);
+	}
 	this.on("activate",(function(f) {
 		return function() {
 			return f();
 		};
 	})($bind(this,this.init)));
+	this.on("accept",(function(f1) {
+		return function(a1) {
+			return f1(a1);
+		};
+	})($bind(this,this.accept)));
 };
 $hxClasses["tannus.display.CropWidget"] = tannus.display.CropWidget;
 tannus.display.CropWidget.__name__ = ["tannus","display","CropWidget"];
 tannus.display.CropWidget.__super__ = tannus.display.Entity;
 tannus.display.CropWidget.prototype = $extend(tannus.display.Entity.prototype,{
 	init: function() {
+		var _g = this;
 		this.stage.add(this.image);
 		this.stage.add(this.box);
+		var boxPtr = new tannus.utils.CPointer(function() {
+			return _g.box;
+		});
+		if(this.options.acceptButton != null) this.options.acceptButton.on("click",function(e) {
+			var bx = boxPtr.getValue();
+			if(bx != null) bx.crop();
+		});
+	}
+	,accept: function(can) {
+		if(this.options.accept != null && Reflect.isFunction(this.options.accept)) this.options.accept(can);
+	}
+	,grab: function(callb) {
+		throw "Not Yet Implemented!";
 	}
 	,bindToInput: function(ref) {
 		var _g = this;
@@ -1647,6 +1741,20 @@ tannus.display.CropWidget.prototype = $extend(tannus.display.Entity.prototype,{
 	}
 	,__class__: tannus.display.CropWidget
 });
+tannus.display._CropWidget = {};
+tannus.display._CropWidget.CropWidgetOptions = function() {
+	var obj = { };
+	var this1;
+	if(tannus.utils.Types.basictype(obj) == "StringMap") this1 = tannus.utils.MapTools.toDynamic(obj); else this1 = obj;
+	this.icons = this1;
+	this.accept = null;
+	this.acceptButton = null;
+};
+$hxClasses["tannus.display._CropWidget.CropWidgetOptions"] = tannus.display._CropWidget.CropWidgetOptions;
+tannus.display._CropWidget.CropWidgetOptions.__name__ = ["tannus","display","_CropWidget","CropWidgetOptions"];
+tannus.display._CropWidget.CropWidgetOptions.prototype = {
+	__class__: tannus.display._CropWidget.CropWidgetOptions
+};
 tannus.display.Cropbox = $hx_exports.tannus.display.Cropbox = function(img) {
 	tannus.display.Entity.call(this);
 	this.z = 999;
@@ -1741,6 +1849,9 @@ tannus.display.Cropbox.prototype = $extend(tannus.display.Entity.prototype,{
 				var pos = dragOffset.relativeTo(_g.stage.mouse);
 				me.box.x = pos.x;
 				me.box.y = pos.y;
+				var imr = me.image.rect();
+				if(me.box.x + me.box.width > imr.x + imr.width) me.box.x = imr.x + imr.width - me.box.width; else if(me.box.x < imr.x) me.box.x = imr.x;
+				if(me.box.y + me.box.height > imr.y + imr.height) me.box.y = imr.y + imr.height - me.box.height; else if(me.box.y < imr.y) me.box.y = imr.y;
 			}
 		});
 		me.on("mousedown",function(e1) {
@@ -1754,12 +1865,76 @@ tannus.display.Cropbox.prototype = $extend(tannus.display.Entity.prototype,{
 			followMouse = false;
 		});
 	}
+	,initButtons: function() {
+		var _g = this;
+		this.addButton("icons/check.light.png",function(e) {
+			var chunk = _g.image.crop(_g.box);
+			console.log(chunk.toDataURI());
+		});
+	}
+	,addButton: function(imageSrc,onClick) {
+		var _g = this;
+		var btn = new tannus.display.Button();
+		btn.z = 1000;
+		btn.setImage(imageSrc);
+		btn.on("click",onClick);
+		var size = new tannus.utils.CPointer(function() {
+			return tannus.math.TMath.clamp(_g.box.width / 3,25,50);
+		});
+		btn.bindPointer("width",size);
+		btn.bindPointer("height",size);
+		var padding = 8;
+		var bx = new tannus.utils.CPointer(function() {
+			if(!(_g.box.x + _g.box.width - _g.stage.width < padding + size.getValue())) return _g.box.x + _g.box.width + padding; else return 20;
+		});
+		btn.bindPointer("x",bx);
+		var by = new tannus.utils.CPointer(function() {
+			return _g.box.y + 5;
+		});
+		btn.bindPointer("y",by);
+		this.addAsset(btn);
+		this.stage.add(btn);
+	}
 	,initImage: function() {
 		this.box = new tannus.geom.Rectangle(0,0,100,100);
-		this.image.width = this.stage.width;
-		this.image.height = this.stage.height;
-		this.width = this.image.width;
-		this.height = this.image.height;
+		var _g = this.image.orientation;
+		switch(_g[1]) {
+		case 0:
+			var rel = this.image.originalSize.height / this.image.originalSize.width;
+			this.image.width = this.stage.width;
+			this.image.height = this.stage.height * rel;
+			this.image.y = this.stage.height / 2 - this.image.height / 2;
+			break;
+		case 1:
+			var rel1 = this.image.originalSize.width / this.image.originalSize.height;
+			this.image.width = this.stage.width * rel1;
+			this.image.height = this.stage.height;
+			this.image.x = this.stage.width / 2 - this.image.height / 2;
+			break;
+		case 2:
+			var myorient = new tannus.geom.Rectangle(0,0,this.stage.width,this.stage.height).orientation();
+			switch(myorient[1]) {
+			case 0:
+				this.image.height = this.stage.height;
+				this.image.width = this.image.height;
+				this.image.x = this.stage.width / 2 - this.image.width / 2;
+				break;
+			case 1:
+				this.image.width = this.stage.width;
+				this.image.height = this.image.width;
+				this.image.y = this.stage.height / 2 - this.image.height / 2;
+				break;
+			case 2:
+				this.image.width = this.stage.width;
+				this.image.height = this.stage.height;
+				this.image.x = 0;
+				this.image.y = 0;
+				break;
+			}
+			break;
+		}
+		this.width = this.stage.width;
+		this.height = this.stage.height;
 		this.box.x = this.image.width / 2 - this.box.width / 2;
 		this.box.y = this.image.height / 2 - this.box.height / 2;
 		var imageBrightness = this.image.canvas.pixels().average().brightness();
@@ -1780,27 +1955,144 @@ tannus.display.Cropbox.prototype = $extend(tannus.display.Entity.prototype,{
 		}
 	}
 	,update: function(stage,c) {
+		if(this.box.width > this.image.width) this.box.width = this.image.width; else if(this.box.height > this.image.height) this.box.height = this.image.height;
+		var me = this;
+		var imr = me.image.rect();
+		if(me.box.x + me.box.width > imr.x + imr.width) me.box.x = imr.x + imr.width - me.box.width; else if(me.box.x < imr.x) me.box.x = imr.x;
+		if(me.box.y + me.box.height > imr.y + imr.height) me.box.y = imr.y + imr.height - me.box.height; else if(me.box.y < imr.y) me.box.y = imr.y;
+	}
+	,crop: function() {
+		var subImage = this.image.crop(this.box);
+		var widget = this.stage.get(".CropWidget").get(0);
+		if(widget != null) widget.emit("accept",subImage);
 	}
 	,__class__: tannus.display.Cropbox
 });
-tannus.display.Image = $hx_exports.tannus.display.Image = function(ref) {
+tannus.display.Image = $hx_exports.tannus.display.Image = function(ref,waitForActivation) {
+	if(waitForActivation == null) waitForActivation = true;
 	var _g = this;
 	tannus.display.Entity.call(this);
 	this.image = tannus.ui.JQuery.select(ref).at(0);
 	this.complete = false;
-	console.log("Image created");
 	tannus.ui.Canvas.fromImage(this.image,function(canvas) {
 		_g.canvas = canvas;
 		_g.width = _g.canvas.component.width;
 		_g.height = _g.canvas.component.height;
-		console.log("Canvas initialized");
+		if(!waitForActivation) {
+			_g.complete = true;
+			_g.emit("ready",_g);
+		}
 	});
+	this.on("ready",(function(f) {
+		return function() {
+			return f();
+		};
+	})($bind(this,this.init)));
 };
 $hxClasses["tannus.display.Image"] = tannus.display.Image;
 tannus.display.Image.__name__ = ["tannus","display","Image"];
 tannus.display.Image.__super__ = tannus.display.Entity;
 tannus.display.Image.prototype = $extend(tannus.display.Entity.prototype,{
-	render: function(stage,c) {
+	init: function() {
+		var img;
+		var obj = this.image;
+		var this1;
+		if(tannus.utils.Types.basictype(obj) == "StringMap") this1 = tannus.utils.MapTools.toDynamic(obj); else this1 = obj;
+		img = this1;
+		this.originalSize = new tannus.geom.Rectangle(0,0,(function($this) {
+			var $r;
+			var prop = img.naturalWidth;
+			$r = prop != void(0);
+			return $r;
+		}(this))?(function($this) {
+			var $r;
+			var this2;
+			{
+				var key;
+				var this3;
+				if(tannus.utils.Types.basictype("naturalWidth") == "StringMap") this3 = tannus.utils.MapTools.toDynamic("naturalWidth"); else this3 = "naturalWidth";
+				key = this3;
+				var obj1 = Reflect.getProperty(img,key);
+				var this4;
+				if(tannus.utils.Types.basictype(obj1) == "StringMap") this4 = tannus.utils.MapTools.toDynamic(obj1); else this4 = obj1;
+				this2 = this4;
+			}
+			$r = Std.parseFloat(Std.string(this2));
+			return $r;
+		}(this)):(function($this) {
+			var $r;
+			var this5;
+			{
+				var key1;
+				var this6;
+				if(tannus.utils.Types.basictype("width") == "StringMap") this6 = tannus.utils.MapTools.toDynamic("width"); else this6 = "width";
+				key1 = this6;
+				var obj2 = Reflect.getProperty(img,key1);
+				var this7;
+				if(tannus.utils.Types.basictype(obj2) == "StringMap") this7 = tannus.utils.MapTools.toDynamic(obj2); else this7 = obj2;
+				this5 = this7;
+			}
+			$r = Std.parseFloat(Std.string(this5));
+			return $r;
+		}(this)),(function($this) {
+			var $r;
+			var prop1 = img.naturalHeight;
+			$r = prop1 != void(0);
+			return $r;
+		}(this))?(function($this) {
+			var $r;
+			var this8;
+			{
+				var key2;
+				var this9;
+				if(tannus.utils.Types.basictype("naturalHeight") == "StringMap") this9 = tannus.utils.MapTools.toDynamic("naturalHeight"); else this9 = "naturalHeight";
+				key2 = this9;
+				var obj3 = Reflect.getProperty(img,key2);
+				var this10;
+				if(tannus.utils.Types.basictype(obj3) == "StringMap") this10 = tannus.utils.MapTools.toDynamic(obj3); else this10 = obj3;
+				this8 = this10;
+			}
+			$r = Std.parseFloat(Std.string(this8));
+			return $r;
+		}(this)):(function($this) {
+			var $r;
+			var this11;
+			{
+				var key3;
+				var this12;
+				if(tannus.utils.Types.basictype("height") == "StringMap") this12 = tannus.utils.MapTools.toDynamic("height"); else this12 = "height";
+				key3 = this12;
+				var obj4 = Reflect.getProperty(img,key3);
+				var this13;
+				if(tannus.utils.Types.basictype(obj4) == "StringMap") this13 = tannus.utils.MapTools.toDynamic(obj4); else this13 = obj4;
+				this11 = this13;
+			}
+			$r = Std.parseFloat(Std.string(this11));
+			return $r;
+		}(this)));
+		if(this.originalSize.width > this.originalSize.height) this.orientation = tannus.utils.Orientation.OLandscape; else if(this.originalSize.width < this.originalSize.height) this.orientation = tannus.utils.Orientation.OPortrait; else if(this.originalSize.width == this.originalSize.height) this.orientation = tannus.utils.Orientation.OSquare;
+	}
+	,scale: function() {
+		var origA = this.originalSize.area();
+		var currA = this.rect().area();
+		console.log(Std.string([origA,currA]) + "");
+		return currA / origA;
+	}
+	,crop: function(crect) {
+		var top_left = crect.topLeft();
+		var bottom_right = crect.bottomRight();
+		top_left = this.position().relativeTo(top_left);
+		bottom_right = this.position().relativeTo(bottom_right);
+		top_left = top_left.offsetFactorOf(this.rect());
+		bottom_right = bottom_right.offsetFactorOf(this.rect());
+		var full = this.originalSize;
+		var top_left_full = new tannus.geom.Point(full.width * top_left.x,full.height * top_left.y);
+		var bottom_right_full = new tannus.geom.Point(full.width * bottom_right.x,full.height * bottom_right.y);
+		var fullCropRect = new tannus.geom.Line(top_left_full,bottom_right_full).rect();
+		console.log(Std.string(fullCropRect) + "");
+		return this.canvas.crop(fullCropRect);
+	}
+	,render: function(stage,c) {
 		tannus.display.Entity.prototype.render.call(this,stage,c);
 		if(this.canvas != null) {
 			this.canvas.set_width(this.image.naturalWidth);
@@ -1919,6 +2211,145 @@ tannus.display.PixelArray.prototype = $extend(tannus.core.EventDispatcher.protot
 	}
 	,__class__: tannus.display.PixelArray
 });
+tannus.display.Selection = function(selStr,stage) {
+	this.stage = stage;
+	this.selectorString = selStr;
+	this.filterFunction = tannus.ore.ObjectRegEx.getFunc(this.selectorString);
+	this.entities = this.stage.childNodes.filter(this.filterFunction);
+	this.length = this.entities.length;
+};
+$hxClasses["tannus.display.Selection"] = tannus.display.Selection;
+tannus.display.Selection.__name__ = ["tannus","display","Selection"];
+tannus.display.Selection.__interfaces__ = [tannus.core.Destructible];
+tannus.display.Selection.prototype = {
+	get: function(index) {
+		return this.entities[index];
+	}
+	,iterator: function() {
+		return HxOverrides.iter(this.entities);
+	}
+	,destroy: function() {
+		var _g = 0;
+		var _g1 = this.entities;
+		while(_g < _g1.length) {
+			var ent = _g1[_g];
+			++_g;
+			ent.destroy();
+		}
+	}
+	,cache: function() {
+		var _g = 0;
+		var _g1 = this.entities;
+		while(_g < _g1.length) {
+			var ent = _g1[_g];
+			++_g;
+			ent.cache();
+		}
+	}
+	,uncache: function() {
+		var _g = 0;
+		var _g1 = this.entities;
+		while(_g < _g1.length) {
+			var ent = _g1[_g];
+			++_g;
+			ent.uncache();
+		}
+	}
+	,hide: function() {
+		var _g = 0;
+		var _g1 = this.entities;
+		while(_g < _g1.length) {
+			var ent = _g1[_g];
+			++_g;
+			ent.hide();
+		}
+	}
+	,show: function() {
+		var _g = 0;
+		var _g1 = this.entities;
+		while(_g < _g1.length) {
+			var ent = _g1[_g];
+			++_g;
+			ent.show();
+		}
+	}
+	,on: function(channel,handler) {
+		var _g = 0;
+		var _g1 = this.entities;
+		while(_g < _g1.length) {
+			var ent = _g1[_g];
+			++_g;
+			ent.on(channel,handler);
+		}
+	}
+	,emit: function(channel,data) {
+		var _g = 0;
+		var _g1 = this.entities;
+		while(_g < _g1.length) {
+			var ent = _g1[_g];
+			++_g;
+			ent.emit(channel,data);
+		}
+	}
+	,attr: function(name,value) {
+		if(value != null) {
+			var _g = 0;
+			var _g1 = this.entities;
+			while(_g < _g1.length) {
+				var ent = _g1[_g];
+				++_g;
+				var this1;
+				var this2;
+				if(tannus.utils.Types.basictype(ent) == "StringMap") this2 = tannus.utils.MapTools.toDynamic(ent); else this2 = ent;
+				this1 = this2;
+				var name1;
+				var this3;
+				if(tannus.utils.Types.basictype(name) == "StringMap") this3 = tannus.utils.MapTools.toDynamic(name); else this3 = name;
+				name1 = this3;
+				Reflect.setProperty(this1,name1,value);
+			}
+			return null;
+		} else {
+			var results = new Array();
+			var _g2 = 0;
+			var _g11 = this.entities;
+			while(_g2 < _g11.length) {
+				var ent1 = _g11[_g2];
+				++_g2;
+				results.push((function($this) {
+					var $r;
+					var this4;
+					{
+						var this5;
+						if(tannus.utils.Types.basictype(ent1) == "StringMap") this5 = tannus.utils.MapTools.toDynamic(ent1); else this5 = ent1;
+						this4 = this5;
+					}
+					var key;
+					{
+						var this6;
+						if(tannus.utils.Types.basictype(name) == "StringMap") this6 = tannus.utils.MapTools.toDynamic(name); else this6 = name;
+						key = this6;
+					}
+					$r = (function($this) {
+						var $r;
+						var obj = Reflect.getProperty(this4,key);
+						$r = (function($this) {
+							var $r;
+							var this7;
+							if(tannus.utils.Types.basictype(obj) == "StringMap") this7 = tannus.utils.MapTools.toDynamic(obj); else this7 = obj;
+							$r = this7;
+							return $r;
+						}($this));
+						return $r;
+					}($this));
+					return $r;
+				}(this)));
+			}
+			return results;
+		}
+	}
+	,__class__: tannus.display.Selection
+};
 tannus.display.Stage = $hx_exports.tannus.display.Stage = function(can) {
 	tannus.core.EventDispatcher.call(this);
 	this.canvas = new tannus.ui.Canvas(can);
@@ -1933,6 +2364,7 @@ tannus.display.Stage.__name__ = ["tannus","display","Stage"];
 tannus.display.Stage.__super__ = tannus.core.EventDispatcher;
 tannus.display.Stage.prototype = $extend(tannus.core.EventDispatcher.prototype,{
 	init: function() {
+		this.initHelpers();
 		this.initEvents();
 		this.startHeartbeat();
 	}
@@ -1971,6 +2403,9 @@ tannus.display.Stage.prototype = $extend(tannus.core.EventDispatcher.prototype,{
 			if(!child._cached) child.update(this,ctx);
 		}
 	}
+	,get: function(sel) {
+		return new tannus.display.Selection(sel,this);
+	}
 	,startHeartbeat: function() {
 		var _g = this;
 		var win = window;
@@ -1987,49 +2422,84 @@ tannus.display.Stage.prototype = $extend(tannus.core.EventDispatcher.prototype,{
 		win.requestAnimationFrame(frame);
 	}
 	,initEvents: function() {
-		var _g = this;
+		var _g1 = this;
 		var events = ["click","mousedown","mouseup","mousemove"];
-		var _g1 = 0;
-		while(_g1 < events.length) {
-			var eventName = events[_g1];
-			++_g1;
+		var _g = 0;
+		while(_g < events.length) {
+			var eventName = events[_g];
+			++_g;
 			this.canvas.on(eventName,(function(f,a1) {
 				return function(a2) {
 					return f(a1,a2);
 				};
 			})($bind(this,this.emit),eventName));
 		}
+		this.canvas.on("mouseleave",(function(f1,a11) {
+			return function(a21) {
+				return f1(a11,a21);
+			};
+		})($bind(this,this.emit),"mouseleave"));
+		this.canvas.on("mouseenter",(function(f2,a12) {
+			return function(a22) {
+				return f2(a12,a22);
+			};
+		})($bind(this,this.emit),"mouseenter"));
+		var lastTargets;
+		var _g2 = new haxe.ds.StringMap();
+		_g2.set("click",null);
+		_g2.set("mousedown",null);
+		_g2.set("mouseup",null);
+		_g2.set("mousemove",null);
+		lastTargets = _g2;
 		var handleEvent = function(type,event) {
 			var targets = new Array();
-			var _g11 = 0;
-			var _g2 = _g.childNodes;
-			while(_g11 < _g2.length) {
-				var child = _g2[_g11];
-				++_g11;
+			var _g21 = 0;
+			var _g3 = _g1.childNodes;
+			while(_g21 < _g3.length) {
+				var child = _g3[_g21];
+				++_g21;
 				if(child.rect().containsPoint(event.position)) targets.push(child);
 			}
 			if(targets.length > 0) {
 				var target = targets[0];
-				var _g12 = 0;
-				while(_g12 < targets.length) {
-					var ent = targets[_g12];
-					++_g12;
+				var _g22 = 0;
+				while(_g22 < targets.length) {
+					var ent = targets[_g22];
+					++_g22;
 					if(ent.z > target.z) target = ent;
 				}
 				target.emit(type,event);
+				lastTargets.set(type,target);
+				target;
 			}
-			if(type == "mousemove") _g.mouse = event.position;
+			if(type == "mousemove") _g1.mouse = event.position;
 		};
-		var _g3 = 0;
-		while(_g3 < events.length) {
-			var eventName1 = events[_g3];
-			++_g3;
-			this.on(eventName1,(function(f1,a11) {
-				return function(a21) {
-					return f1(a11,a21);
+		var _g11 = 0;
+		while(_g11 < events.length) {
+			var eventName1 = events[_g11];
+			++_g11;
+			this.on(eventName1,(function(f3,a13) {
+				return function(a23) {
+					return f3(a13,a23);
 				};
 			})(handleEvent,eventName1));
 		}
+		this.on("mouseleave",function(e) {
+			console.log("That mouse just fucking left!!");
+			var lastThingPressed = lastTargets.get("mousedown");
+			if(lastThingPressed != null) lastThingPressed.emit("mouseup",e);
+		});
+	}
+	,initHelpers: function() {
+		var reg = tannus.ore.ObjectRegEx;
+		console.log("Newp!");
+		reg.helper("visible",function(ent) {
+			console.log(ent);
+			return !ent._hidden;
+		});
+		reg.helper("contains",function(ent1,x,y) {
+			return ent1.rect().containsPoint(new tannus.geom.Point(x,y));
+		});
 	}
 	,__class__: tannus.display.Stage
 });
@@ -2070,6 +2540,9 @@ tannus.geom.Point.prototype = {
 	,relativeTo: function(other) {
 		return new tannus.geom.Point(other.x - this.x,other.y - this.y,other.z - this.z);
 	}
+	,offsetFactorOf: function(rect) {
+		return rect.relateTo(this);
+	}
 	,toString: function() {
 		return "Point(" + this.x + ", " + this.y + ", " + this.z + ")";
 	}
@@ -2087,9 +2560,15 @@ tannus.geom.Rectangle = $hx_exports.tannus.geom.Rectangle = function(x,y,width,h
 };
 $hxClasses["tannus.geom.Rectangle"] = tannus.geom.Rectangle;
 tannus.geom.Rectangle.__name__ = ["tannus","geom","Rectangle"];
+tannus.geom.Rectangle.fromRelationship = function(vect,rect) {
+	return new tannus.geom.Rectangle(rect.width * vect.x,rect.height * vect.y,rect.width * vect.width,rect.height * vect.height);
+};
 tannus.geom.Rectangle.prototype = {
 	clone: function() {
 		return new tannus.geom.Rectangle(this.x,this.y,this.width,this.height);
+	}
+	,area: function() {
+		return this.width * this.height;
 	}
 	,equals: function(other) {
 		return this.x == other.x && this.y == other.y && this.width == other.width && this.height == other.height;
@@ -2101,6 +2580,18 @@ tannus.geom.Rectangle.prototype = {
 		points.push(new tannus.geom.Point(this.x + this.width,this.y + this.height));
 		points.push(new tannus.geom.Point(this.x,this.y + this.height));
 		return points;
+	}
+	,topLeft: function() {
+		return new tannus.geom.Point(this.x,this.y);
+	}
+	,topRight: function() {
+		return new tannus.geom.Point(this.x + this.width,this.y);
+	}
+	,bottomLeft: function() {
+		return new tannus.geom.Point(this.x,this.y + this.height);
+	}
+	,bottomRight: function() {
+		return new tannus.geom.Point(this.x + this.width,this.y + this.height);
 	}
 	,contains: function(cx,cy) {
 		return cx > this.x && cx < this.x + this.width && (cy > this.y && cy < this.y + this.height);
@@ -2128,8 +2619,24 @@ tannus.geom.Rectangle.prototype = {
 		}
 		return false;
 	}
+	,relationshipTo: function(other) {
+		return new tannus.geom.Rectangle(this.x / other.width,this.y / other.height,this.width / other.width,this.height / other.height);
+	}
+	,relateTo: function(pt) {
+		var rx = pt.x;
+		var ry = pt.y;
+		rx = rx / this.width;
+		ry = ry / this.height;
+		return new tannus.geom.Point(rx,ry);
+	}
 	,isEmpty: function() {
 		return this.x == 0 && this.y == 0 && this.width == 0 && this.height == 0;
+	}
+	,orientation: function() {
+		if(this.width > this.height) return tannus.utils.Orientation.OLandscape; else if(this.width < this.height) return tannus.utils.Orientation.OPortrait; else if(this.width == this.height) return tannus.utils.Orientation.OSquare; else throw "WhatTheFuck: " + Std.string(this);
+	}
+	,toString: function() {
+		return "Rectangle(" + this.x + ", " + this.y + ", " + this.width + ", " + this.height + ")";
 	}
 	,__class__: tannus.geom.Rectangle
 };
@@ -3668,7 +4175,7 @@ tannus.ui.Canvas.prototype = $extend(tannus.core.EventDispatcher.prototype,{
 			_g.emit(type,event);
 			console.log({ type : type, event : event});
 		};
-		var events = ["click","mousemove","mousedown","mouseup"];
+		var events = ["click","mousemove","mousedown","mouseup","mouseenter","mouseleave"];
 		var self = tannus.ui.JQuery.select(this.component);
 		var _g1 = 0;
 		while(_g1 < events.length) {
@@ -4379,6 +4886,16 @@ tannus.utils.MapTools.merge = function(props,others) {
 	}
 	return res;
 };
+tannus.utils.Orientation = { __ename__ : ["tannus","utils","Orientation"], __constructs__ : ["OLandscape","OPortrait","OSquare"] };
+tannus.utils.Orientation.OLandscape = ["OLandscape",0];
+tannus.utils.Orientation.OLandscape.toString = $estr;
+tannus.utils.Orientation.OLandscape.__enum__ = tannus.utils.Orientation;
+tannus.utils.Orientation.OPortrait = ["OPortrait",1];
+tannus.utils.Orientation.OPortrait.toString = $estr;
+tannus.utils.Orientation.OPortrait.__enum__ = tannus.utils.Orientation;
+tannus.utils.Orientation.OSquare = ["OSquare",2];
+tannus.utils.Orientation.OSquare.toString = $estr;
+tannus.utils.Orientation.OSquare.__enum__ = tannus.utils.Orientation;
 tannus.utils.PathTools = function() { };
 $hxClasses["tannus.utils.PathTools"] = tannus.utils.PathTools;
 tannus.utils.PathTools.__name__ = ["tannus","utils","PathTools"];

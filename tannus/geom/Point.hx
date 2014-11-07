@@ -1,5 +1,7 @@
 package tannus.geom;
 
+import tannus.geom.Rectangle;
+
 @:expose
 class Point {
 	public var x:Float;
@@ -30,6 +32,10 @@ class Point {
 			(other.y - this.y),
 			(other.z - this.z)
 		);
+	}
+
+	public function offsetFactorOf(rect:Rectangle):Point {
+		return rect.relateTo(this);
 	}
 
 	public function toString():String {

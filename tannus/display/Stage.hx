@@ -2,6 +2,7 @@ package tannus.display;
 
 import tannus.core.EventDispatcher;
 import tannus.display.Entity;
+import tannus.display.Selection;
 import tannus.math.TMath;
 import tannus.geom.Point;
 
@@ -34,6 +35,7 @@ class Stage extends EventDispatcher {
 	 * Initialize [this] Stage
 	 */
 	public function init():Void {
+		this.initHelpers();
 		this.initEvents();
 		this.startHeartbeat();
 	}
@@ -76,6 +78,10 @@ class Stage extends EventDispatcher {
 		}
 	}
 	
+	public function get(sel : String):Selection {
+		return new Selection(sel, this);
+	}
+	
 	public function startHeartbeat():Void {
 		var win = js.Browser.window;
 		var frameDelay:Int = 30;
@@ -100,6 +106,15 @@ class Stage extends EventDispatcher {
 		for (eventName in events) {
 			canvas.on(eventName, this.emit.bind(eventName, _));
 		}
+		canvas.on('mouseleave', this.emit.bind('mouseleave', _));
+		canvas.on('mouseenter', this.emit.bind('mouseenter', _));
+		
+		var lastTargets:Map<String, Null<Entity>> = [
+			"click" => null,
+			"mousedown" => null,
+			"mouseup" => null,
+			"mousemove" => null
+		];
 		function handleEvent(type:String, event:Dynamic):Void {
 			var targets:Array<Entity> = new Array();
 			for (child in childNodes) {
@@ -117,6 +132,7 @@ class Stage extends EventDispatcher {
 					}
 				}
 				target.emit(type, event);
+				lastTargets[type] = target;
 			}
 
 			if (type == 'mousemove') {
@@ -127,6 +143,29 @@ class Stage extends EventDispatcher {
 		for (eventName in events) {
 			this.on(eventName, handleEvent.bind(eventName, _));	
 		}
+
+		this.on('mouseleave', function(e):Void {
+			trace("That mouse just fucking left!!");
+			var lastThingPressed = lastTargets['mousedown'];
+
+			if (lastThingPressed != null) {
+				lastThingPressed.emit('mouseup', e);
+			}
+		});
+	}
+
+	public function initHelpers():Void {
+		var reg = tannus.ore.ObjectRegEx;
+		
+		trace("Newp!");
+		reg.helper('visible', function(ent:Entity):Bool {
+			trace(ent);
+			return (!ent._hidden);
+		});
+
+		reg.helper('contains', function(ent:Entity, x:Float, y:Float):Bool {
+			return (ent.rect().containsPoint(new Point(x, y)));
+		});
 	}
 
 	public static inline function __init__():Void {

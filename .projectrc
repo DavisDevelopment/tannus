@@ -3,5 +3,15 @@ echo ""
 echo "=== Tannus Library ==="
 echo ""
 
-git status
+message () {
+	echo ""
+	echo '=== $1 ==='
+	echo ""
+}
 
+commit () {
+	git add --all
+	git commit && git push
+	clear
+	message "Tannus Library Synced to Github"
+}
