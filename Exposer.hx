@@ -35,11 +35,33 @@ class Exposer {
 		envir['Utils'] = tannus.serverside.socks.Utils;
 		envir['ore'] = ObjectRegEx;
 
+		var buf:Buffer = "No, Daddy, is Christmas!";
+		trace(buf.toInt8Array());
+
 		envir['ui'] = {
 			'Canvas' : tannus.ui.Canvas,
-			'Stage' : tannus.display.Stage
+			'Stage' : tannus.display.Stage,
+			'FileInput' : tannus.ui.FileInput
 		};
-		new tannus.display.CropWidget('', null);
+		envir['display']['CropWidget'] = tannus.display.CropWidget;
+
+		envir['display']['makeCrop'] = function(startImage:Dynamic, canvas:Dynamic, stageRect:tannus.geom.Rectangle, ?inputToBind:Null<Dynamic>):tannus.display.CropWidget {
+			var stage = new tannus.display.Stage(canvas);
+			
+			stage.width = stageRect.width;
+			stage.height = stageRect.height;
+
+			var ent = new tannus.display.CropWidget(startImage);
+			ent.bindToInput(inputToBind);
+			stage.add(ent);
+
+			stage.report();
+
+
+			return ent;
+		};
+
+		//new tannus.display.CropWidget('', null);
 		
 
 		initHelpers();

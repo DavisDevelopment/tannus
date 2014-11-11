@@ -251,9 +251,14 @@ abstract Buffer(Bytes) {
 		return new js.html.Int32Array(self.toArray());
 	}
 
+	@:to
+	public function toInt8Array():js.html.Int8Array {
+		return new js.html.Int8Array(self.toArray());
+	}
+
 	public function toClientBlob(?mime_type:String):js.html.Blob {
-		return new js.html.Blob([self.toInt32Array()], {
-			'type' : (mime_type != null ? mime_type : 'application/octet-stream')
+		return new js.html.Blob([self.toInt8Array()], {
+			'type' : (mime_type != null ? mime_type : 'application/octet-binary')
 		});
 	}
 #end

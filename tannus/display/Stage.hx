@@ -11,6 +11,7 @@ import tannus.ui.Canvas;
 import js.html.CanvasElement;
 
 @:expose
+@:keep
 class Stage extends EventDispatcher {
 	public var canvas:Canvas;
 	public var childNodes:Array<Entity>;
@@ -47,8 +48,18 @@ class Stage extends EventDispatcher {
 		}
 	}
 
+	public function report():Void {
+		trace(this);
+	}
+
+	public function setRectangle(rect:tannus.geom.Rectangle):Void {
+		this.width = rect.width;
+		this.height = rect.height;
+	}
+
 	public function render():Void {
-		canvas.reset();
+		trace("Stage being rendered");
+	//	canvas.reset();
 		var ctx:Dynamic = canvas.getContext('2d');
 		for (child in childNodes) {
 			if (!child._hidden) {
@@ -58,6 +69,7 @@ class Stage extends EventDispatcher {
 	}
 
 	public function update():Void {
+		trace("Stage being updated");
 		// handle [width] and [height] fields
 		if (width != null) {
 			canvas.width = Std.int(width);

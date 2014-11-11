@@ -13,7 +13,8 @@ import js.html.Document;
 
 private typedef NativeCanvas = js.html.CanvasElement;
 
-
+@:expose
+@:keep
 class Canvas extends EventDispatcher {
 	public var component:NativeCanvas;
 	public var document:Document;
@@ -71,8 +72,8 @@ class Canvas extends EventDispatcher {
 
 		do {
 
-			totalOffsetX += (currentElement.offsetLeft - currentElement.scrollLeft);
-			totalOffsetY += (currentElement.offsetTop - currentElement.scrollTop);
+			totalOffsetX += (currentElement.offsetLeft - currentElement.scrollLeft * 2);
+			totalOffsetY += (currentElement.offsetTop - currentElement.scrollTop * 2);
 
 			currentElement = currentElement.offsetParent;
 
@@ -81,6 +82,19 @@ class Canvas extends EventDispatcher {
 
 		canvasX = (event.pageX - totalOffsetX - js.Browser.window.scrollX);
 		canvasY = (event.pageY - totalOffsetY - js.Browser.window.scrollY);
+
+		var jq:Null<Dynamic> = untyped __js__('jQuery');
+		if (jq != null && Reflect.isFunction(jq)) {
+			var offset:Dynamic = jq(component).offset();
+
+			var pt = new Point(
+				(event.pageX - offset.left),
+				(event.pageY - offset.top)
+			);
+			var c = getContext('2d');
+			c.fillRect(pt.x, pt.y, 10, 10);
+			return pt;
+		}
 
 		return new Point(canvasX, canvasY);
 	 }

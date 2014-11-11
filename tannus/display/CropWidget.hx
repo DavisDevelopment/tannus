@@ -12,9 +12,10 @@ import tannus.utils.Buffer;
 import tannus.utils.Pointer;
 import tannus.core.Object;
 
+@:keep
 class CropWidget extends Entity {
-	public var image:Image;
-	public var box:Cropbox;
+	public var image:Null<Image>;
+	public var box:Null<Cropbox>;
 	public var options:CropWidgetOptions;
 	
 	public function new(ref:Dynamic, ?options:CropWidgetOptions):Void {
@@ -37,8 +38,10 @@ class CropWidget extends Entity {
 	}
 
 	public function init():Void {
-		this.stage.add(this.image);
-		this.stage.add(this.box);
+		if (image != null && box != null) {
+			this.stage.add(this.image);
+			this.stage.add(this.box);
+		}
 
 		var boxPtr:Pointer<Null<Cropbox>> = Pointer.literal(this.box);
 
@@ -53,17 +56,18 @@ class CropWidget extends Entity {
 	}
 
 	public function accept(can:Canvas):Void {
-		if (this.options.accept != null && Reflect.isFunction(this.options.accept)) {
+		if (this.options.accept != null) {
 			this.options.accept(can);
 		}
 	}
 
 	public function grab(callb:Canvas -> Void):Void {
-		throw 'Not Yet Implemented!';
+		callb(this.image.crop(this.box.box));
 	}
 
 	public function bindToInput(ref:Dynamic):Void {
 		var finput:FileInput = new FileInput(ref);
+		trace(finput);
 
 		finput.on('file-loaded', function(file) {
 			trace(file);
@@ -72,8 +76,11 @@ class CropWidget extends Entity {
 				var imgUrl:String = data.toDataURI(file.type);
 				var img:Image = new Image('<img src="$imgUrl" />');
 				
-				this.image.destroy();
-				this.box.destroy();
+				if (this.image != null)
+					this.image.destroy();
+
+				if (this.box != null)
+					this.box.destroy();
 
 				this.image = img;
 				addAsset(this.image);

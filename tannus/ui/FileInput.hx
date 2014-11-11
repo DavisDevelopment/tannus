@@ -4,6 +4,8 @@ import tannus.ui.JQuery;
 import tannus.core.EventDispatcher;
 import tannus.utils.Buffer;
 
+@:keep
+@:expose
 class FileInput extends EventDispatcher {
 	public var el:Dynamic;
 	

@@ -14,6 +14,7 @@ import tannus.utils.Orientation;
 import js.html.ImageElement;
 
 @:expose
+@:keep
 class Image extends Entity {
 	public var complete:Bool;
 	public var originalSize:Rectangle;
@@ -118,6 +119,7 @@ class Image extends Entity {
 	 * Draws [this] image onto the canvas
 	 */
 	override public function render(stage:Stage, c:Dynamic):Void {
+		trace("Image being rendered");
 		super.render(stage, c);
 		if (this.canvas != null) {
 			canvas.width = image.naturalWidth;
@@ -130,6 +132,8 @@ class Image extends Entity {
 			c.drawImage(canvas.component, 0, 0, canvas.width, canvas.height, this.x, this.y, this.width, this.height);
 
 			c.restore();
+		} else {
+			trace("Cannot render Image, [canvas] is null");
 		}
 	}
 	

@@ -11,6 +11,7 @@ import tannus.display.Stage;
 
 
 @:expose
+@:keepSub
 class Entity extends EventDispatcher implements Destructible {
 	public var x:Float;
 	public var y:Float;
