@@ -57,8 +57,8 @@ class CropWidget extends Entity {
 			this.box.on('resize', function(event:Dynamic) {
 				if (Reflect.isFunction(options.resize)) {
 					options.resize(event);
-					this.box.crop();
 				}
+				this.box.crop();
 			});
 		}
 
@@ -66,8 +66,8 @@ class CropWidget extends Entity {
 			this.box.on('drag', function(event:Dynamic) {
 				if (Reflect.isFunction(options.drag)) {
 					options.drag(event);
-					this.box.crop();
 				}
+				this.box.crop();
 			});
 		}
 	}
