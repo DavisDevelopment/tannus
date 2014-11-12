@@ -1,10 +1,13 @@
 package tannus.display;
 
 import tannus.core.EventDispatcher;
+import tannus.core.Destructible;
 import tannus.display.Entity;
 import tannus.display.Selection;
 import tannus.math.TMath;
 import tannus.geom.Point;
+
+import tannus.io.Memory;
 
 import tannus.ui.Canvas;
 
@@ -12,13 +15,16 @@ import js.html.CanvasElement;
 
 @:expose
 @:keep
-class Stage extends EventDispatcher {
+class Stage extends EventDispatcher implements Destructible {
 	public var canvas:Canvas;
 	public var childNodes:Array<Entity>;
 
 	public var mouse:Point;
 	public var width:Float;
 	public var height:Float;
+
+	public var frameId:Int;
+	public var id:Int;
 
 	public function new(can:CanvasElement):Void {
 		super();
@@ -29,6 +35,9 @@ class Stage extends EventDispatcher {
 		this.width = null;
 		this.height = null;
 
+		this.frameId = 0;
+		this.id = Memory.uniqueIdInt();
+
 		this.init();
 	}
 	
@@ -36,9 +45,22 @@ class Stage extends EventDispatcher {
 	 * Initialize [this] Stage
 	 */
 	public function init():Void {
+		addInstance(this);
 		this.initHelpers();
 		this.initEvents();
 		this.startHeartbeat();
+	}
+
+	/*
+	 * "destroy" or "delete" [this] Stage
+	 */
+	public function destroy():Void {
+		for (child in this.childNodes) {
+			child.destroy();
+		}
+
+		removeInstance(this);
+		js.Browser.window.cancelAnimationFrame(this.frameId);
 	}
 
 	public function add(ent : Entity):Void {
@@ -102,10 +124,10 @@ class Stage extends EventDispatcher {
 			update();
 			render();
 
-			win.requestAnimationFrame(frame);
+			this.frameId = win.requestAnimationFrame(frame);
 			return true;
 		};
-		win.requestAnimationFrame(frame);
+		this.frameId = win.requestAnimationFrame(frame);
 	}
 
 	public function initEvents():Void {
@@ -177,6 +199,31 @@ class Stage extends EventDispatcher {
 
 		reg.helper('contains', function(ent:Entity, x:Float, y:Float):Bool {
 			return (ent.rect().containsPoint(new Point(x, y)));
+		});
+	}
+	
+	public static var instances:Array<Stage> = {
+		new Array();
+	};
+	
+	public static function hasInstance(inst : Stage):Bool {
+		for (instance in instances) {
+			if (instance.id == inst.id) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static inline function addInstance(inst : Stage):Void {
+		if (!hasInstance(inst)) {
+			instances.push(inst);
+		}
+	}
+
+	public static inline function removeInstance(inst : Stage):Void {
+		instances = instances.filter(function(x:Stage):Bool {
+			return (x.id != inst.id);
 		});
 	}
 

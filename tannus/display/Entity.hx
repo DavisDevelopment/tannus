@@ -33,6 +33,7 @@ class Entity extends EventDispatcher implements Destructible {
 		this.x = 0;
 		this.y = 0;
 		this.z = 0;
+		this.id = Memory.uniqueIdString(Type.getClassName(Type.getClass(this)));
 
 		this.width = 0;
 		this.height = 0;
@@ -80,6 +81,14 @@ class Entity extends EventDispatcher implements Destructible {
 			asset.destroy();
 		}
 		super.emit('destroy', this);
+		this._remove = true;
+	}
+
+	/*
+	 * Detach [this] Entity from whatever Stage it belongs to
+	 */
+	public function detach():Void {
+		super.emit('detach', this);
 		this._remove = true;
 	}
 
