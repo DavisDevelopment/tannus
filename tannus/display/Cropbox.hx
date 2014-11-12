@@ -54,8 +54,16 @@ class Cropbox extends Entity {
 			// get the top-left and bottom-right points, and re-create the [box] Rectangle from them
 			var topleft:Point = newPoint;
 			var bottomright:Point = new Point((box.x + box.width), (box.y + box.height));
-
+			
+			var _cur = this.box;
 			this.box = (new Line(topleft, bottomright).rect());
+			this.emit('resize', {
+				'target': topLeft,
+				'rect': {
+					'old': _cur,
+					'new': this.box
+				}
+			});
 		};
 		// bind [tlDragHandler] to the relevant events
 		topLeft.on('drag-end', tlDragHandler);
@@ -72,8 +80,17 @@ class Cropbox extends Entity {
 			// get the top-right and bottom-left points, and re-create the [box] Rectangle from them
 			var topright:Point = newPoint;
 			var bottomleft:Point = new Point(box.x, (box.y + box.height));
-
+			
+			var _cur = this.box;
 			this.box = (new Line(topright, bottomleft).rect());
+
+			this.emit('resize', {
+				'target': topRight,
+				'rect': {
+					'old': _cur,
+					'new': this.box
+				}
+			});
 		};
 		// bind [trDragHandler] to the relevant events
 		topRight.on('drag-end', trDragHandler);
@@ -90,8 +107,17 @@ class Cropbox extends Entity {
 			// get the top-right and bottom-left points, and re-create the [box] Rectangle from them
 			var topright:Point = new Point((box.x + box.width), box.y);
 			var bottomleft:Point = newPoint;
-
+			
+			var _cur = this.box;
 			this.box = (new Line(topright, bottomleft).rect());
+
+			this.emit('resize', {
+				'target': bottomLeft,
+				'rect': {
+					'old': _cur,
+					'new': this.box
+				}
+			});
 		};
 		// bind [blDragHandler] to the relevant events
 		bottomLeft.on('drag-end', blDragHandler);
@@ -109,8 +135,17 @@ class Cropbox extends Entity {
 			// get the top-left and bottom-right points, and re-create the [box] Rectangle from them
 			var topleft:Point = new Point(box.x, box.y);
 			var bottomright:Point = newPoint;
-
+			
+			var _cur = this.box;
 			this.box = (new Line(topleft, bottomright).rect());
+
+			this.emit('resize', {
+				'target': bottomRight,
+				'rect': {
+					'old': _cur,
+					'new': this.box
+				}
+			});
 		};
 		// bind [brDragHandler] to the relevant events
 		bottomRight.on('drag', brDragHandler);
@@ -160,6 +195,12 @@ class Cropbox extends Entity {
 					me.box.y = imr.y;
 				}
 			}
+
+			me.emit('drag', {
+				'target': me,
+				'size': me.box,
+				'corners': me.cropCorners
+			});
 		});
 
 		me.on('mousedown', function(e:Dynamic):Void {

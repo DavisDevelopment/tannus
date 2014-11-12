@@ -53,6 +53,13 @@ class CropWidget extends Entity {
 				}
 			});
 		}
+		if (this.options.resize != null) {
+			this.box.on('resize', this.options.resize);
+		}
+
+		if (this.options.drag != null) {
+			this.box.on('drag', this.options.drag);
+		}
 	}
 
 	public function accept(can:Canvas):Void {
@@ -89,6 +96,8 @@ class CropWidget extends Entity {
 				this.box = new Cropbox(img);
 				addAsset(this.box);
 				this.stage.add(this.box);
+
+				this.init();
 			}
 		});
 	}
@@ -98,10 +107,14 @@ private class CropWidgetOptions {
 	public var icons : Null<Object>;
 	public var accept : Null<Canvas -> Void>;
 	public var acceptButton : Null<Dynamic>;
+	public var resize : Null<Dynamic -> Void>;
+	public var drag : Null<Dynamic -> Void>;
 
 	public function new():Void {
 		this.icons = new Object({});
 		this.accept = null;
 		this.acceptButton = null;
+		this.resize = null;
+		this.drag = null;
 	}
 }
