@@ -54,11 +54,21 @@ class CropWidget extends Entity {
 			});
 		}
 		if (this.options.resize != null) {
-			this.box.on('resize', this.options.resize);
+			this.box.on('resize', function(event:Dynamic) {
+				if (Reflect.isFunction(options.resize)) {
+					options.resize(event);
+					this.box.crop();
+				}
+			});
 		}
 
 		if (this.options.drag != null) {
-			this.box.on('drag', this.options.drag);
+			this.box.on('drag', function(event:Dynamic) {
+				if (Reflect.isFunction(options.drag)) {
+					options.drag(event);
+					this.box.crop();
+				}
+			});
 		}
 	}
 
