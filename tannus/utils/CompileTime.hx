@@ -84,7 +84,7 @@ class CompileTime
 	}()));
     }
 
-    /** Same as readFile, but checks that the file is valid Xml */
+    /* Same as readFile, but checks that the file is valid Xml */
     macro public static function readXmlFile(path:String):ExprOf<String> {
         var content = loadFileAsString(path);
         try Xml.parse(content) catch (e:Dynamic) {

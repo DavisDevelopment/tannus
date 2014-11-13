@@ -80,7 +80,6 @@ class Stage extends EventDispatcher implements Destructible {
 	}
 
 	public function render():Void {
-		trace("Stage being rendered");
 	//	canvas.reset();
 		var ctx:Dynamic = canvas.getContext('2d');
 		for (child in childNodes) {
@@ -91,7 +90,6 @@ class Stage extends EventDispatcher implements Destructible {
 	}
 
 	public function update():Void {
-		trace("Stage being updated");
 		// handle [width] and [height] fields
 		if (width != null) {
 			canvas.width = Std.int(width);
@@ -179,7 +177,6 @@ class Stage extends EventDispatcher implements Destructible {
 		}
 
 		this.on('mouseleave', function(e):Void {
-			trace("That mouse just fucking left!!");
 			var lastThingPressed = lastTargets['mousedown'];
 
 			if (lastThingPressed != null) {
@@ -191,9 +188,7 @@ class Stage extends EventDispatcher implements Destructible {
 	public function initHelpers():Void {
 		var reg = tannus.ore.ObjectRegEx;
 		
-		trace("Newp!");
 		reg.helper('visible', function(ent:Entity):Bool {
-			trace(ent);
 			return (!ent._hidden);
 		});
 

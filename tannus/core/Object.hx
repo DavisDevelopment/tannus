@@ -17,10 +17,12 @@ import tannus.utils.MapTools;
 import tannus.utils.Types;
 import tannus.utils.RegEx;
 import tannus.ore.ObjectRegEx;
+import Type;
 
 abstract Object (Dynamic) {
 	private var self(get, never):Object;
-	private var type(get, never):String;
+	public var type(get, never):String;
+	public var systemType(get, never):ValueType;
 
 	public inline function new(obj:Dynamic):Void {
 		if (Types.basictype(obj) == "StringMap") {
@@ -44,6 +46,11 @@ abstract Object (Dynamic) {
 	public inline function get_type():String {
 		return (Types.basictype(this));
 	}
+
+	public inline function get_systemType():ValueType {
+		return (Type.typeof(this));
+	}
+
 	//- retrieve an array of names of all attributes set on (this)
 	public inline function keys():Array<String> {
 		return (Reflect.fields(this));
@@ -53,6 +60,15 @@ abstract Object (Dynamic) {
 	public inline function exists(key : String):Bool {
 		var prop:Dynamic = untyped this[key];
 		return (prop != (untyped __js__('void(0)')));
+	}
+
+	//- Clone [this] Object, then return the copy
+	public inline function clone():Object {
+		var copy:Object = new Object({});
+		for (key in self.keys()) {
+			copy[key] = self[key];
+		}
+		return copy;
 	}
 
 	//- Merge two objects together, returning the product
@@ -76,8 +92,22 @@ abstract Object (Dynamic) {
 	//- Add anything to an Object instance
 	@:op(A + B)
 	public function add_to_dynamic(_other : Dynamic):Object {
-		var other : Object = cast _other;
-		return (self + other);
+		switch (self.systemType) {
+			case ValueType.TInt, ValueType.TFloat:
+				return cast (this + _other);
+
+			case ValueType.TObject:
+				if (self.is('.String')) {
+					return cast (this + _other + '');
+				} else {
+					var copy:Object = self.clone();
+					copy.merge(_other);
+					return copy;
+				}
+
+			default:
+				return cast (this + _other);
+		}
 	}
 
 	//- Add String to Object instance

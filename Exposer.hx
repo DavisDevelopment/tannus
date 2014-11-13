@@ -43,6 +43,18 @@ class Exposer {
 			'Stage' : tannus.display.Stage,
 			'FileInput' : tannus.ui.FileInput
 		};
+
+		if (!envir.exists('io')) {
+			envir['io'] = {};
+		}
+		if (!envir.exists('utils')) {
+			envir['utils'] = {};
+		}
+
+		envir['utils'] += {
+			'SearchEngine' : SearchEngine
+		};
+
 		envir['display']['CropWidget'] = tannus.display.CropWidget;
 
 		envir['display']['makeCrop'] = function(startImage:Dynamic, canvas:Dynamic, stageRect:tannus.geom.Rectangle, ?inputToBind:Null<Dynamic>):tannus.display.CropWidget {

@@ -6,6 +6,7 @@ import tannus.core.Object;
 import tannus.geom.Point;
 import tannus.geom.Rectangle;
 import tannus.utils.Pointer;
+import tannus.io.Memory;
 
 import tannus.display.Stage;
 

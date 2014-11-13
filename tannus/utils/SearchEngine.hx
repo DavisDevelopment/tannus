@@ -1,105 +1,91 @@
 package tannus.utils;
 
 import tannus.core.Object;
-
+import tannus.io.Byte;
 
 using tannus.utils.ArrayTools;
 @:expose
 class SearchEngine {
-	public var index:Array<Object>;
-	public var threshold:Int;
+	public var settings:Dynamic;
+	public var pool:Array<Dynamic>;
 	public var searchableFields:Array<String>;
-	public var computedFields:Object;
+	public var getTestValue:Object -> String;
+	
 
-	public function new(settings:Object):Void {
-		this.index = settings['items'].asArray();
-		this.threshold = settings['threshold'].asInteger();
-		this.searchableFields = [for (field in settings['searchableFields'].asArray()) field.toString()];
-		this.computedFields = settings['computed'];
+	public function new(settings:Dynamic):Void {
+		this.settings = settings;
+
+		if (settings.pool == null)
+			settings.pool = [];
+
+		this.pool = cast(settings.pool, Array<Dynamic>);
+		this.searchableFields = [for (x in cast(settings.fields, Array<Dynamic>)) cast(x, String)];
+
+		this.getTestValue = function(obj:Object) return (obj.toDynamic() + '');
+		if (settings.getValue != null) {
+			this.getTestValue = cast settings.getValue;
+		}
 	}
-	public function query(searchTerm:String):Array<Result> {
-		var i:Int = 0;
+
+	public function query(term:String):Array<Result> {
 		var results:Array<Result> = new Array();
-		while (i < index.length) {
-			var item:Object = index[i];
-			var fi:Int = 0;
-			var item_rating:Float = 0;
-			var terms:Array<String> = (searchTerm.split(' '));
+		
+		trace(unpunctuate(term));
+
+		for (target in pool) {
+			var obj:Object = new Object(target);
 			
-			while (fi < searchableFields.length) {
-				var field:String = searchableFields[fi];
-				var fieldValue:Object = null;
-				if (computedFields.exists(field)) {
-					var getter:Dynamic = computedFields[field];
-					fieldValue = getter(item);
-				} else {
-					fieldValue = item[field];
-				}
-				/*
-				 * - base_rating - The rating this item will get if the search term is an exact match to the current field
-				 */
-				var base_rating:Float = (searchableFields.length - fi) * 3.2;
-
-				var distance:Int = levenshtein(fieldValue.toString().toLowerCase(), searchTerm.toLowerCase());
-				item_rating += (threshold - distance) * 2.5;
-
-				for (term in terms) {
-					/*
-					 * - check for precise match
-					 */
-					
-					if (term == fieldValue) {
-						item_rating += base_rating * 2.5;
-					} else {
-						var fv:String = fieldValue.toString().toLowerCase();
-						var st:String = term.toLowerCase();
-
-						/*
-						 * - check for case-insensitive equality
-						 */
-						if (fv == st) {
-							item_rating += (base_rating * CASE_OFFSET);
-						} else {
-							/*
-							 * - check whether field_value CONTAINS search_term
-							 */
-							if (fv.indexOf(st) != -1) {
-								item_rating += (base_rating * CONTAINS_OFFSET);
-							} else {
-								/*
-								 * - check levenshtein distance, and calculate rating based on that
-								 */
-								var distance:Int = levenshtein(fv, st);
-								if (distance <= threshold) {
-									var rating_increase:Int = (threshold - distance);
-
-									item_rating += (rating_increase * LEVEN_OFFSET);
-								}
-							}
-						}
-					}
-				}
-
-				fi++;
-			}
-
-			if (item_rating > 0) {
-				results.push({
-					'rating': item_rating,
-					'value': item
-				});
-			}
-
-			i++;
+			results.push(calculateResult(obj, term));
 		}
 
-		haxe.ds.ArraySort.sort(results, function(a, b):Int {
-			return Math.round(a.rating - b.rating);
+		haxe.ds.ArraySort.sort(results, function(x:Result, y:Result):Int {
+			return (x.offset - y.offset);
 		});
 
-		results.reverse();
-
 		return results;
+	}
+
+	public function calculateResult(target:Object, term:String):Result {
+		var pieces:Array<String> = term.toLowerCase().split(' ');
+		pieces = [for (piece in pieces) unpunctuate(piece)];
+		
+		var offset:Int = 0;
+
+		for (piece in pieces) {
+			var value:String = this.getTestValue(target);
+			value = unpunctuate(value).toLowerCase();
+			var vpieces:Array<String> = value.split(' ');
+
+			for (vp in vpieces) {
+				var v:String = vp.substring(0, piece.length);
+
+				offset += levenshtein(piece, v);
+			}
+			
+		}
+
+		return {
+			'offset': offset,
+			'value' : target
+		};
+	}
+
+	
+	//- Remove all non-whitespace/non-alphanumeric characters from a string
+	public static inline function unpunctuate(str:String):String {
+		var _chars:Array<String> = str.split('');
+		var bytes:Array<Byte> = [for (c in _chars) Byte.fromString(c)];
+
+		var resultBytes:Array<Byte> = new Array();
+		
+		for (c in bytes) {
+			if (isWhiteSpace(c) || isAlphaNumeric(c)) {
+				resultBytes.push(c);
+			}
+		}
+
+		var result:Array<String> = [for (c in resultBytes) (c + '')];
+		return result.join('');
 	}
 
 	//- Calculates the Levenshtein distance between a and b
@@ -139,6 +125,20 @@ class SearchEngine {
 		}
 		return current[len_a];
 	}
+	
+	/*
+	 * Determines if character [c] is a whitespace character
+	 */
+	public static inline function isWhiteSpace(c : Byte):Bool {
+		return Lambda.has([9, 1, 11, 12, 13, 32], c);
+	}
+
+	/*
+	 * Determines if character [c] is an alphanumeric character
+	 */
+	public static inline function isAlphaNumeric(c : Byte):Bool {
+		return ~/[A-Za-z0-9_\-]/gi.match(c + '');
+	}
 
 	public static var CASE_OFFSET:Float = 1.5;
 	public static var CONTAINS_OFFSET:Float = 0.8;
@@ -146,6 +146,6 @@ class SearchEngine {
 }
 
 private typedef Result = {
-	rating:Float,
+	offset:Int,
 	value:Object
 };
