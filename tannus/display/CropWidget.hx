@@ -11,15 +11,19 @@ import tannus.ui.Canvas;
 import tannus.utils.Buffer;
 import tannus.utils.Pointer;
 import tannus.core.Object;
+import tannus.geom.Rectangle;
 
 @:keep
 class CropWidget extends Entity {
 	public var image:Null<Image>;
 	public var box:Null<Cropbox>;
 	public var options:CropWidgetOptions;
+	public var boxrect:Rectangle;
 	
 	public function new(ref:Dynamic, ?options:CropWidgetOptions):Void {
 		super();
+
+		this.boxrect = new Rectangle();
 		
 		if (options == null)
 			options = new CropWidgetOptions();
@@ -80,6 +84,10 @@ class CropWidget extends Entity {
 
 	public function grab(callb:Canvas -> Void):Void {
 		callb(this.image.crop(this.box.box));
+	}
+
+	public  function setRect(rect : Rectangle):Void {
+		this.box.setRect(rect);
 	}
 
 	public function bindToInput(ref:Dynamic):Void {

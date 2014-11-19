@@ -323,6 +323,13 @@ class Cropbox extends Entity {
 		}
 	}
 
+	public function setRect(rect : Rectangle):Void {
+		this.box.x = rect.x;
+		this.box.y = rect.y;
+		this.box.width = rect.width;
+		this.box.height = rect.height;
+	}
+
 	override public function render(stage:Stage, c:Dynamic):Void {
 		if (image.complete) {
 			c.save();
