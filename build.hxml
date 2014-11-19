@@ -1,6 +1,6 @@
 
 -main Exposer
--js ../tannus.raw.js
+-js testing/tannus.raw.js
 -dce std
 -D rtti
 -D tojs

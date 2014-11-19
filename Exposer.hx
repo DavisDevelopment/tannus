@@ -16,6 +16,8 @@ import tannus.crypto.Tea;
 import tannus.display.Stage;
 import tannus.display.*;
 
+import tannus.ui.Button;
+
 class Exposer {
 	private static var env(get, never):Object;
 	public static function expose(name:Object, value:Object):Void {
@@ -73,9 +75,17 @@ class Exposer {
 			return ent;
 		};
 
-		//new tannus.display.CropWidget('', null);
-		
+		var button:Button = new Button('Hello, World!');
+		button.addTo('#wrapper');
+		button.text = "Pinch Cheeks";
 
+		button.size = 'large';
+		var box:tannus.ui.Dialog = new tannus.ui.Dialog();
+		box.content = '<h1>Hello, World! :D</h1>';
+		button.on('click', function(e) {
+			box.open();
+		});
+		
 		initHelpers();
 	}
 
