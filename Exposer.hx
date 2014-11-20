@@ -3,11 +3,14 @@ package ;
 import tannus.core.Object;
 import tannus.core.Route;
 import tannus.Application;
+import tannus.core.Page;
 import tannus.mvc.Controller;
 import tannus.utils.CompileTime;
 import tannus.io.Byte;
 import tannus.io.ByteArray;
 import tannus.utils.Buffer;
+import tannus.utils.Tuple;
+import tannus.utils.Pointer;
 import tannus.ore.ObjectRegEx;
 import tannus.utils.SearchEngine;
 
@@ -17,6 +20,12 @@ import tannus.display.Stage;
 import tannus.display.*;
 
 import tannus.ui.Button;
+import tannus.ui.Window;
+import tannus.ui.*;
+
+import tannus.utils.Value;
+import tannus.core.Signal;
+import tannus.tasks.Action;
 
 class Exposer {
 	private static var env(get, never):Object;
@@ -24,56 +33,17 @@ class Exposer {
 		env[name.toString()] = value;
 	}
 	public static function main():Void {
-		if (env["tannus"] == null) env["tannus"] = {};
-		var envir:Object = env;
-		if (js.Browser.supported) {
-			envir = env['tannus'];
-		}
 
-		#if client
-		envir["Application"] = Application;
-		#end
+		var app:Application = new Application();
+		app.route('index.html', index.bind(_));
 
-		envir['Utils'] = tannus.serverside.socks.Utils;
-		envir['ore'] = ObjectRegEx;
+		app.start();
 
-		var buf:Buffer = "No, Daddy, is Christmas!";
-		trace(buf.toInt8Array());
+		var tup:ThreeTuple<String, Int, Int> = new ThreeTuple('Hello', 1, 2);
+		trace(tup);
+		Window.title = 'Tannus Testing Page';
+		trace(Window.viewport);
 
-		envir['ui'] = {
-			'Canvas' : tannus.ui.Canvas,
-			'Stage' : tannus.display.Stage,
-			'FileInput' : tannus.ui.FileInput
-		};
-
-		if (!envir.exists('io')) {
-			envir['io'] = {};
-		}
-		if (!envir.exists('utils')) {
-			envir['utils'] = {};
-		}
-
-		envir['utils'] += {
-			'SearchEngine' : SearchEngine
-		};
-
-		envir['display']['CropWidget'] = tannus.display.CropWidget;
-
-		envir['display']['makeCrop'] = function(startImage:Dynamic, canvas:Dynamic, stageRect:tannus.geom.Rectangle, ?inputToBind:Null<Dynamic>):tannus.display.CropWidget {
-			var stage = new tannus.display.Stage(canvas);
-			
-			stage.width = stageRect.width;
-			stage.height = stageRect.height;
-
-			var ent = new tannus.display.CropWidget(startImage);
-			ent.bindToInput(inputToBind);
-			stage.add(ent);
-
-			stage.report();
-
-
-			return ent;
-		};
 
 		var button:Button = new Button('Hello, World!');
 		button.addTo('#wrapper');
@@ -100,6 +70,51 @@ class Exposer {
 				return ent.exists(item.toString());
 			}
 		});
+	}
+
+	public static function index(page : Page):Void {
+		var nameinput:TextInput = new TextInput();
+		nameinput.addTo('body');
+
+		var hasCar:RadioButtonInput = new RadioButtonInput();
+		hasCar.value = 'car';
+		hasCar.tooltip = 'Do you have a car?';
+		hasCar.name = 'trans-types';
+
+		var hasTruck:RadioButtonInput = new RadioButtonInput();
+		hasTruck.value = 'truck';
+		hasTruck.tooltip = 'Do you have a truck?';
+		hasTruck.name = 'trans-types';
+
+		hasCar.addTo('body');
+		hasTruck.addTo('body');
+
+		hasCar.on('change', function():Void {
+			trace('Fuckles');
+		});
+
+		hasCar.on('tst', function(data:Dynamic):Void {
+			trace(data);
+		});
+
+		var signl:Signal<String, String> = new Signal(hasCar, 'tst');
+
+		var namev:Value<String> = nameinput.valueTracker();
+
+		var _name:String = "";
+		var name:Value<String> = Value.create(_name);
+		name.bind(namev);
+
+		var getmessage:Action<String> = new Action(function(ctx) {
+			ctx.value.bind(namev);
+		});
+
+		getmessage.oncomplete = function(v:String):Void {
+			trace('Hello $v!');
+		};
+
+		getmessage.perform();
+
 	}
 
 	private static function get_env():Object {

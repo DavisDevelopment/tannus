@@ -1,7 +1,5 @@
 
 -main Exposer
 -js testing/tannus.raw.js
--dce std
 -D rtti
--D tojs
--D client
+-D debug

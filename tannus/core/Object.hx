@@ -25,11 +25,7 @@ abstract Object (Dynamic) {
 	public var systemType(get, never):ValueType;
 
 	public inline function new(obj:Dynamic):Void {
-		if (Types.basictype(obj) == "StringMap") {
-			this = MapTools.toDynamic(cast obj);
-		} else {
-			this = obj;
-		}
+		this = (Types.basictype(obj) == 'StringMap' ? MapTools.toDynamic(cast obj) : obj);
 	}
 
 //=====================================//
@@ -58,12 +54,11 @@ abstract Object (Dynamic) {
 
 	//- query whether a given key is defined as an attribute of (this)
 	public inline function exists(key : String):Bool {
-		var prop:Dynamic = untyped this[key];
-		return (prop != (untyped __js__('void(0)')));
+		return ((untyped this[key]) != (untyped __js__('void(0)')));
 	}
 
 	//- Clone [this] Object, then return the copy
-	public inline function clone():Object {
+	public function clone():Object {
 		var copy:Object = new Object({});
 		for (key in self.keys()) {
 			copy[key] = self[key];
@@ -72,7 +67,7 @@ abstract Object (Dynamic) {
 	}
 
 	//- Merge two objects together, returning the product
-	public inline function merge(other : Object):Void {
+	public function merge(other : Object):Void {
 		for (key in other.keys()) {
 			if (!self.exists(key)) {
 				self[key] = other[key];
@@ -156,7 +151,7 @@ abstract Object (Dynamic) {
 	}
 
 	//- Encode Object as JSON-string
-	public inline function toJSON(?prettyPrint:Null<Int>):String {
+	public function toJSON(?prettyPrint:Null<Int>):String {
 		if (prettyPrint != null) {
 			var spaces:String = '';
 			for (i in 0...prettyPrint) spaces += (' ');
@@ -192,7 +187,7 @@ abstract Object (Dynamic) {
 	}
 
 	@:to 
-	public inline function asArray():Array<Object> {
+	public function asArray():Array<Object> {
 		return [for (item in cast(this, Array<Dynamic>)) new Object(item)];
 	}
 

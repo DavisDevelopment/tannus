@@ -13,4 +13,10 @@ class FunctionTools {
 			}
 		});
 	}
+
+	public static inline function wrap <R> (func:Dynamic, wrapper:Dynamic -> Array<Dynamic> -> R):Dynamic {
+		return Reflect.makeVarArgs(function(args : Array<Dynamic>):R {
+			return wrapper(func, args);
+		});
+	}
 }

@@ -3,7 +3,7 @@ package tannus.utils;
 import haxe.macro.Expr;
 
 abstract Setter <T> (CSetter) {
-	private inline function new(setterFunc : T -> Void):Void {
+	public inline function new(setterFunc : T -> Void):Void {
 		this = new CSetter(setterFunc);
 	}
 

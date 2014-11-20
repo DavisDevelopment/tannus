@@ -25,7 +25,7 @@ abstract Pointer <T> (CPointer <T>) {
 	}
 
 	public macro static inline function literal <T> (expr:ExprOf <T>):ExprOf<Pointer<T>> {
-		return macro new Pointer(function() return $expr);
+		return macro new tannus.utils.Pointer(function() return $expr);
 	}
 }
 
@@ -46,5 +46,8 @@ class CPointer <T> {
 	}
 	public function getValue():T {
 		return this.getter();
+	}
+	public function get():T {
+		return this.getValue();
 	}
 }

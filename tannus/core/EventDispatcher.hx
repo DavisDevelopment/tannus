@@ -1,61 +1,58 @@
 package tannus.core;
 
-private typedef Handler = { channel:String, func:Dynamic, once:Bool };
+import tannus.core.Destructible;
+import tannus.io.Memory;
+import tannus.utils.Pointer;
 
 @:expose
 class EventDispatcher {
-	public var handlers : Map<String, Array<Handler>>;
+	public var handlers : Map<String, Map<String, Handler>>;
 	public var emitted : Map<String, Dynamic>;
-	public var paused : Map<String, Array<Handler>>;
 
 	public function new() {
 		this.handlers = new Map();
-		this.paused = new Map();
 	}
 
 	private inline function makeHandler( channel : String, func : Dynamic, once : Bool ):Handler {
-		return {
-			'channel' : channel,
-			'func' : func,
-			'once' : once
-		};
+		return new Handler(channel, func, once, this);
 	}
+
+	public function allHandlers(channel : String):Pointer<Array<Handler>> {
+		return Pointer.literal((handlers.exists(channel) ? Lambda.array(handlers.get(channel)) : []));
+	}
+
 	public function callHandler( handler : Handler, data : Dynamic ):Void {
-		var func : Dynamic = handler.func;
-		var channel : String = cast handler.channel;
+		handler.call( data );
+	}
 
-		if (Reflect.isFunction(func)) {
-
-			#if debug
-			try {
-			#end
-				func( data );
-				if (handler.once) {
-					var handlerList : Array < Handler > = this.handlers.get( channel );
-					handlerList.remove( handler );
-				}
-			#if debug
-			} catch (err : String) {
-				trace(err);
-				trace(handler);
-				trace(data);
+	public function hasHandler(channel:String, handler:Dynamic):Bool {
+		var channelExists:Bool = (handlers.exists(channel));
+		if (channelExists) {
+			var handlerSet:Array<Handler> = allHandlers(channel).get();
+			if (handlerSet.length == 0) {
+				return false;
 			}
-			#end
+
+			for (handl in handlerSet) {
+				if (handl.equals(handler)) {
+					return true;
+				}
+			}
+
+			return false;
+		} else {
+			return false;
 		}
 	}
-	public function hasHandler(channel:String, handler:Dynamic):Bool {
-		var applicableChannels:Array<String> = [];
-		for ( key in this.handlers.keys() ) {
-			if (key.indexOf(channel) != -1) applicableChannels.push(key);
-		}
-		var handler_objects:Array<Handler> = new Array();
-		for (chann in applicableChannels) {
-			var sub_handlers:Array<Handler> = handlers.get(chann);
-			handler_objects = handler_objects.concat(sub_handlers);
-		}
-		var handler_functions:Array<Dynamic> = [for (handlr in handler_objects) handlr.func];
 
-		return Lambda.has(handler_functions, handler);
+	public function addHandler(channel:String, handler:Handler):Void {
+		var handlerMap:Null<Map<String, Handler>> = handlers.get(channel);
+		if (handlerMap == null) {
+			handlerMap = new Map();
+			handlers.set(channel, handlerMap);
+		}
+
+		handlerMap.set(handler.id, handler);
 	}
 
 /*
@@ -67,48 +64,39 @@ class EventDispatcher {
 */
 
 	public function lissen( channel : String, handler : Dynamic, once:Bool = false ):Void {
-		var channelHandlers : Array<Handler> = this.handlers.get( channel );
-		if ( channelHandlers == null ) {
-			channelHandlers = new Array();
-			this.handlers.set( channel, channelHandlers );
-		}
-		channelHandlers.push(this.makeHandler(channel, handler, once));
+		var handlerObj:Handler = makeHandler(channel, handler, once);
+
+		addHandler(channel, handlerObj);
 	}
 
 	public function on( channel : String, handler : Dynamic, ?once:Bool = false ):Void {
 		this.lissen( channel, handler, once );
 	}
 
-	public function broadcast( channel : String, data : Dynamic ):Void {
-		var receivingChannels:Array<String> = [];
-		for ( key in this.handlers.keys() ) {
-			if (key.indexOf(channel) != -1) receivingChannels.push(key);
+	public function broadcast( channel : String, data : Dynamic, ?mappr:Handler->(Dynamic->Void) ):Void {
+		var recipients:Array<Handler> = allHandlers(channel);
+		for (handl in recipients) {
+			var f:Dynamic -> Void = handl.call.bind(_);
+			if (mappr != null) {
+				f = mappr(handl);
+			}
+
+			f( data );
 		}
-		var handlers : Array < Handler > = [];
-		for ( key in receivingChannels ) handlers = handlers.concat(this.handlers.get(key));
-		for ( handler in handlers ) this.callHandler( handler, data );
 	}
 
 	public function emit( channel : String, data : Dynamic ):Void {
 		this.broadcast( channel, data );
 	}
 
-	public function removeHandler( channel : String, handler : Dynamic ):Void {
-		var handlerList:Array<Handler> = this.handlers.get(channel);
-		if (handlerList == null) return;
-		handlerList = handlerList.filter(function(h:Handler) return (h.func != handler));
-		this.handlers.set(channel, handlerList);
-	}
 	public function unbind( channel:String ):Void {
 		this.ignore(channel);
 	}
+
 	public function ignore( channel:String, ?handler:Dynamic ):Void {
-		if ( handler != null ) {
-			this.removeHandler(channel, handler);
-		} else {
-			this.handlers.remove(channel);
-		}
+		//- Not implemented yet	
 	}
+
 	public function forward(target : EventDispatcher, events:Array<String>):Void {
 		for (eventName in events) {
 			this.on(eventName, function(data : Dynamic):Void {
@@ -117,6 +105,7 @@ class EventDispatcher {
 		}
 		return;
 	}
+
 	public function forwardFrom(target : EventDispatcher, events:Array<String>):Void {
 		for (eventName in events) {
 			target.on(eventName, function(data : Dynamic):Void {
@@ -124,14 +113,52 @@ class EventDispatcher {
 			});	
 		}
 	}
-	public function pause( channel:String ):Void {
-		var handlerSet:Array<Handler> = this.handlers.get(channel);
-		if (handlerSet != null) {
-			this.handlers.remove(channel);
-		}
-		this.paused.set(channel, (this.paused.exists(channel)?this.paused.get(channel).concat(handlerSet):handlerSet));
-	}
-	public function resume( channel:String ):Void {
+}
 
+/*
+private typedef handler = { channel:string, func:dynamic, once:bool };
+*/
+
+class Handler implements Destructible {
+	public var id:String;
+	public var dispatcher:EventDispatcher;
+	public var channel:String;
+	public var func:Dynamic;
+	public var once:Bool;
+
+	public var equals:Dynamic -> Bool;
+
+	public function new(channel:String, func:Dynamic, once:Bool, owner:EventDispatcher):Void {
+		this.id = Memory.uniqueIdString('handler');
+		this.dispatcher = owner;
+		this.channel = channel;
+		this.func = func;
+		this.once = once;
+		
+		var _func:Dynamic = (this.func);
+		this.equals = function(other:Dynamic) {
+			return (other == this.func || other == _func);
+		};
+	}
+
+	public function wrap(wrapper:Dynamic -> Array<Dynamic> -> Void):Void {
+		var _func:Dynamic = func;
+		this.func = Reflect.makeVarArgs(function(args:Array<Dynamic>) {
+			wrapper(_func, args);
+		});
+	}
+
+	public function destroy():Void {
+		func = null;
+		dispatcher.handlers.get(channel).remove(id);
+	}
+
+	public function call(data : Dynamic):Void {
+		if (Reflect.isFunction(func)) {
+			func(data);
+			if (once) {
+				destroy();
+			}
+		}
 	}
 }

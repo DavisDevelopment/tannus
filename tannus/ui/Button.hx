@@ -3,8 +3,6 @@ package tannus.ui;
 import tannus.ui.Element;
 
 class Button extends Element {
-	public var text(get, set):String;
-	public var html(get, set):String;
 	public var disabled(get, set):Bool;
 
 	public function new(txt:String):Void {
@@ -13,26 +11,6 @@ class Button extends Element {
 		this.el = jq('<button class="button">$txt</button>');
 	}
 	
-	private inline function foundation():Void {
-		untyped jq(js.Browser.window.document).foundation();
-	}
-
-	private inline function get_text():String {
-		return el.text();
-	}
-	private inline function set_text(txt:String):String {
-		el.text(txt);
-		return el.text();
-	}
-
-	private inline function get_html():String {
-		return el.html();
-	}
-	private inline function set_html(txt:String):String {
-		el.html(txt);
-		return el.html();
-	}
-
 	private inline function get_disabled():Bool {
 		return el.is('.disabled');
 	}
