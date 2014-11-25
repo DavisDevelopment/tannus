@@ -1,38 +1,44 @@
 package tannus;
 
+#if !macro
+
 import tannus.io.Memory;
 import tannus.utils.Pointer;
 import tannus.utils.CompileTime;
 import tannus.utils.Buffer;
 
+#else
+
+import tannus.utils.CompileTime;
+import haxe.macro.Expr;
+import haxe.macro.Compiler;
+
+using haxe.macro.ExprTools;
+#end
+
 class Assets {
-	public static var registry:Map<String, Asset> = {
-		new Map();
-	};
+	macro public static function add(alias, path) {
+		var pth:String = path.getValue();
+		//- Base64-encoded version of the input file
+		var bsf = haxe.crypto.Base64.encode(sys.io.File.getBytes(pth));
+		var ptr = macro new tannus.utils.Pointer(function() {
+			return haxe.crypto.Base64.decode(${CompileTime.toExpr(bsf)});
+		});
 
-	public static function getAsset(name:String):Null<Asset> {
-		return registry.get(name);
-	}
+		return macro (function() {
+			var bytPtr = ${ptr};
+			var bits:haxe.io.Bytes = bytPtr.get();
 
-	public static function getContent(name:String):String {
-		var asset:Null<Asset> = getAsset(name);
-		if (asset != null) {
-			return asset.readAsString();
-		} else {
-			throw 'AssetError: Asset "$name" not found';
-		}
-	}
+			var ptr = new tannus.utils.Pointer(function() return (new tannus.utils.Buffer(bits)));
 
-	public static function getBuffer(name:String):Buffer {
-		var asset:Null<Asset> = getAsset(name);
-		if (asset != null) {
-			return asset.readAsBuffer();
-		} else {
-			throw 'AssetError: Asset "$name" not found';
-		}
+			var ass = new Asset(${alias}, ptr);
+			tannus.internal.AssetRegistry.add(${alias}, ass);
+			return ass;
+		}());
 	}
 }
 
+#if !macro
 class Asset {
 	public var id:Int;
 	public var alias:String;
@@ -73,3 +79,4 @@ class Asset {
 		return (readAsBuffer() + '');
 	}
 }
+#end

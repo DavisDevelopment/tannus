@@ -7,7 +7,7 @@ import haxe.macro.Expr;
 abstract Pointer <T> (CPointer <T>) {
 	//private var self(get, never):Pointer<T>;
 	public inline function new(getter : Void->T):Void {
-		this = new CPointer(getter);
+		this = new CPointer<T>(getter);
 	}
 
 	@:to 
@@ -34,6 +34,7 @@ abstract Pointer <T> (CPointer <T>) {
 	}
 }
 
+@:generic
 class CPointer <T> {
 	public var getter:Void -> T;
 

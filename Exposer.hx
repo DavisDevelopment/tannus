@@ -24,6 +24,7 @@ import tannus.ui.Window;
 import tannus.ui.*;
 
 import tannus.utils.Value;
+import tannus.Assets;
 import tannus.tasks.Action;
 
 class Exposer {
@@ -54,6 +55,8 @@ class Exposer {
 		button.on('click', function(e) {
 			box.open();
 		});
+
+		Assets.add("buildfile", "build.hxml");
 		
 		initHelpers();
 	}
