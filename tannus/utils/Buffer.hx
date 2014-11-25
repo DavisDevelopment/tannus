@@ -243,9 +243,14 @@ abstract Buffer(Bytes) {
 
 		return buf;
 	}
+
+//	@:from
+//	public static function fromNodeBuffer(nb:Dynamic):Buffer {
+//		return Buffer.).map(function(x:Dynamic) return Std.parseInt(x+'')));
+//	}
 #end
 
-#if (client || js)
+#if (js && !(server || node))
 	@:to
 	public function toInt32Array():js.html.Int32Array {
 		return new js.html.Int32Array(self.toArray());

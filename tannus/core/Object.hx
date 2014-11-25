@@ -167,6 +167,12 @@ abstract Object (Dynamic) {
 		return MapTools.fromDynamic(this);
 	}
 
+	//- cast Object to Map<String, Dynamic>
+	@:to
+	public inline function toStringMapDynamic():Map<String, Dynamic> {
+		return MapTools.fromDynamic(this);
+	}
+
 //====================================//
 //== Primitive-Type Casting-Methods ==//
 //====================================//

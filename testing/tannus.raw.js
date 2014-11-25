@@ -148,8 +148,6 @@ Exposer.index = function(page) {
 	hasCar.on("tst",function(data) {
 		console.log(data);
 	});
-	var signl_i1 = hasCar;
-	var signl_i2 = "tst";
 	var namev = nameinput.valueTracker();
 	var _name = "";
 	var name;
@@ -1261,6 +1259,9 @@ tannus.core._Object.Object_Impl_.toJSON = function(this1,prettyPrint) {
 tannus.core._Object.Object_Impl_.toStringMap = function(this1) {
 	return tannus.utils.MapTools.fromDynamic(this1);
 };
+tannus.core._Object.Object_Impl_.toStringMapDynamic = function(this1) {
+	return tannus.utils.MapTools.fromDynamic(this1);
+};
 tannus.core._Object.Object_Impl_.asBoolean = function(this1) {
 	return this1 == true;
 };
@@ -1426,68 +1427,6 @@ tannus.core.Router.prototype = {
 	}
 	,__class__: tannus.core.Router
 };
-tannus.core._Signal = {};
-tannus.core._Signal.Signal_Impl_ = function() { };
-$hxClasses["tannus.core._Signal.Signal_Impl_"] = tannus.core._Signal.Signal_Impl_;
-tannus.core._Signal.Signal_Impl_.__name__ = ["tannus","core","_Signal","Signal_Impl_"];
-tannus.core._Signal.Signal_Impl_.__properties__ = {get_channel:"get_channel",get_owner:"get_owner",get_self:"get_self"}
-tannus.core._Signal.Signal_Impl_._new = function(dispatcher,chan) {
-	return { i1 : dispatcher, i2 : chan};
-};
-tannus.core._Signal.Signal_Impl_.broadcast = function(this1,msg) {
-	var ctx = new tannus.core.SignalContext(msg,this1);
-};
-tannus.core._Signal.Signal_Impl_.get_self = function(this1) {
-	return this1;
-};
-tannus.core._Signal.Signal_Impl_.get_owner = function(this1) {
-	var this2;
-	var this3;
-	if(tannus.utils.Types.basictype(this1) == "StringMap") this3 = tannus.utils.MapTools.toDynamic(this1); else this3 = this1;
-	this2 = this3;
-	var key;
-	var obj = "i" + 1;
-	var this4;
-	if(tannus.utils.Types.basictype(obj) == "StringMap") this4 = tannus.utils.MapTools.toDynamic(obj); else this4 = obj;
-	key = this4;
-	var obj1 = Reflect.getProperty(this2,key);
-	var this5;
-	if(tannus.utils.Types.basictype(obj1) == "StringMap") this5 = tannus.utils.MapTools.toDynamic(obj1); else this5 = obj1;
-	return this5;
-};
-tannus.core._Signal.Signal_Impl_.get_channel = function(this1) {
-	var this2;
-	var this3;
-	if(tannus.utils.Types.basictype(this1) == "StringMap") this3 = tannus.utils.MapTools.toDynamic(this1); else this3 = this1;
-	this2 = this3;
-	var key;
-	var obj = "i" + 2;
-	var this4;
-	if(tannus.utils.Types.basictype(obj) == "StringMap") this4 = tannus.utils.MapTools.toDynamic(obj); else this4 = obj;
-	key = this4;
-	var obj1 = Reflect.getProperty(this2,key);
-	var this5;
-	if(tannus.utils.Types.basictype(obj1) == "StringMap") this5 = tannus.utils.MapTools.toDynamic(obj1); else this5 = obj1;
-	return this5;
-};
-tannus.core.SignalContext = function(data,sig) {
-	this.signal = sig;
-	this.data = data;
-	this.responses = new Array();
-};
-$hxClasses["tannus.core.SignalContext"] = tannus.core.SignalContext;
-tannus.core.SignalContext.__name__ = ["tannus","core","SignalContext"];
-tannus.core.SignalContext.prototype = {
-	ignore: function() {
-	}
-	,__class__: tannus.core.SignalContext
-};
-tannus.core.SignalResponse = { __ename__ : ["tannus","core","SignalResponse"], __constructs__ : ["SRNone","SRPacket","SRPacketSequence"] };
-tannus.core.SignalResponse.SRNone = ["SRNone",0];
-tannus.core.SignalResponse.SRNone.toString = $estr;
-tannus.core.SignalResponse.SRNone.__enum__ = tannus.core.SignalResponse;
-tannus.core.SignalResponse.SRPacket = function(data) { var $x = ["SRPacket",1,data]; $x.__enum__ = tannus.core.SignalResponse; $x.toString = $estr; return $x; };
-tannus.core.SignalResponse.SRPacketSequence = function(data) { var $x = ["SRPacketSequence",2,data]; $x.__enum__ = tannus.core.SignalResponse; $x.toString = $estr; return $x; };
 tannus.core.Task = function(stuff_to_do) {
 	tannus.core.EventDispatcher.call(this);
 	this.start = stuff_to_do;
@@ -5607,6 +5546,11 @@ tannus.utils.FunctionTools.once = function(func) {
 			invokedYet = true;
 			return func.apply(null,args);
 		} else return null;
+	});
+};
+tannus.utils.FunctionTools.wrap = function(func,wrapper) {
+	return Reflect.makeVarArgs(function(args) {
+		return wrapper(func,args);
 	});
 };
 tannus.utils._Maybe = {};
