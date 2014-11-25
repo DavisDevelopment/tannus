@@ -85,7 +85,7 @@ Exposer.expose = function(name,value) {
 	var this2;
 	if(tannus.utils.Types.basictype(obj) == "StringMap") this2 = tannus.utils.MapTools.toDynamic(obj); else this2 = obj;
 	name1 = this2;
-	Reflect.setProperty(this1,name1,value);
+	Reflect.setProperty(this1,Std.string(name1),value);
 };
 Exposer.main = function() {
 	var app = new tannus.Application();
@@ -148,8 +148,6 @@ Exposer.index = function(page) {
 	hasCar.on("tst",function(data) {
 		console.log(data);
 	});
-	var signl_i1 = hasCar;
-	var signl_i2 = "tst";
 	var namev = nameinput.valueTracker();
 	var _name = "";
 	var name;
@@ -1120,7 +1118,7 @@ tannus.core._Object = {};
 tannus.core._Object.Object_Impl_ = function() { };
 $hxClasses["tannus.core._Object.Object_Impl_"] = tannus.core._Object.Object_Impl_;
 tannus.core._Object.Object_Impl_.__name__ = ["tannus","core","_Object","Object_Impl_"];
-tannus.core._Object.Object_Impl_.__properties__ = {get_systemType:"get_systemType",get_type:"get_type",get_self:"get_self"}
+tannus.core._Object.Object_Impl_.__properties__ = {get_handle:"get_handle",get_systemType:"get_systemType",get_type:"get_type",get_self:"get_self"}
 tannus.core._Object.Object_Impl_._new = function(obj) {
 	var this1;
 	if(tannus.utils.Types.basictype(obj) == "StringMap") this1 = tannus.utils.MapTools.toDynamic(obj); else this1 = obj;
@@ -1161,11 +1159,11 @@ tannus.core._Object.Object_Impl_.clone = function(this1) {
 		var this4;
 		if(tannus.utils.Types.basictype(key) == "StringMap") this4 = tannus.utils.MapTools.toDynamic(key); else this4 = key;
 		key1 = this4;
-		var obj1 = Reflect.getProperty(this1,key1);
+		var obj1 = Reflect.getProperty(this1,Std.string(key1));
 		var this5;
 		if(tannus.utils.Types.basictype(obj1) == "StringMap") this5 = tannus.utils.MapTools.toDynamic(obj1); else this5 = obj1;
 		value = this5;
-		Reflect.setProperty(copy,name,value);
+		Reflect.setProperty(copy,Std.string(name),value);
 	}
 	return copy;
 };
@@ -1185,11 +1183,11 @@ tannus.core._Object.Object_Impl_.merge = function(this1,other) {
 			var this3;
 			if(tannus.utils.Types.basictype(key) == "StringMap") this3 = tannus.utils.MapTools.toDynamic(key); else this3 = key;
 			key1 = this3;
-			var obj = Reflect.getProperty(other,key1);
+			var obj = Reflect.getProperty(other,Std.string(key1));
 			var this4;
 			if(tannus.utils.Types.basictype(obj) == "StringMap") this4 = tannus.utils.MapTools.toDynamic(obj); else this4 = obj;
 			value = this4;
-			Reflect.setProperty(this1,name,value);
+			Reflect.setProperty(this1,Std.string(name),value);
 		}
 	}
 };
@@ -1233,13 +1231,13 @@ tannus.core._Object.Object_Impl_.add_two_objects = function(x,y) {
 	return this2;
 };
 tannus.core._Object.Object_Impl_.get = function(this1,key) {
-	var obj = Reflect.getProperty(this1,key);
+	var obj = Reflect.getProperty(this1,Std.string(key));
 	var this2;
 	if(tannus.utils.Types.basictype(obj) == "StringMap") this2 = tannus.utils.MapTools.toDynamic(obj); else this2 = obj;
 	return this2;
 };
 tannus.core._Object.Object_Impl_.set = function(this1,name,value) {
-	Reflect.setProperty(this1,name,value);
+	Reflect.setProperty(this1,Std.string(name),value);
 };
 tannus.core._Object.Object_Impl_.toDynamic = function(this1) {
 	return this1;
@@ -1287,6 +1285,9 @@ tannus.core._Object.Object_Impl_.asArray = function(this1) {
 		}(this)));
 	}
 	return _g;
+};
+tannus.core._Object.Object_Impl_.get_handle = function(this1) {
+	return new tannus.io.Handle(this1);
 };
 tannus.core._Object.Object_Impl_.fromDynamic = function(obj) {
 	var this1;
@@ -1336,7 +1337,7 @@ tannus.core.Page.prototype = $extend(tannus.core.EventDispatcher.prototype,{
 			_g.emit("hashchange",_g.hash);
 		};
 		value = this3;
-		Reflect.setProperty(win,name,value);
+		Reflect.setProperty(win,Std.string(name),value);
 	}
 	,__class__: tannus.core.Page
 });
@@ -1426,68 +1427,6 @@ tannus.core.Router.prototype = {
 	}
 	,__class__: tannus.core.Router
 };
-tannus.core._Signal = {};
-tannus.core._Signal.Signal_Impl_ = function() { };
-$hxClasses["tannus.core._Signal.Signal_Impl_"] = tannus.core._Signal.Signal_Impl_;
-tannus.core._Signal.Signal_Impl_.__name__ = ["tannus","core","_Signal","Signal_Impl_"];
-tannus.core._Signal.Signal_Impl_.__properties__ = {get_channel:"get_channel",get_owner:"get_owner",get_self:"get_self"}
-tannus.core._Signal.Signal_Impl_._new = function(dispatcher,chan) {
-	return { i1 : dispatcher, i2 : chan};
-};
-tannus.core._Signal.Signal_Impl_.broadcast = function(this1,msg) {
-	var ctx = new tannus.core.SignalContext(msg,this1);
-};
-tannus.core._Signal.Signal_Impl_.get_self = function(this1) {
-	return this1;
-};
-tannus.core._Signal.Signal_Impl_.get_owner = function(this1) {
-	var this2;
-	var this3;
-	if(tannus.utils.Types.basictype(this1) == "StringMap") this3 = tannus.utils.MapTools.toDynamic(this1); else this3 = this1;
-	this2 = this3;
-	var key;
-	var obj = "i" + 1;
-	var this4;
-	if(tannus.utils.Types.basictype(obj) == "StringMap") this4 = tannus.utils.MapTools.toDynamic(obj); else this4 = obj;
-	key = this4;
-	var obj1 = Reflect.getProperty(this2,key);
-	var this5;
-	if(tannus.utils.Types.basictype(obj1) == "StringMap") this5 = tannus.utils.MapTools.toDynamic(obj1); else this5 = obj1;
-	return this5;
-};
-tannus.core._Signal.Signal_Impl_.get_channel = function(this1) {
-	var this2;
-	var this3;
-	if(tannus.utils.Types.basictype(this1) == "StringMap") this3 = tannus.utils.MapTools.toDynamic(this1); else this3 = this1;
-	this2 = this3;
-	var key;
-	var obj = "i" + 2;
-	var this4;
-	if(tannus.utils.Types.basictype(obj) == "StringMap") this4 = tannus.utils.MapTools.toDynamic(obj); else this4 = obj;
-	key = this4;
-	var obj1 = Reflect.getProperty(this2,key);
-	var this5;
-	if(tannus.utils.Types.basictype(obj1) == "StringMap") this5 = tannus.utils.MapTools.toDynamic(obj1); else this5 = obj1;
-	return this5;
-};
-tannus.core.SignalContext = function(data,sig) {
-	this.signal = sig;
-	this.data = data;
-	this.responses = new Array();
-};
-$hxClasses["tannus.core.SignalContext"] = tannus.core.SignalContext;
-tannus.core.SignalContext.__name__ = ["tannus","core","SignalContext"];
-tannus.core.SignalContext.prototype = {
-	ignore: function() {
-	}
-	,__class__: tannus.core.SignalContext
-};
-tannus.core.SignalResponse = { __ename__ : ["tannus","core","SignalResponse"], __constructs__ : ["SRNone","SRPacket","SRPacketSequence"] };
-tannus.core.SignalResponse.SRNone = ["SRNone",0];
-tannus.core.SignalResponse.SRNone.toString = $estr;
-tannus.core.SignalResponse.SRNone.__enum__ = tannus.core.SignalResponse;
-tannus.core.SignalResponse.SRPacket = function(data) { var $x = ["SRPacket",1,data]; $x.__enum__ = tannus.core.SignalResponse; $x.toString = $estr; return $x; };
-tannus.core.SignalResponse.SRPacketSequence = function(data) { var $x = ["SRPacketSequence",2,data]; $x.__enum__ = tannus.core.SignalResponse; $x.toString = $estr; return $x; };
 tannus.core.Task = function(stuff_to_do) {
 	tannus.core.EventDispatcher.call(this);
 	this.start = stuff_to_do;
@@ -1670,7 +1609,7 @@ tannus.display.Entity.prototype = $extend(tannus.core.EventDispatcher.prototype,
 			var this5;
 			if(tannus.utils.Types.basictype(obj) == "StringMap") this5 = tannus.utils.MapTools.toDynamic(obj); else this5 = obj;
 			value = this5;
-			Reflect.setProperty(this1,name,value);
+			Reflect.setProperty(this1,Std.string(name),value);
 		}
 	}
 	,destroy: function() {
@@ -1934,7 +1873,7 @@ tannus.display.Selection.prototype = {
 				var this3;
 				if(tannus.utils.Types.basictype(name) == "StringMap") this3 = tannus.utils.MapTools.toDynamic(name); else this3 = name;
 				name1 = this3;
-				Reflect.setProperty(this1,name1,value);
+				Reflect.setProperty(this1,Std.string(name1),value);
 			}
 			return null;
 		} else {
@@ -1960,7 +1899,7 @@ tannus.display.Selection.prototype = {
 					}
 					$r = (function($this) {
 						var $r;
-						var obj = Reflect.getProperty(this4,key);
+						var obj = Reflect.getProperty(this4,Std.string(key));
 						$r = (function($this) {
 							var $r;
 							var this7;
@@ -2749,6 +2688,123 @@ tannus.io.Color.prototype = $extend(tannus.core.EventDispatcher.prototype,{
 	,__class__: tannus.io.Color
 	,__properties__: {set_a:"set_a",get_a:"get_a",set_b:"set_b",get_b:"get_b",set_g:"set_g",get_g:"get_g",set_r:"set_r",get_r:"get_r"}
 });
+tannus.io.Handle = function(obj) {
+	this.value = obj;
+};
+$hxClasses["tannus.io.Handle"] = tannus.io.Handle;
+tannus.io.Handle.__name__ = ["tannus","io","Handle"];
+tannus.io.Handle.prototype = {
+	stringValue: function() {
+		return Std.string(this.value);
+	}
+	,intValue: function() {
+		return Std.parseInt(this.stringValue());
+	}
+	,floatValue: function() {
+		return Std.parseFloat(this.stringValue());
+	}
+	,booleanValue: function() {
+		if(this.value == true && !this.value == false) return true;
+		if(this.value == false && !this.value == true) return false;
+		if(typeof(this.value) == "number" || js.Boot.__instanceof(this.value,Int)) {
+			var numericValue = Std.parseFloat(Std.string(this.value));
+			return numericValue >= 1;
+		}
+		return this.value != null;
+	}
+	,objectValue: function() {
+		if(!(this.value == null || this.value == true || this.value == false)) return this.value; else throw "" + Std.string(this.value) + " is not an Object";
+	}
+	,arrayValue: function() {
+		try {
+			return js.Boot.__cast(this.value , Array);
+		} catch( err ) {
+			if( js.Boot.__instanceof(err,String) ) {
+				if(Reflect.isObject(this.value)) {
+					var alias;
+					var obj = this.value;
+					var this1;
+					if(tannus.utils.Types.basictype(obj) == "StringMap") this1 = tannus.utils.MapTools.toDynamic(obj); else this1 = obj;
+					alias = this1;
+					var keys = Reflect.fields(alias);
+					var av = [];
+					var _g = 0;
+					while(_g < keys.length) {
+						var k = keys[_g];
+						++_g;
+						var i = Std.parseInt(k + "");
+						if(!Math.isNaN(i)) av[i] = Reflect.getProperty(this.value,k);
+					}
+					return av;
+				} else {
+					var alias1;
+					var obj1 = this.value;
+					var this2;
+					if(tannus.utils.Types.basictype(obj1) == "StringMap") this2 = tannus.utils.MapTools.toDynamic(obj1); else this2 = obj1;
+					alias1 = this2;
+					if(alias1.toArray != void(0) && Reflect.isFunction((function($this) {
+						var $r;
+						var this3;
+						{
+							var key;
+							var this4;
+							if(tannus.utils.Types.basictype("toArray") == "StringMap") this4 = tannus.utils.MapTools.toDynamic("toArray"); else this4 = "toArray";
+							key = this4;
+							var obj2 = Reflect.getProperty(alias1,Std.string(key));
+							var this5;
+							if(tannus.utils.Types.basictype(obj2) == "StringMap") this5 = tannus.utils.MapTools.toDynamic(obj2); else this5 = obj2;
+							this3 = this5;
+						}
+						$r = this3;
+						return $r;
+					}(this)))) return ((function($this) {
+						var $r;
+						var key1;
+						{
+							var this6;
+							if(tannus.utils.Types.basictype("toArray") == "StringMap") this6 = tannus.utils.MapTools.toDynamic("toArray"); else this6 = "toArray";
+							key1 = this6;
+						}
+						$r = (function($this) {
+							var $r;
+							var obj3 = Reflect.getProperty(alias1,Std.string(key1));
+							$r = (function($this) {
+								var $r;
+								var this7;
+								if(tannus.utils.Types.basictype(obj3) == "StringMap") this7 = tannus.utils.MapTools.toDynamic(obj3); else this7 = obj3;
+								$r = this7;
+								return $r;
+							}($this));
+							return $r;
+						}($this));
+						return $r;
+					}(this)))(); else try {
+						var iter;
+						var key2;
+						var this8;
+						if(tannus.utils.Types.basictype("iterator") == "StringMap") this8 = tannus.utils.MapTools.toDynamic("iterator"); else this8 = "iterator";
+						key2 = this8;
+						var obj4 = Reflect.getProperty(alias1,Std.string(key2));
+						var this9;
+						if(tannus.utils.Types.basictype(obj4) == "StringMap") this9 = tannus.utils.MapTools.toDynamic(obj4); else this9 = obj4;
+						iter = this9;
+						var _g1 = [];
+						while( iter.hasNext() ) {
+							var x = iter.next();
+							_g1.push(x);
+						}
+						return _g1;
+					} catch( error ) {
+						if( js.Boot.__instanceof(error,String) ) {
+							return this.stringValue().split("");
+						} else throw(error);
+					}
+				}
+			} else throw(err);
+		}
+	}
+	,__class__: tannus.io.Handle
+};
 tannus.io.Memory = function() { };
 $hxClasses["tannus.io.Memory"] = tannus.io.Memory;
 tannus.io.Memory.__name__ = ["tannus","io","Memory"];
@@ -4094,7 +4150,7 @@ tannus.ui.Element.get_foundation_available = function() {
 			var this4;
 			if(tannus.utils.Types.basictype("jQuery") == "StringMap") this4 = tannus.utils.MapTools.toDynamic("jQuery"); else this4 = "jQuery";
 			key = this4;
-			var obj = Reflect.getProperty(this3,key);
+			var obj = Reflect.getProperty(this3,Std.string(key));
 			var this5;
 			if(tannus.utils.Types.basictype(obj) == "StringMap") this5 = tannus.utils.MapTools.toDynamic(obj); else this5 = obj;
 			this2 = this5;
@@ -4102,7 +4158,7 @@ tannus.ui.Element.get_foundation_available = function() {
 			var this6;
 			if(tannus.utils.Types.basictype("fn") == "StringMap") this6 = tannus.utils.MapTools.toDynamic("fn"); else this6 = "fn";
 			key1 = this6;
-			var obj1 = Reflect.getProperty(this2,key1);
+			var obj1 = Reflect.getProperty(this2,Std.string(key1));
 			var this7;
 			if(tannus.utils.Types.basictype(obj1) == "StringMap") this7 = tannus.utils.MapTools.toDynamic(obj1); else this7 = obj1;
 			this1 = this7;
@@ -4157,7 +4213,7 @@ tannus.ui.Element.prototype = $extend(tannus.core.EventDispatcher.prototype,{
 							var this3;
 							if(tannus.utils.Types.basictype("destroy") == "StringMap") this3 = tannus.utils.MapTools.toDynamic("destroy"); else this3 = "destroy";
 							key = this3;
-							var obj1 = Reflect.getProperty(o,key);
+							var obj1 = Reflect.getProperty(o,Std.string(key));
 							var this4;
 							if(tannus.utils.Types.basictype(obj1) == "StringMap") this4 = tannus.utils.MapTools.toDynamic(obj1); else this4 = obj1;
 							this2 = this4;
@@ -4174,7 +4230,7 @@ tannus.ui.Element.prototype = $extend(tannus.core.EventDispatcher.prototype,{
 						}
 						$r = (function($this) {
 							var $r;
-							var obj2 = Reflect.getProperty(o,key1);
+							var obj2 = Reflect.getProperty(o,Std.string(key1));
 							$r = (function($this) {
 								var $r;
 								var this6;
@@ -4290,7 +4346,7 @@ tannus.ui.Element.prototype = $extend(tannus.core.EventDispatcher.prototype,{
 				}
 				$r = (function($this) {
 					var $r;
-					var obj1 = Reflect.getProperty(offs,key);
+					var obj1 = Reflect.getProperty(offs,Std.string(key));
 					$r = (function($this) {
 						var $r;
 						var this4;
@@ -4316,7 +4372,7 @@ tannus.ui.Element.prototype = $extend(tannus.core.EventDispatcher.prototype,{
 				}
 				$r = (function($this) {
 					var $r;
-					var obj2 = Reflect.getProperty(offs,key1);
+					var obj2 = Reflect.getProperty(offs,Std.string(key1));
 					$r = (function($this) {
 						var $r;
 						var this7;
@@ -4387,7 +4443,7 @@ tannus.ui.Element.prototype = $extend(tannus.core.EventDispatcher.prototype,{
 				var this3;
 				if(tannus.utils.Types.basictype("document") == "StringMap") this3 = tannus.utils.MapTools.toDynamic("document"); else this3 = "document";
 				key = this3;
-				var obj = Reflect.getProperty(this2,key);
+				var obj = Reflect.getProperty(this2,Std.string(key));
 				var this4;
 				if(tannus.utils.Types.basictype(obj) == "StringMap") this4 = tannus.utils.MapTools.toDynamic(obj); else this4 = obj;
 				this1 = this4;
@@ -4684,7 +4740,7 @@ tannus.ui.CElementData.prototype = {
 		var this2;
 		if(tannus.utils.Types.basictype(key) == "StringMap") this2 = tannus.utils.MapTools.toDynamic(key); else this2 = key;
 		key1 = this2;
-		var obj = Reflect.getProperty(this1,key1);
+		var obj = Reflect.getProperty(this1,Std.string(key1));
 		var this3;
 		if(tannus.utils.Types.basictype(obj) == "StringMap") this3 = tannus.utils.MapTools.toDynamic(obj); else this3 = obj;
 		return this3;
@@ -4983,7 +5039,7 @@ tannus.ui.Window.get_viewport = function() {
 		var this3;
 		if(tannus.utils.Types.basictype("innerWidth") == "StringMap") this3 = tannus.utils.MapTools.toDynamic("innerWidth"); else this3 = "innerWidth";
 		key = this3;
-		var obj2 = Reflect.getProperty(win,key);
+		var obj2 = Reflect.getProperty(win,Std.string(key));
 		var this4;
 		if(tannus.utils.Types.basictype(obj2) == "StringMap") this4 = tannus.utils.MapTools.toDynamic(obj2); else this4 = obj2;
 		viewWidth = this4;
@@ -4991,7 +5047,7 @@ tannus.ui.Window.get_viewport = function() {
 		var this5;
 		if(tannus.utils.Types.basictype("innerHeight") == "StringMap") this5 = tannus.utils.MapTools.toDynamic("innerHeight"); else this5 = "innerHeight";
 		key1 = this5;
-		var obj3 = Reflect.getProperty(win,key1);
+		var obj3 = Reflect.getProperty(win,Std.string(key1));
 		var this6;
 		if(tannus.utils.Types.basictype(obj3) == "StringMap") this6 = tannus.utils.MapTools.toDynamic(obj3); else this6 = obj3;
 		viewHeight = this6;
@@ -5003,7 +5059,7 @@ tannus.ui.Window.get_viewport = function() {
 			var this8;
 			if(tannus.utils.Types.basictype("documentElement") == "StringMap") this8 = tannus.utils.MapTools.toDynamic("documentElement"); else this8 = "documentElement";
 			key2 = this8;
-			var obj4 = Reflect.getProperty(doc,key2);
+			var obj4 = Reflect.getProperty(doc,Std.string(key2));
 			var this9;
 			if(tannus.utils.Types.basictype(obj4) == "StringMap") this9 = tannus.utils.MapTools.toDynamic(obj4); else this9 = obj4;
 			this7 = this9;
@@ -5019,7 +5075,7 @@ tannus.ui.Window.get_viewport = function() {
 			var this12;
 			if(tannus.utils.Types.basictype("documentElement") == "StringMap") this12 = tannus.utils.MapTools.toDynamic("documentElement"); else this12 = "documentElement";
 			key3 = this12;
-			var obj5 = Reflect.getProperty(doc,key3);
+			var obj5 = Reflect.getProperty(doc,Std.string(key3));
 			var this13;
 			if(tannus.utils.Types.basictype(obj5) == "StringMap") this13 = tannus.utils.MapTools.toDynamic(obj5); else this13 = obj5;
 			this11 = this13;
@@ -5027,7 +5083,7 @@ tannus.ui.Window.get_viewport = function() {
 			var this14;
 			if(tannus.utils.Types.basictype("clientWidth") == "StringMap") this14 = tannus.utils.MapTools.toDynamic("clientWidth"); else this14 = "clientWidth";
 			key4 = this14;
-			var obj6 = Reflect.getProperty(this11,key4);
+			var obj6 = Reflect.getProperty(this11,Std.string(key4));
 			var this15;
 			if(tannus.utils.Types.basictype(obj6) == "StringMap") this15 = tannus.utils.MapTools.toDynamic(obj6); else this15 = obj6;
 			this10 = this15;
@@ -5040,7 +5096,7 @@ tannus.ui.Window.get_viewport = function() {
 		var this17;
 		if(tannus.utils.Types.basictype("documentElement") == "StringMap") this17 = tannus.utils.MapTools.toDynamic("documentElement"); else this17 = "documentElement";
 		key5 = this17;
-		var obj7 = Reflect.getProperty(doc,key5);
+		var obj7 = Reflect.getProperty(doc,Std.string(key5));
 		var this18;
 		if(tannus.utils.Types.basictype(obj7) == "StringMap") this18 = tannus.utils.MapTools.toDynamic(obj7); else this18 = obj7;
 		this16 = this18;
@@ -5048,7 +5104,7 @@ tannus.ui.Window.get_viewport = function() {
 		var this19;
 		if(tannus.utils.Types.basictype("clientWidth") == "StringMap") this19 = tannus.utils.MapTools.toDynamic("clientWidth"); else this19 = "clientWidth";
 		key6 = this19;
-		var obj8 = Reflect.getProperty(this16,key6);
+		var obj8 = Reflect.getProperty(this16,Std.string(key6));
 		var this20;
 		if(tannus.utils.Types.basictype(obj8) == "StringMap") this20 = tannus.utils.MapTools.toDynamic(obj8); else this20 = obj8;
 		viewWidth = this20;
@@ -5057,7 +5113,7 @@ tannus.ui.Window.get_viewport = function() {
 		var this22;
 		if(tannus.utils.Types.basictype("documentElement") == "StringMap") this22 = tannus.utils.MapTools.toDynamic("documentElement"); else this22 = "documentElement";
 		key7 = this22;
-		var obj9 = Reflect.getProperty(doc,key7);
+		var obj9 = Reflect.getProperty(doc,Std.string(key7));
 		var this23;
 		if(tannus.utils.Types.basictype(obj9) == "StringMap") this23 = tannus.utils.MapTools.toDynamic(obj9); else this23 = obj9;
 		this21 = this23;
@@ -5065,7 +5121,7 @@ tannus.ui.Window.get_viewport = function() {
 		var this24;
 		if(tannus.utils.Types.basictype("clientHeight") == "StringMap") this24 = tannus.utils.MapTools.toDynamic("clientHeight"); else this24 = "clientHeight";
 		key8 = this24;
-		var obj10 = Reflect.getProperty(this21,key8);
+		var obj10 = Reflect.getProperty(this21,Std.string(key8));
 		var this25;
 		if(tannus.utils.Types.basictype(obj10) == "StringMap") this25 = tannus.utils.MapTools.toDynamic(obj10); else this25 = obj10;
 		viewHeight = this25;
@@ -5075,7 +5131,7 @@ tannus.ui.Window.get_viewport = function() {
 		var this26;
 		if(tannus.utils.Types.basictype("getElementsByTagName") == "StringMap") this26 = tannus.utils.MapTools.toDynamic("getElementsByTagName"); else this26 = "getElementsByTagName";
 		key9 = this26;
-		var obj11 = Reflect.getProperty(doc,key9);
+		var obj11 = Reflect.getProperty(doc,Std.string(key9));
 		var this27;
 		if(tannus.utils.Types.basictype(obj11) == "StringMap") this27 = tannus.utils.MapTools.toDynamic(obj11); else this27 = obj11;
 		bytag = this27;
@@ -5609,6 +5665,11 @@ tannus.utils.FunctionTools.once = function(func) {
 		} else return null;
 	});
 };
+tannus.utils.FunctionTools.wrap = function(func,wrapper) {
+	return Reflect.makeVarArgs(function(args) {
+		return wrapper(func,args);
+	});
+};
 tannus.utils._Maybe = {};
 tannus.utils._Maybe.Maybe_Impl_ = function() { };
 $hxClasses["tannus.utils._Maybe.Maybe_Impl_"] = tannus.utils._Maybe.Maybe_Impl_;
@@ -6067,7 +6128,7 @@ tannus.utils._Tuple.TwoTuple_Impl_.get = function(this1,index) {
 		var this4;
 		if(tannus.utils.Types.basictype(obj) == "StringMap") this4 = tannus.utils.MapTools.toDynamic(obj); else this4 = obj;
 		key = this4;
-		var obj1 = Reflect.getProperty(this2,key);
+		var obj1 = Reflect.getProperty(this2,Std.string(key));
 		var this5;
 		if(tannus.utils.Types.basictype(obj1) == "StringMap") this5 = tannus.utils.MapTools.toDynamic(obj1); else this5 = obj1;
 		return this5;
@@ -6103,7 +6164,7 @@ tannus.utils._Tuple.ThreeTuple_Impl_.get = function(this1,index) {
 		var this4;
 		if(tannus.utils.Types.basictype(obj) == "StringMap") this4 = tannus.utils.MapTools.toDynamic(obj); else this4 = obj;
 		key = this4;
-		var obj1 = Reflect.getProperty(this2,key);
+		var obj1 = Reflect.getProperty(this2,Std.string(key));
 		var this5;
 		if(tannus.utils.Types.basictype(obj1) == "StringMap") this5 = tannus.utils.MapTools.toDynamic(obj1); else this5 = obj1;
 		return this5;
@@ -6210,7 +6271,7 @@ var key;
 var this3;
 if(tannus.utils.Types.basictype("jQuery") == "StringMap") this3 = tannus.utils.MapTools.toDynamic("jQuery"); else this3 = "jQuery";
 key = this3;
-var obj = Reflect.getProperty(this2,key);
+var obj = Reflect.getProperty(this2,Std.string(key));
 var this4;
 if(tannus.utils.Types.basictype(obj) == "StringMap") this4 = tannus.utils.MapTools.toDynamic(obj); else this4 = obj;
 this1 = this4;
@@ -6218,7 +6279,7 @@ var key1;
 var this5;
 if(tannus.utils.Types.basictype("fn") == "StringMap") this5 = tannus.utils.MapTools.toDynamic("fn"); else this5 = "fn";
 key1 = this5;
-var obj1 = Reflect.getProperty(this1,key1);
+var obj1 = Reflect.getProperty(this1,Std.string(key1));
 var this6;
 if(tannus.utils.Types.basictype(obj1) == "StringMap") this6 = tannus.utils.MapTools.toDynamic(obj1); else this6 = obj1;
 fn = this6;
@@ -6236,7 +6297,7 @@ if(tannus.utils.Types.basictype(function() {
 	var this11;
 	if(tannus.utils.Types.basictype("jQuery") == "StringMap") this11 = tannus.utils.MapTools.toDynamic("jQuery"); else this11 = "jQuery";
 	key2 = this11;
-	var obj2 = Reflect.getProperty(this10,key2);
+	var obj2 = Reflect.getProperty(this10,Std.string(key2));
 	var this12;
 	if(tannus.utils.Types.basictype(obj2) == "StringMap") this12 = tannus.utils.MapTools.toDynamic(obj2); else this12 = obj2;
 	this9 = this12;
@@ -6253,7 +6314,7 @@ if(tannus.utils.Types.basictype(function() {
 	var this11;
 	if(tannus.utils.Types.basictype("jQuery") == "StringMap") this11 = tannus.utils.MapTools.toDynamic("jQuery"); else this11 = "jQuery";
 	key2 = this11;
-	var obj2 = Reflect.getProperty(this10,key2);
+	var obj2 = Reflect.getProperty(this10,Std.string(key2));
 	var this12;
 	if(tannus.utils.Types.basictype(obj2) == "StringMap") this12 = tannus.utils.MapTools.toDynamic(obj2); else this12 = obj2;
 	this9 = this12;
@@ -6270,7 +6331,7 @@ if(tannus.utils.Types.basictype(function() {
 	var this11;
 	if(tannus.utils.Types.basictype("jQuery") == "StringMap") this11 = tannus.utils.MapTools.toDynamic("jQuery"); else this11 = "jQuery";
 	key2 = this11;
-	var obj2 = Reflect.getProperty(this10,key2);
+	var obj2 = Reflect.getProperty(this10,Std.string(key2));
 	var this12;
 	if(tannus.utils.Types.basictype(obj2) == "StringMap") this12 = tannus.utils.MapTools.toDynamic(obj2); else this12 = obj2;
 	this9 = this12;
@@ -6281,7 +6342,7 @@ if(tannus.utils.Types.basictype(function() {
 	return modl;
 };
 value = this8;
-Reflect.setProperty(fn,name,value);
+Reflect.setProperty(fn,Std.string(name),value);
 haxe.crypto.Base64.CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 haxe.crypto.Base64.BYTES = haxe.io.Bytes.ofString(haxe.crypto.Base64.CHARS);
 tannus.display.Stage.instances = new Array();

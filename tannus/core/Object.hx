@@ -17,6 +17,9 @@ import tannus.utils.MapTools;
 import tannus.utils.Types;
 import tannus.utils.RegEx;
 import tannus.ore.ObjectRegEx;
+
+import tannus.io.Handle;
+
 import Type;
 
 abstract Object (Dynamic) {
@@ -54,7 +57,11 @@ abstract Object (Dynamic) {
 
 	//- query whether a given key is defined as an attribute of (this)
 	public inline function exists(key : String):Bool {
-		return ((untyped this[key]) != (untyped __js__('void(0)')));
+		#if js
+			return ((untyped this[key]) != (untyped __js__('void(0)')));
+		#else
+			return (self[key] != null);
+		#end
 	}
 
 	//- Clone [this] Object, then return the copy
@@ -125,13 +132,13 @@ abstract Object (Dynamic) {
 	//- perform a lookup of the given key on (this) object
 	@:arrayAccess
 	public inline function get(key : Object):Null<Object> {
-		return Reflect.getProperty(this, cast key);
+		return Reflect.getProperty(this, Std.string(key));
 	}
 
 	//- set an attribute of the given key on (this) object
 	@:arrayAccess
 	public inline function set(name:Object, value:Object):Void {
-		Reflect.setProperty(this, cast name, value);
+		Reflect.setProperty(this, Std.string(name), value);
 	}
 
 //=====================================//
@@ -167,6 +174,15 @@ abstract Object (Dynamic) {
 		return MapTools.fromDynamic(this);
 	}
 
+#if php
+
+	@:to
+	public inline function toPHPArray():php.NativeArray {
+		return php.Lib.associativeArrayOfObject(this);
+	}
+
+#end
+
 //====================================//
 //== Primitive-Type Casting-Methods ==//
 //====================================//
@@ -190,6 +206,14 @@ abstract Object (Dynamic) {
 	public function asArray():Array<Object> {
 		return [for (item in cast(this, Array<Dynamic>)) new Object(item)];
 	}
+//========================================//
+//== Instance-Level Computed Properties ==//
+//========================================//
+
+	public var handle(get, never):Handle<Dynamic>;
+	private function get_handle():Handle<Dynamic> {
+		return new Handle(this);
+	}
 
 //==================================//
 //== Class-Level Implicit Casting ==//
@@ -203,7 +227,7 @@ abstract Object (Dynamic) {
 
 	//- cast from Map<String, Object> to Object
 	@:from
-	public static inline function fromStringMap(map : Map<String, Object>):Object {
+	public static inline function fromStringMap <V> (map : Map<String, V>):Object {
 		return cast MapTools.toDynamic(map);
 	}
 
@@ -212,4 +236,13 @@ abstract Object (Dynamic) {
 	public static inline function fromString(str : String):Object {
 		return new Object(str);
 	}
+
+#if php
+
+	@:from
+	public static inline function fromNativeArray(na : php.NativeArray):Object {
+		return new Object(php.Lib.objectOfAssociativeArray(na));
+	}
+
+#end
 }

@@ -24,7 +24,6 @@ import tannus.ui.Window;
 import tannus.ui.*;
 
 import tannus.utils.Value;
-import tannus.core.Signal;
 import tannus.tasks.Action;
 
 class Exposer {
@@ -97,7 +96,6 @@ class Exposer {
 			trace(data);
 		});
 
-		var signl:Signal<String, String> = new Signal(hasCar, 'tst');
 
 		var namev:Value<String> = nameinput.valueTracker();
 
