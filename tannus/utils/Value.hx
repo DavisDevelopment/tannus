@@ -32,6 +32,16 @@ abstract Value <T> (CValue <T>) {
 		});
 	}
 
+	@:op(A &= B)
+	public inline function literalSet(other : T):T {
+		return this.set(other);
+	}
+
+	@:op(A &= B)
+	public inline function pointerSet(other : Pointer<T>):T {
+		return this.set(other);
+	}
+
 	@:to
 	public inline function toType():T {
 		return this.get();

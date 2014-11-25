@@ -3,6 +3,7 @@ $hx_exports.tannus = $hx_exports.tannus || {};
 $hx_exports.tannus.utils = $hx_exports.tannus.utils || {};
 ;$hx_exports.tannus.ui = $hx_exports.tannus.ui || {};
 ;$hx_exports.tannus.io = $hx_exports.tannus.io || {};
+;$hx_exports.tannus.internal = $hx_exports.tannus.internal || {};
 ;$hx_exports.tannus.geom = $hx_exports.tannus.geom || {};
 ;$hx_exports.tannus.display = $hx_exports.tannus.display || {};
 ;$hx_exports.tannus.core = $hx_exports.tannus.core || {};
@@ -113,6 +114,18 @@ Exposer.main = function() {
 	button.on("click",function(e) {
 		box.open();
 	});
+	(function() {
+		var bytPtr = new tannus.utils.CPointer(function() {
+			return haxe.crypto.Base64.decode("Ci1tYWluIEV4cG9zZXIKLWpzIHRlc3RpbmcvdGFubnVzLnJhdy5qcwotRCBydHRpCi1EIGRlYnVnCg==");
+		});
+		var bits = bytPtr.getValue();
+		var ptr = new tannus.utils.CPointer(function() {
+			return bits;
+		});
+		var ass = new tannus.Asset("buildfile",ptr);
+		tannus.internal.AssetRegistry.add("buildfile",ass);
+		return ass;
+	})();
 	Exposer.initHelpers();
 };
 Exposer.initHelpers = function() {
@@ -1063,7 +1076,7 @@ tannus.Application.prototype = $extend(tannus.core.EventDispatcher.prototype,{
 		var rout = new tannus.core.Route(url);
 		if(pageClass != null) rout.page_class = pageClass;
 		rout.on("take",function(pg) {
-			func(pg);
+			if(func != null) func(pg);
 		});
 		this.router.add(rout);
 	}
@@ -1073,6 +1086,70 @@ tannus.Application.prototype = $extend(tannus.core.EventDispatcher.prototype,{
 	}
 	,__class__: tannus.Application
 });
+tannus.Assets = function() { };
+$hxClasses["tannus.Assets"] = tannus.Assets;
+tannus.Assets.__name__ = ["tannus","Assets"];
+tannus.Asset = function(name,_dat) {
+	this.id = tannus.io.Memory.uniqueIdInt();
+	this.alias = name;
+	this._data = _dat;
+	this.data = null;
+};
+$hxClasses["tannus.Asset"] = tannus.Asset;
+tannus.Asset.__name__ = ["tannus","Asset"];
+tannus.Asset.prototype = {
+	readAsBuffer: function() {
+		if(this.data != null) return this.data; else {
+			var cachedData = this._data.getValue();
+			this.data = cachedData;
+			return this.data;
+		}
+	}
+	,readAsString: function() {
+		var this1;
+		var this2 = this.readAsBuffer();
+		var other;
+		var bytes = haxe.io.Bytes.ofString("");
+		other = bytes;
+		var one = this2;
+		var other1 = other;
+		other1 = js.Boot.__cast(other1 , haxe.io.Bytes);
+		one = js.Boot.__cast(one , haxe.io.Bytes);
+		var sum;
+		var bits = haxe.io.Bytes.alloc(one.length + other1.length);
+		sum = bits;
+		var i = 0;
+		while(i < one.length) {
+			var val;
+			try {
+				val = one.b[i];
+			} catch( err ) {
+				if( js.Boot.__instanceof(err,String) ) {
+					val = null;
+				} else throw(err);
+			}
+			sum.b[i] = val & 255;
+			val;
+			i++;
+		}
+		while(i < one.length + other1.length) {
+			var val1;
+			try {
+				val1 = other1.b[i - one.length];
+			} catch( err1 ) {
+				if( js.Boot.__instanceof(err1,String) ) {
+					val1 = null;
+				} else throw(err1);
+			}
+			sum.b[i] = val1 & 255;
+			val1;
+			i++;
+		}
+		this1 = sum;
+		return this1.toString();
+	}
+	,__class__: tannus.Asset
+};
 tannus.core.Destructible = function() { };
 $hxClasses["tannus.core.Destructible"] = tannus.core.Destructible;
 tannus.core.Destructible.__name__ = ["tannus","core","Destructible"];
@@ -1257,6 +1334,9 @@ tannus.core._Object.Object_Impl_.toJSON = function(this1,prettyPrint) {
 	} else return JSON.stringify(this1);
 };
 tannus.core._Object.Object_Impl_.toStringMap = function(this1) {
+	return tannus.utils.MapTools.fromDynamic(this1);
+};
+tannus.core._Object.Object_Impl_.toStringMapDynamic = function(this1) {
 	return tannus.utils.MapTools.fromDynamic(this1);
 };
 tannus.core._Object.Object_Impl_.asBoolean = function(this1) {
@@ -2242,6 +2322,14 @@ tannus.geom.Rectangle.prototype = {
 		return "Rectangle(" + this.x + ", " + this.y + ", " + this.width + ", " + this.height + ")";
 	}
 	,__class__: tannus.geom.Rectangle
+};
+tannus.internal = {};
+tannus.internal.AssetRegistry = $hx_exports.tannus.internal.AssetRegistry = function() { };
+$hxClasses["tannus.internal.AssetRegistry"] = tannus.internal.AssetRegistry;
+tannus.internal.AssetRegistry.__name__ = ["tannus","internal","AssetRegistry"];
+tannus.internal.AssetRegistry.add = function(alias,entry) {
+	tannus.internal.AssetRegistry.entries.set(alias,entry);
+	entry;
 };
 tannus.io = {};
 tannus.io._Byte = {};
@@ -5837,6 +5925,11 @@ tannus.utils._Pointer.Pointer_Impl_.reassignToValue = function(this1,other) {
 		return other;
 	};
 };
+tannus.utils._Pointer.Pointer_Impl_.reassignToPointer = function(this1,other) {
+	this1.getter = function() {
+		return other.getValue();
+	};
+};
 tannus.utils._Pointer.Pointer_Impl_.getter = function(gtr) {
 	return new tannus.utils.CPointer(gtr);
 };
@@ -6188,6 +6281,12 @@ tannus.utils._Value.Value_Impl_.bind = function(this1,other) {
 		this1.set(other.get());
 	});
 };
+tannus.utils._Value.Value_Impl_.literalSet = function(this1,other) {
+	return this1.set(other);
+};
+tannus.utils._Value.Value_Impl_.pointerSet = function(this1,other) {
+	return this1.set(other.getValue());
+};
 tannus.utils._Value.Value_Impl_.toType = function(this1) {
 	return this1.get();
 };
@@ -6346,6 +6445,7 @@ Reflect.setProperty(fn,Std.string(name),value);
 haxe.crypto.Base64.CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 haxe.crypto.Base64.BYTES = haxe.io.Bytes.ofString(haxe.crypto.Base64.CHARS);
 tannus.display.Stage.instances = new Array();
+tannus.internal.AssetRegistry.entries = new haxe.ds.StringMap();
 tannus.math.TMath.E = 2.718281828459045;
 tannus.math.TMath.LN2 = 0.6931471805599453;
 tannus.math.TMath.LN10 = 2.302585092994046;

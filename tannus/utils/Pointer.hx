@@ -3,11 +3,11 @@ package tannus.utils;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 
-
+@:forward(getter)
 abstract Pointer <T> (CPointer <T>) {
 	//private var self(get, never):Pointer<T>;
 	public inline function new(getter : Void->T):Void {
-		this = new CPointer(getter);
+		this = new CPointer<T>(getter);
 	}
 
 	@:to 
@@ -20,6 +20,11 @@ abstract Pointer <T> (CPointer <T>) {
 		this.getter = (function() return other);
 	}
 
+	@:op(A &= B)
+	public inline function reassignToPointer(other : Pointer<T>):Void {
+		this.getter = (function() return (other.get()));
+	}
+
 	public static inline function getter <T> (gtr:Void->T):Pointer <T> {
 		return new Pointer(gtr);
 	}
@@ -29,6 +34,7 @@ abstract Pointer <T> (CPointer <T>) {
 	}
 }
 
+@:generic
 class CPointer <T> {
 	public var getter:Void -> T;
 

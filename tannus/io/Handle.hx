@@ -23,14 +23,23 @@ class Handle<T> {
 		return Std.parseFloat(stringValue());
 	}
 	public function booleanValue():Bool {
-		var t:String = Types.basictype(value);
-		switch (t) {
-			case 'Bool': return (value == true);
-			case 'Int', 'Float':
-				return (Math.round(floatValue()) >= 1);
-			default:
-				return (value != null);
+		//- Native Boolean values - True
+		if (value == true && !value == false) {
+			return true;
 		}
+
+		//- Native Boolean values - False
+		if (value == false && !value == true) {
+			return false;
+		}
+
+		if (Std.is(value, Float) || Std.is(value, Int)) {
+			var numericValue:Float = Std.parseFloat(Std.string(value));
+
+			return (numericValue >= 1);
+		}
+
+		return (value != null);
 	}
 	public function objectValue():Dynamic {
 		if (!(value == null || value == true || value == false)) {

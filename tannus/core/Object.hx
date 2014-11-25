@@ -174,6 +174,7 @@ abstract Object (Dynamic) {
 		return MapTools.fromDynamic(this);
 	}
 
+<<<<<<< HEAD
 #if php
 
 	@:to
@@ -183,6 +184,14 @@ abstract Object (Dynamic) {
 
 #end
 
+=======
+	//- cast Object to Map<String, Dynamic>
+	@:to
+	public inline function toStringMapDynamic():Map<String, Dynamic> {
+		return MapTools.fromDynamic(this);
+	}
+
+>>>>>>> b4ffadca49fb439a22b0b0d3257df51d30391c4f
 //====================================//
 //== Primitive-Type Casting-Methods ==//
 //====================================//
