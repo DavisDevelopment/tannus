@@ -11,6 +11,16 @@ abstract Maybe <T> (Null<T>) from Null<T> {
 		return (this != null);
 	}
 
+	public var value(get, never):T;
+	private inline function get_value():T {
+		return (self.extract(true));
+	}
+
+	@:to
+	public inline function toT():T {
+		return (self.value);
+	}
+
 	public inline function extract(?safe:Bool):T {
 		if (safe == null) {
 			#if debug

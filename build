@@ -1,0 +1,78 @@
+#!/usr/bin/python3
+
+import shutil
+import subprocess as sp
+
+#- small class for Terminal color-printing
+class bcolors:
+	HEADER = '\033[95m'
+	OKBLUE = '\033[94m'
+	OKGREEN = '\033[92m'
+	WARNING = '\033[93m'
+	FAIL = '\033[91m'
+	ENDC = '\033[0m'
+
+#- query terminal-window dimensions
+def getTerminalSize():
+    return shutil.get_terminal_size()
+
+#- prints potentially useful information to the developer in
+#- an easy-to-read form
+def announce(message):
+    if not message.endswith(' '): message += ' '
+    if not message.startswith(' '): message = (' ' + message)
+
+    (width, height) = getTerminalSize()
+    
+    if len(message) % 2 != 0:
+        message += ' '
+
+    coln = ((width - len(str(message))) // 2)
+    padding = ("=" * (coln -2))
+
+    lpadding = ('#' + padding + '>')
+    rpadding = ('<' + padding + '#')
+    main_line = (lpadding + str(message) + rpadding)
+    line = ('#' + ("=" * (width - 2)) + '#')
+
+    print('\n' + line)
+
+    print(main_line)
+
+    print(line + '\n')
+
+def note(messg):
+    (w, h) = getTerminalSize()
+
+    line = ((" " * 4) + '<=>  ')
+    print(line)
+
+
+def command(command, *clargs):
+    args = ([command] + list(clargs))
+
+    p = sp.Popen(args, **{
+        'stdin'  :  sp.PIPE,
+        'stdout' :  sp.PIPE,
+        'stderr' :  sp.PIPE
+    })
+
+    status = p.communicate()
+    return status
+
+buildfile = lambda target: ("build-files/build-{0}.hxml".format( str(target) ))
+
+def javascript():
+        
+        announce("Compiling PromiScript to JavaScript")
+        js_update = command('haxe-nightly', buildfile('js'))
+
+
+
+#- main entry-point to the program
+def main():
+    javascript()
+
+
+if __name__ == '__main__':
+    main()

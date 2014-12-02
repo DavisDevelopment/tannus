@@ -1,0 +1,5 @@
+
+-main PromiScript
+-js testing/promiscript-cpp
+-D debug
+-rtti

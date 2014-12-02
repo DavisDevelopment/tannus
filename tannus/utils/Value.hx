@@ -11,7 +11,9 @@ import haxe.macro.Expr;
 
 @:forward(
 		on,
-		emit
+		emit,
+		destroy,
+		ondestroy
 	 )
 abstract Value <T> (CValue <T>) {
 	public inline function new(g:Pointer<T>, s:Setter<T>):Void {
@@ -51,19 +53,27 @@ abstract Value <T> (CValue <T>) {
 		var pt = macro tannus.utils.Pointer.literal($target);
 		var st = macro tannus.utils.Setter.create($target);
 
-		return macro new tannus.utils.Value($pt, $st);
+		return macro (function() {
+			var val = new tannus.utils.Value($pt, $st);
+			val.ondestroy = function() {
+				$target = null;
+			};
+			return val;
+		}());
 	}
 }
 
 class CValue <T> extends EventDispatcher {
 	public var gtr:Pointer<T>;
 	public var str:Setter <T>;
+	public var __destructor:Null<Void -> Void>;
 
 	public  function new(g:Pointer<T>, s:Setter<T>):Void {
 		super();
 
 		this.gtr = g;
 		this.str = s;
+		this.__destructor = null;
 	}
 
 	public function get():T {
@@ -74,5 +84,18 @@ class CValue <T> extends EventDispatcher {
 		str.set(nv);
 		emit('change', this);
 		return get();
+	}
+
+	public function destroy():Void {
+		var f = (__destructor);
+		if (Reflect.isFunction(f)) {
+			f();
+		}
+	}
+
+	public var ondestroy(null, set):Void -> Void;
+	private inline function set_ondestroy(listener:Void->Void):Void->Void {
+		__destructor = listener;
+		return listener;
 	}
 }

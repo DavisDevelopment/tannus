@@ -1,7 +1,7 @@
 all: haxe
 
 haxe:
-	haxe build.hxml
+	haxe-nightly ./build-files/build-js.hxml && node testing/promiscript.js
 
 compress: haxe
 	cd ..; cd lib; uglifyjs -o tannus.min.js tannus.raw.js

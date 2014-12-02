@@ -1,8 +1,36 @@
 package tannus.io;
 
+import tannus.io.Char;
+
 abstract Byte (Int) {
 	public inline function new(i : Int):Void {
 		this = i;
+	}
+
+	private var self(get, never):Byte;
+	private inline function get_self():Byte return cast this;
+
+	public var char(get, never):Char;
+	private inline function get_char():Char return (self.toChar());
+
+	public var isnumeric(get, never):Bool;
+	private inline function get_isnumeric():Bool {
+		return self.char.numeric;
+	}
+
+	public var isletter(get, never):Bool;
+	private inline function get_isletter():Bool {
+		return self.char.letter;
+	}
+
+	public var isspace(get, never):Bool;
+	private inline function get_isspace():Bool {
+		return self.char.whitespace;
+	}
+
+	public var isalphanumeric(get, never):Bool;
+	private inline function get_isalphanumeric():Bool {
+		return self.char.alphanumeric;
 	}
 
 	@:to 
@@ -13,6 +41,11 @@ abstract Byte (Int) {
 	@:to 
 	public inline function toInt():Int {
 		return this;
+	}
+
+	@:to
+	public inline function toChar():Char {
+		return new Char(self.toString());
 	}
 
 	@:op(A == B)

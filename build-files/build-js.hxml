@@ -1,0 +1,5 @@
+
+-main PromiScript
+-js testing/promiscript.js
+-D debug
+-D node

@@ -1,0 +1,6 @@
+
+-main PromiScript
+-python testing/promiscript.py
+-D debug
+-cp /usr/lib/haxe-nightly/std
+-cp /usr/lib/haxe-nightly/haxe
