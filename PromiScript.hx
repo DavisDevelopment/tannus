@@ -1,6 +1,9 @@
 package ;
 
 import tannus.utils.Value;
+import tannus.utils.Promise;
+import tannus.utils.Path;
+import tannus.utils.Buffer;
 
 import tannus.internal.rc.*;
 
@@ -22,30 +25,35 @@ class PromiScript {
 		var interp:Interp = new Interp();
 
 		var log = interp.ref('log');
-		log.set(function(x) {
-
+		log.set(function(x:Dynamic) {
 			trace( x );
-
+			return new Promise(function(confirm, fail) {
+				confirm(x);
+			});
 		});
+		
+		var run:Bool = true;
 
-		var p:Null<tannus.utils.Promise<Dynamic>> = interp.executeExpr(program[0], function() {
-			
-			trace(interp.globals);
-
-		});
-
-		if (p != null) {
-			p.then(function(res) {
+		if (run) {
+			interp.execute(program, function(result) {
 				
-				trace(res.get());
+				//var rsay = interp.ref('say');
+				//var say:Dynamic = rsay.get();
+				//say( 'Ryan' ).make();
 
-			}, (function(x) x)).make();
+				var rname = interp.ref('list').get().get();
+				trace(rname);
+
+				trace(interp.globals);
+			});
 		}
 	}
 
 	public static function codeValue():Value<String> {
 		var code:String = "
-			log((1, 2, 3, 4, 5, 6, 7, 8))
+			var list = (1, 2, 3, 4, 5);
+			
+			
 		";
 
 		return Value.create( code );

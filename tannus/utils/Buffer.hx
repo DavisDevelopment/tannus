@@ -234,7 +234,7 @@ abstract Buffer(Bytes) {
 	}
 #end
 
-#if (server || node)
+#if (node)
 	@:to
 	public function toNodeBuffer():Dynamic {
 		var len:Int = this.length;
@@ -359,7 +359,7 @@ abstract Buffer(Bytes) {
 		return bytes;
 	}
 
-#if server
+#if node
 	@:from 
 	public static inline function fromNodeBuffer(buf : Dynamic):Buffer {
 		var len:Int = Std.parseInt(Std.string(buf.length));

@@ -177,8 +177,23 @@ class Parser {
 				case Token.TBlock( toks ):
 					advance();
 					var exprs:Array<Expr> = (new Parser().parse(toks));
+					var e:Expr = Expr.EBlock(exprs);
 
-					return Expr.EBlock(exprs);
+					var mlast:Maybe<Expr> = pop();
+					if (mlast.exists) {
+						var last:Expr = (mlast.value);
+						switch (last) {
+							case Expr.ECall(func, args):
+								var name:String = Std.string(func.getParameters()[0]);
+
+								e = Expr.EFunction(name, args, exprs);
+
+							default:
+								push(last);
+						}
+					}
+
+					return e;
 
 				// === Groups === //
 				case Token.TGroup( toks ):
@@ -225,6 +240,19 @@ class Parser {
 						default:
 							unexpected( tk );
 
+					}
+
+				// === Array Access === //
+				case Token.TArrayAccessor(Token.TNumber(num)):
+					advance();
+					var mlast:Maybe<Expr> = pop();
+					if (mlast.exists) {
+
+						var last:Expr = mlast.value;
+						return Expr.EArrayAccess(last, Expr.ENumber(num));
+
+					} else {
+						unexpected(tk);
 					}
 
 				
@@ -304,7 +332,7 @@ class Parser {
 	}
 
 	private static inline function operator(c : String):Int {
-		var binary:Array<String> = ['=', '=='];
+		var binary:Array<String> = ['=', '.', '=='];
 		var unary :Array<String> = [];
 		
 		//- binary operators

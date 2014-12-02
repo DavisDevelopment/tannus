@@ -18,6 +18,8 @@ enum Token {
 
 	TBlock(tokens : Array<Token>);
 
+	TArrayAccessor(index : Token);
+
 	TShellCommand(content : String);
 
 	TComment(content : String);

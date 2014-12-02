@@ -47,7 +47,7 @@ class Lexer {
 	}
 
 	public inline function isOperator(c : Byte):Bool {
-		var ops:ByteArray = '=';
+		var ops:ByteArray = '=.';
 		
 		return ops.has(c);
 	}
@@ -62,6 +62,13 @@ class Lexer {
 		
 		else {
 			if (c.isspace) {
+				advance();
+			}
+
+			/**
+			  * Semicolons
+			  */
+			else if (c == ';') {
 				advance();
 			}
 			
@@ -229,6 +236,28 @@ class Lexer {
 							continue;
 						}
 					}
+				}
+			}
+
+			/**
+			  * Array Access
+			  */
+			else if (c == '[') {
+				advance();
+				var mtk:Maybe<Token> = this.lexNext(stop);
+				if (mtk.exists) {
+					var tk = mtk.value;
+
+					if (c == ']') {
+						advance();
+						return Token.TArrayAccessor( tk );
+					}
+
+					else {
+						throw 'Unexpected $c';
+					}
+				} else {
+					throw 'Wut';
 				}
 			}
 

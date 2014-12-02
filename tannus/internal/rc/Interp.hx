@@ -11,11 +11,21 @@ import tannus.internal.ValueMap;
 class Interp {
 	public var globals : ValueMap<Dynamic>;
 	public var locals  : ValueMap<Dynamic>;
+	public var binops  : Map<String, Dynamic->Dynamic->Dynamic>;
 	public var program : Array<Expr>;
 
 	public function new():Void {
 		
+		this.binops = new Map();
+		this.initOps();
 		this.reset();
+	}
+
+	//- instantiates all operators
+	public function initOps():Void {
+		this.binops['.'] = function(left:Dynamic, right:Dynamic):Dynamic {
+			return Reflect.getProperty(left, Std.string(right));
+		};
 	}
 	
 	//- restores [this]'s state back to the default
@@ -23,6 +33,44 @@ class Interp {
 		this.globals = new ValueMap();
 		this.locals  = new ValueMap();
 		this.program = new Array();
+	}
+
+	public function execute(prog : Array<Expr>, callback:Dynamic->Void):Void {
+		var routines:Array<{ready:Bool, done:Void->Void, run:Void->Void}> = new Array();
+		var i:Int = 0;
+		
+		function schedule(e : Expr, index:Int):Dynamic {
+			var ctx:Dynamic = {
+				'ready': false
+			};
+			ctx.done = function():Void {
+				ctx.ready = true;
+				
+				if (index == (routines.length - 1)) {
+
+					callback('fewp');
+
+				} else {
+					trace("fewp-dewp");
+					routines[index + 1].run();
+				}
+			};
+			
+			ctx.run = function():Void {
+				var pr:Null<Promise<Dynamic>> = executeExpr(e, ctx.done);
+				
+			};
+
+			return ctx;
+		}
+
+		for (e in prog) {
+			var routine:Dynamic = schedule(e, i);
+			routines.push(routine);
+
+			i++;
+		}
+		routines[0].run();
 	}
 
 	//- executes [e]
@@ -46,11 +94,79 @@ class Interp {
 				valu.make();
 				return null;
 
-			case Expr.ENull, Expr.EString(_), Expr.ENumber(_), Expr.EBool(_), Expr.ETuple(_), Expr.ECall(_, _):
-				return (expr(e)).then((function(r) done()), (function(x) x));
+			case Expr.EFunction(name, params, body):
+				var ptr = ref(name);
+				var localSnapshot = locals.clone();
+				var map_args:Array<Dynamic> -> Void = getArgParser(params);
+				log( 'Parsed parameter-mapping $map_args' );
+
+				ptr.set(Reflect.makeVarArgs(function(args : Array<Dynamic>) {
+					map_args( args );
+					
+					return new Promise(function(confirm, fail) {
+						log( 'Promise-function reached' );
+
+						var intrp:Interp = this;
+						intrp.execute(body, function(data:Dynamic):Void {
+							trace("Function-Body has been executed");
+							locals = localSnapshot;
+
+							confirm('poomfa');
+						});
+					});
+				}));
+
+				var fump = expr(Expr.ENull).then((function(r) done()), (function(x) throw x));
+				fump.make();
+				return null;
+
+				
+
+			case Expr.ENull, Expr.EString(_), Expr.ENumber(_), Expr.EBool(_), Expr.ETuple(_), Expr.ECall(_, _), Expr.EBinOp(_, _, _), Expr.EArrayAccess(_, _):
+				return (expr(e)).then((function(r) done()), (function(x) throw x));
 
 			default:
 				throw 'Unable to execute $e';
+		}
+	}
+
+	public function getArgParser(params : Array<Expr>):Array<Dynamic> -> Void {
+		var ops:Array<Array<Dynamic> -> Void> = new Array();
+		var i:Int = 0;
+
+		function map(e:Expr, index:Int):Array<Dynamic> -> Void {
+			switch ( e ) {
+				case Expr.EIdent( id ):
+					return function (a:Array<Dynamic>):Void {
+						var mine:Dynamic = a[index];
+						var ptr = locals.val( id );
+
+						ptr.set( mine );
+					};
+
+				case Expr.ETuple( sub ):
+					var arger = getArgParser( sub );
+
+					return function(a:Array<Dynamic>):Void {
+						var subs:Array<Dynamic> = cast (a[index]);
+
+						arger( subs );
+					};
+
+				default:
+					throw 'Unexpected $e';
+			}
+		}
+
+		for(e in params) {
+			ops.push(map(e, i));
+			i++;
+		}
+
+		return function(args:Array<Dynamic>):Void {
+			for (op in ops) {
+				op(args);
+			}
 		}
 	}
 	
@@ -93,7 +209,8 @@ class Interp {
 						var args:Array<Dynamic> = cast(results[1], Array<Dynamic>);
 
 						var ret_val_promise:Null<Promise<Dynamic>> = Reflect.callMethod(null, f, args);
-						
+						trace( ret_val_promise );
+
 						if (ret_val_promise == null) {
 							gconfirm( null );
 						} else {
@@ -119,12 +236,65 @@ class Interp {
 					both.make();
 				});
 
+			case Expr.EArrayAccess(earr, eindex):
+				return new Promise(function(confirm, fail):Void {
+					trace('array-access has been invoked');
+					var parr = expr(earr);
+					var pindex = expr(eindex);
+
+					parr.then(function(rarr) {
+						var arr:Array<Dynamic> = cast rarr.get();
+						trace('Array has been resolved to $arr');
+
+						pindex.then(function(rindex) {
+							var index = rindex.get();
+							trace('Index has been resolved to $index');
+
+							var v = arr[index];
+							trace(v);
+							confirm(v);
+
+						}, function(ierr) {
+							if (ierr != null) throw ierr;
+						});
+
+					}, function(err) {
+						if (err != null) throw err;
+					});
+
+				});
+
 			case Expr.EIdent( name ):
 				return new Promise(function(confirm, fail):Void {
 					var v = get(name);
 
 					confirm(v.get());
 				});
+
+
+			case Expr.EBinOp(op, eleft, eright):
+				if (binops.exists(op)) {
+					return new Promise(function(confirm, fail) {
+						var both:Promise<Array<Dynamic>> = promises([eleft, eright].map(function(x) return expr(x)));
+
+						both.then(function(vresults) {
+							var results:Array<Dynamic> = cast vresults.get();
+							var left:Dynamic = results[0];
+							var right:Dynamic = results[1];
+
+							var f:Dynamic -> Dynamic -> Dynamic = (binops.get(op));
+							
+							confirm(f(left, right));
+
+						}, function(error) {
+							if (error != null) {
+								fail( error );
+							}
+						});
+					});
+				} else {
+					throw 'Unexpected "$op"';
+				}
 
 
 			default:
@@ -178,7 +348,7 @@ class Interp {
 
 				}, function(err:Dynamic) {
 					if (err != null) {
-						errors[si] = err;
+						throw err;
 					}
 				});
 			}
@@ -191,4 +361,12 @@ class Interp {
 			proms[0].make();
 		});
 	}
+
+	private static inline function log(x : Dynamic):Void {
+		if (VERBOSE) {
+			trace( x );
+		}
+	}
+
+	private static inline var VERBOSE:Bool = true;
 }
