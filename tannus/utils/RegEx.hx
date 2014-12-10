@@ -1,9 +1,12 @@
 package tannus.utils;
 
+import tannus.utils.EitherType;
+import tannus.utils.Maybe;
+
 abstract RegEx ( EReg ) from EReg {
 	private var self(get, never):RegEx;
-	public inline function new(ereg : EReg):Void {
-		this = ereg;
+	public inline function new(ereg : EitherType<String, EReg>, ?flags:Maybe<String>):Void {
+		this = (Std.is(ereg, String) ? new EReg(ereg, flags.or('')) : ereg);
 	}
             
 //= Methods =//

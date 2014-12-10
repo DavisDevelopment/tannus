@@ -1,11 +1,4 @@
 
--main TerminalProgram
--js testing/chrome_extension/extend.chrome.js
--D debug
--D chrome
-
---next
-
--main TerminalProgram
--js testing/chrome_extension/extend.client.js
+-main Demo
+-js testing/app.js
 -D debug
