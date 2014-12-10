@@ -1,0 +1,18 @@
+
+def colored(msg, color, *others):
+    color = min(int(color), 255)
+    
+    extras = ';'.join([str(int(x)) for x in others])
+
+    out = ('\033[' + extras + '38;5;' + str(color) + 'm')
+    out += msg
+    out += '\033[0m'
+
+    return out
+
+def warn(message):
+    print(colored(message, 196))
+
+def note(message):
+    print(colored(message, 195))
+

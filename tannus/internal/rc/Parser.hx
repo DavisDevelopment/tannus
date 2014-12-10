@@ -128,7 +128,17 @@ class Parser {
 
 								return null;
 
-
+								
+							// == "RETURN" Statement == //
+							case 'return':
+								var mretval:Maybe<Expr> = parseNext(context);
+								if (mretval.exists) {
+									var retval:Expr = (mretval.value);
+									
+									return Expr.EReturn(Expr.EReturn(retval));
+								} else {
+									return Expr.EReturn(Expr.ENull);
+								}
 
 							// == Unrecognized Keyword == //
 							default:

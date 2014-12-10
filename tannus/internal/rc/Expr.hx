@@ -11,7 +11,9 @@ enum Expr {
 	
 	EArrayAccess(arr:Expr, index:Expr);
 	ECall(f:Expr, args:Array<Expr>);
+
 	EFunction(name:String, params:Array<Expr>, body:Array<Expr>);
+	EReturn(value : Expr);
 	EIf(cond:Expr, ult:Expr);
 
 /*

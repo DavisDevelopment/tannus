@@ -44,6 +44,11 @@ abstract Value <T> (CValue <T>) {
 		return this.set(other);
 	}
 
+	@:op(A &= B)
+	public inline function valueSet(other : Value<T>):T {
+		return this.set(other.get());
+	}
+
 	@:to
 	public inline function toType():T {
 		return this.get();

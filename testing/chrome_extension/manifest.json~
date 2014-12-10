@@ -1,0 +1,19 @@
+{
+	"manifest_version": 2,
+
+	"name": "Porn-Link Aggregator",
+	"description": "Do stuff on the internet",
+	"version": "1.0",
+	"background":  {
+		"scripts": ["extend.chrome.js"]
+	},
+	"permissions": [
+		"contextMenus"
+	],
+	"content_scripts": [
+		{
+			"matches": ["http://www.xvideos.com/*"],
+			"js": ["extend.client.js"]
+		}
+	]
+}

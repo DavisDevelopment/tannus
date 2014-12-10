@@ -1,55 +1,48 @@
 package ;
 
-import tannus.display.Stage;
-import tannus.ui.Canvas;
-import tannus.ui.Window;
-import tannus.utils.Task;
+import tannus.utils.Value;
+import tannus.utils.Path;
+
+import tannus.internal.rc.Runtime;
 
 class Demo {
-	public var stage : Stage;
-
-	public function new():Void {
-		var dim = Window.viewport;
-		
-		var can = js.Browser.window.document.createCanvasElement();
-		can.width = Math.floor(dim.width);
-		can.height = Math.floor(dim.height);
-
-		q('body').append(can);
-
-		this.stage = new Stage(can);
-
-		init();
-	}
-
-	public function init():Void {
-		var img = new tannus.display.Image('<img src="nodejs.png"></img>');
-
-		img.on('ready', function() {
-			
-			 img.width /= 3;
-			img.height /= 3;
-
-			var stuff = new Task();
-			var i:Float = 200;
-
-			stuff.subtask(i /= 2);
-			stuff *= 3;
-
-			trace(i);
-			stuff.run();
-			trace(i);
-
-		});
-		
-		stage.add( img );
-	}
-
-
-
 	public static function main():Void {
-		trace("Cheeks n Beard :3");
-		var demo = new Demo();
+		var code:String = '
+			echo( "Hello" );
+		';
+
+		var engine = Runtime.execString( code );
+		engine.__getvar = function(name : String):Null<Dynamic> {
+			return shellFunction(name);
+		};
+
+		engine.get('main')({
+			'name': "DemoClassStuff"
+		});
 	}
-	private static inline function q(x:Dynamic) return (new js.JQuery(x));
+
+	public static function shellFunction(name:String):Null<Array<Dynamic>> -> String {
+		return function(?args : Array<Dynamic>):String {
+			if (args == null) {
+				args = new Array();
+			}
+
+			var params:Array<String> = [name];
+			for (v in args) {
+				var s:String = Std.string( v );
+				params.push( s );
+			}
+
+			return run(params);
+		};
+	}
+
+	public static function run(params : Array<String>):String {
+		var command:String = params.shift();
+
+		var p = new sys.io.Process(command, params);
+		var out:String = p.stdout.readAll().toString();
+		
+		return out;
+	}
 }

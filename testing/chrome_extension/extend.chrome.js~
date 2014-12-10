@@ -1,0 +1,16 @@
+(function () { "use strict";
+var console = (1,eval)('this').console || {log:function(){}};
+var TerminalProgram = function() { };
+TerminalProgram.main = function() {
+	tannus.chrome.ContextMenus.create({ title : "View in Fullscreen", type : "normal", contexts : ["link"], onclick : function(info,tab) {
+		alert(tab.url);
+	}});
+};
+var tannus = {};
+tannus.chrome = {};
+tannus.chrome.ContextMenus = function() { };
+tannus.chrome.ContextMenus.create = function(props,onclick) {
+	chrome.contextMenus.create(props,onclick);
+};
+TerminalProgram.main();
+})();

@@ -33,20 +33,20 @@ class Lexer {
 		return (cast currentByte());
 	}
 
-	public inline function currentByte():Maybe<Byte> {
+	public function currentByte():Maybe<Byte> {
 		return (input[ cursor ]);
 	}
 
-	public inline function next(?lookahead:Int = 1):Maybe<Byte> {
+	public function next(?lookahead:Int = 1):Maybe<Byte> {
 		return (input[(cursor + lookahead)]);
 	}
 
-	public inline function advance(?distance:Int = 1):Maybe<Byte> {
+	public function advance(?distance:Int = 1):Maybe<Byte> {
 		cursor += distance;
 		return currentByte();
 	}
 
-	public inline function isOperator(c : Byte):Bool {
+	public function isOperator(c : Byte):Bool {
 		var ops:ByteArray = '=.';
 		
 		return ops.has(c);

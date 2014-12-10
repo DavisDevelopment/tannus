@@ -20,6 +20,10 @@ abstract ValueMap <T> (VMap <T>) {
 		return (cast this.clone());
 	}
 
+	public inline function toString():String {
+		return (this._data + '');
+	}
+
 	public static inline function fromMap <T> (map:Map<String, T>):ValueMap<T> {
 		return (cast VMap.fromMap(map));
 	}
