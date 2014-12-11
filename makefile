@@ -1,5 +1,5 @@
 all:
-	haxe-nightly ./build.hxml
+	haxe ./build.hxml
 
 js:
 	haxe ./build-files/build-js.hxml && node testing/promiscript.js

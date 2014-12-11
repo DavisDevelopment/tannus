@@ -12,11 +12,17 @@ class Application extends EventDispatcher {
 
 	public function new():Void {
 		super();
-		var subs = CompileTime.getAllClasses(tannus.core.promises.Promise);
-		trace(subs);
 		this.router = new Router();
+
+		this.init();
 	}
 
+	public function init():Void {
+		js.Browser.window.onhashchange = function(x : Dynamic) {
+			this.emit('hash-change', js.Browser.window.location.hash);
+			trace("FEWPDEWP");
+		};
+	}
 	public function route(url : String, ?func:Dynamic, ?pageClass:Class<Page>):Void {
 		var rout:Route = new Route(url);
 		if (pageClass != null) {

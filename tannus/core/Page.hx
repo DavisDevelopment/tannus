@@ -6,7 +6,6 @@ import tannus.core.Object;
 
 import tannus.utils.Pointer;
 
-@:expose
 class Page extends EventDispatcher {
 	private var route:Route;
 	#if tojs

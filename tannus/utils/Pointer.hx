@@ -3,6 +3,7 @@ package tannus.utils;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 
+/*
 @:forward(getter)
 abstract Pointer <T> (CPointer <T>) {
 	//private var self(get, never):Pointer<T>;
@@ -31,6 +32,27 @@ abstract Pointer <T> (CPointer <T>) {
 
 	public macro static inline function literal <T> (expr:ExprOf <T>):ExprOf<Pointer<T>> {
 		return macro new tannus.utils.Pointer(function() return $expr);
+	}
+}
+*/
+
+abstract Pointer <T> (Void -> T) from Void->T {
+	public inline function new(f:Void -> T):Void {
+		this = f;
+	}
+
+	@:to
+	public inline function get():T {
+		return (this());
+	}
+
+	@:op(A &= B)
+	public inline function reassignToPointer(other : Pointer<T>):Void {
+		this = (cast other);
+	}
+
+	public static macro function literal <T> (e : ExprOf<T>):ExprOf<Pointer<T>> {
+		return macro new tannus.utils.Pointer(function() return $e);
 	}
 }
 

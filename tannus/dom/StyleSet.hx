@@ -59,8 +59,9 @@ class CStyleSet {
 	}
 
 	public function setProperties(ncss:Map<String, Dynamic>):Void {
-		var cssa:String = cast(e['css'], Maybe<String>).or('');
-		var cssMap<String, String> = new Map();
+		var cssm:Maybe<String> = (e['style']);
+		var cssa:String = cssm.or('');
+		var cssMap:Map<String, String> = new Map();
 		if (cssa != '') {
 			var props = cssa.split(';').filter(function(x:String) return (x != ''));
 			for (prop in props) {
@@ -76,6 +77,6 @@ class CStyleSet {
 			pairs.push('$key: $value');
 		}
 
-		e['css'] = (pairs.join(';'));
+		e['style'] = (pairs.join(';'));
 	}
 }

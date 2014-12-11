@@ -27,11 +27,29 @@ abstract Value <T> (CValue <T>) {
 	public inline function set(nv:T):T {
 		return this.set(nv);
 	}
+	private var self(get, never):Value<T>;
+	private inline function get_self():Value<T> {
+		return cast this;
+	}
+
+	public var v(get, set):T;
+	private inline function get_v():T {
+		return (self.get());
+	}
+	private inline function set_v(nv:T):T {
+		self.set(nv);
+		return nv;
+	}
 
 	public inline function bind(other:Value <T>):Void {
 		other.on('change', function():Void {
 			this.set(other.get());
 		});
+	}
+
+	@:op( !A )
+	public inline function dereference():T {
+		return (this.get());
 	}
 
 	@:op(A &= B)

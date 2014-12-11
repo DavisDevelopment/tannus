@@ -14,15 +14,15 @@ class Demo extends Application {
 	}
 
 	public function init():Void {
-		var heading = new Element('h1');
-		var css = heading.css;
+		
+		route(':dir/home', null, pages.Home);
 	}
 
 	public static function main():Void {
 		var app = new Demo();
-		
-		trace("Application starting..");
-
+		app.on('hash-change', function(x) {
+			trace("Hashtag changed");
+		});
 		app.start();
 	}
 }

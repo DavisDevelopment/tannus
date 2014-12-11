@@ -1,4 +1,4 @@
 
--main Demo
--js testing/app.js
+-main SuperUser
+-js ../app.js
 -D debug
