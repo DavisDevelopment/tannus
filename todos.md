@@ -1,6 +1,3 @@
 
-- class Angle
-- class Triangle
-- class Ellipse
-- class Hitmask
-
+## Version 0.8 ##
+- reimplement tannus.io.Color as an abstract class
