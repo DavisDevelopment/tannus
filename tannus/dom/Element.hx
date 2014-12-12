@@ -161,6 +161,11 @@ abstract Element (js.JQuery) {
 		this = new js.JQuery(e);
 	}
 
+	private var self(get, never):Element;
+	private inline function get_self():Element {
+		return new Element(untyped this.selector);
+	}
+
 	@:arrayAccess
 	public inline function get(name : String):String {
 		return this.attr(name);
@@ -209,6 +214,26 @@ abstract Element (js.JQuery) {
 	public var tag(get, never):String;
 	private inline function get_tag():String {
 		return (this.context.tagName);
+	}
+
+	public var val(get, set):String;
+	private inline function get_val():String {
+		return (this.val());
+	}
+	private inline function set_val(v:String):String {
+		this.val(v);
+		return this.val();
+	}
+
+	public static inline function bindValue(el:Element, v:Value<String>):Void {
+		var myval = Value.create(el.val);
+		
+
+		el.on('change keyup', function(event : Dynamic):Void {
+			if (myval.v != null) {
+				v &= myval;
+			}
+		});
 	}
 
 	@:to

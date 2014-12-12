@@ -10,19 +10,18 @@ class Demo extends Application {
 	public function new():Void {
 		super();
 
-		init();
+		stuff();
 	}
 
-	public function init():Void {
+	public function stuff():Void {
 		
 		route(':dir/home', null, pages.Home);
+		route(':dir/home/make_super_form', null, pages.SuperForm);
+
 	}
 
 	public static function main():Void {
 		var app = new Demo();
-		app.on('hash-change', function(x) {
-			trace("Hashtag changed");
-		});
 		app.start();
 	}
 }
