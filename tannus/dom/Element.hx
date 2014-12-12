@@ -227,11 +227,13 @@ abstract Element (js.JQuery) {
 
 	public static inline function bindValue(el:Element, v:Value<String>):Void {
 		var myval = Value.create(el.val);
-		
+		var orig = v.v;
 
 		el.on('change keyup', function(event : Dynamic):Void {
-			if (myval.v != null) {
+			if (myval.v != "" && myval.v != null) {
 				v &= myval;
+			} else {
+				v &= orig;
 			}
 		});
 	}

@@ -72,6 +72,10 @@ abstract Value <T> (CValue <T>) {
 		return this.get();
 	}
 
+	public static inline function toString(self : Value<String>):String {
+		return (self.get());
+	}
+
 	public static macro function create <T> (target):ExprOf<Value<T>> {
 		var pt = macro tannus.utils.Pointer.literal($target);
 		var st = macro tannus.utils.Setter.create($target);
@@ -83,6 +87,14 @@ abstract Value <T> (CValue <T>) {
 			};
 			return val;
 		}());
+	}
+
+	public static function all <T> (vals : Array<Value<T>>):Value<T> {
+		return new Value(Pointer.literal(vals[0]), cast function(s) {
+			for (x in vals) {
+				x.set(s);
+			}
+		});
 	}
 }
 

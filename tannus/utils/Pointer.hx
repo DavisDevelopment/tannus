@@ -50,6 +50,10 @@ abstract Pointer <T> (Void -> T) from Void->T {
 	public inline function reassignToPointer(other : Pointer<T>):Void {
 		this = (cast other);
 	}
+	
+	public static inline function toString(self:Pointer<String>):String {
+		return (self.get());
+	}
 
 	public static macro function literal <T> (e : ExprOf<T>):ExprOf<Pointer<T>> {
 		return macro new tannus.utils.Pointer(function() return $e);
