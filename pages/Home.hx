@@ -2,7 +2,7 @@ package pages;
 
 import tannus.core.Page;
 import tannus.core.Route;
-import tannus.utils.Value;
+import tannus.io.Ptr;
 import tannus.dom.Element;
 
 class Home extends Page {
@@ -17,10 +17,19 @@ class Home extends Page {
 		var greeting_el:Element = new Element('#greeting');
 		
 		//- Create the "Pointer"
-		var greeting:Value<String> = Value.create(greeting_el.text);
+		var greeting = Ptr.create(greeting_el.text);
+		
+		//- Get reference to the Element's Styles
+		var styles = greeting_el.css;
+
+		//- Pointer to the Color of the Element
+		var color = Ptr.create(styles['color']);
 		
 		//- Assign "text" field
-		greeting &= "Hello, World!";
+		greeting &= "Hello, Squirrel!";
+
+		//- Assign "color" style
+		color &= "red";
 	}
 
 }

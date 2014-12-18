@@ -14,15 +14,18 @@ class SuperForm extends Page {
 	}
 
 	public function init():Void {
-		trace("You are creating a new super-user");
+		var msg = "Hello, Cheeks";
+		var cheeks = "Cheeks! :3";
+		var message = Value.create(msg);
+		var cheek = Value.create(message.v);
+		
+		trace( message );
+		trace( cheek );
 
-		var el = new Element('#employee');
-		var hel = new Element('h2');
-		var heading = Value.create(hel.text);
-		var title = Value.create(js.Browser.window.document.title);
-		var usrname = Value.create(el.val);
+		message &= "In the near future, cool sh!t will occur";
+		cheek &= "I will om-nom those cheeks";
 
-		el.bindValue( title );	
-		el.bindValue( heading );
+		trace( message );
+		message.destroy();
 	}
 }
