@@ -52,6 +52,8 @@ class Home extends Page {
 		linewidth_input.val = '1';
 		linecol_input.val = 'black';
 
+		current_program.lineCap = 'round';
+
 		/*
 		 == Program-Buttons ==
 		 */

@@ -4,6 +4,8 @@ import tannus.graphics.Canvas;
 import tannus.graphics.CanvasContext;
 import tannus.graphics.CanvasState;
 
+import tannus.graphics.LineCap;
+
 abstract CanvasProgramOperation ( CPC ) from CPC to CPC {
 	public inline function new(comp : CPC):Void {
 		this = comp;
@@ -45,6 +47,15 @@ abstract CanvasProgramOperation ( CPC ) from CPC to CPC {
 
 			case CPC.SetLineWidth(lw):
 				c.lineWidth = lw;
+
+			case CPC.SetLineCap( lc ):
+				c.lineCap = (switch (lc) {
+					case LineCap.Butt: 'butt';
+
+					case LineCap.Round: 'round';
+
+					case LineCap.Square: 'square';
+				});
 
 			default:
 				throw 'CanvasProgramError: Unrecognized token $this';

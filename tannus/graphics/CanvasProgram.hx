@@ -11,6 +11,7 @@ import tannus.graphics.CanvasState;
 import tannus.graphics.Canvas;
 
 import tannus.graphics.CanvasProgramOperation;
+import tannus.graphics.LineCap;
 
 class CanvasProgram {
 	//- The canvas we're acting on
@@ -58,6 +59,29 @@ class CanvasProgram {
 	private inline function set_lineWidth(lw : Float):Float {
 		op(CPC.SetLineWidth(lw));
 		return (lineWidth);
+	}
+
+	//- the manner in which lines are ended
+	public var lineCap(get, set):String;
+	private inline function get_lineCap():String {
+		return (c.lineCap);
+	}
+	private function set_lineCap(lc : String):String {
+		lc = lc.toLowerCase();
+
+		//- resolve/validate the given string to an enum-instance
+		var elc:LineCap = (switch (lc) {
+			case 'butt'  : LineCap.Butt;
+			case 'round' : LineCap.Round;
+			case 'square': LineCap.Square;
+
+			default:
+				error( '[program].lineCap must be (butt, round, square); "$lc" provided' );
+				LineCap.Butt;
+		});
+
+		op(CPC.SetLineCap(elc));
+		return lineCap;
 	}
 	
 	//- Add an operation onto the stack
@@ -113,6 +137,13 @@ class CanvasProgram {
 	//- Get the current CanvasState object
 	private function state():CanvasState {
 		return CanvasState.fromCanvasContext(c);
+	}
+	
+	/**
+	  * Throws an error with [msg] prefixed with 'CanvasProgramError: '
+	  */
+	private static inline function error(msg : String):Void {
+		throw 'CanvasProgramError: $msg';
 	}
 }
 

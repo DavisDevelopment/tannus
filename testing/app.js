@@ -159,8 +159,8 @@ Demo.main = function() {
 Demo.__super__ = tannus.Application;
 Demo.prototype = $extend(tannus.Application.prototype,{
 	stuff: function() {
+		this.route(":dir/index.html",null,pages.Home);
 		this.route("index.html",null,pages.Home);
-		this.route(":dir/home/make_super_form",null,pages.SuperForm);
 	}
 	,__class__: Demo
 });
@@ -997,6 +997,7 @@ pages.Home.prototype = $extend(tannus.core.Page.prototype,{
 		linewidth_input.val();
 		linecol_input.val("black");
 		linecol_input.val();
+		this.current_program.set_lineCap("round");
 		var new_prog = new js.JQuery("#new-program");
 		var run_prog = new js.JQuery("#run-program");
 		run_prog.on("click",function(e) {
@@ -1038,57 +1039,6 @@ pages.Home.prototype = $extend(tannus.core.Page.prototype,{
 		});
 	}
 	,__class__: pages.Home
-});
-pages.SuperForm = function(route) {
-	tannus.core.Page.call(this,route);
-	this.init();
-};
-$hxClasses["pages.SuperForm"] = pages.SuperForm;
-pages.SuperForm.__name__ = ["pages","SuperForm"];
-pages.SuperForm.__super__ = tannus.core.Page;
-pages.SuperForm.prototype = $extend(tannus.core.Page.prototype,{
-	init: function() {
-		var msg = "Hello, Cheeks";
-		var cheeks = "Cheeks! :3";
-		var message = (function() {
-			var val = new tannus.utils.CValue(function() {
-				return msg;
-			},function(value) {
-				msg = value;
-			});
-			val.__destructor = function() {
-				msg = null;
-			};
-			(function() {
-				msg = null;
-			});
-			return val;
-		})();
-		var cheek = (function() {
-			var val1 = new tannus.utils.CValue(function() {
-				return message.get();
-			},function(value1) {
-				message.set(value1);
-				value1;
-			});
-			val1.__destructor = function() {
-				message.set(null);
-				null;
-			};
-			(function() {
-				message.set(null);
-				null;
-			});
-			return val1;
-		})();
-		console.log(message.get());
-		console.log(cheek.get());
-		message.set("In the near future, cool sh!t will occur");
-		cheek.set("I will om-nom those cheeks");
-		console.log(message.get());
-		message.destroy();
-	}
-	,__class__: pages.SuperForm
 });
 tannus.core.Destructible = function() { };
 $hxClasses["tannus.core.Destructible"] = tannus.core.Destructible;
@@ -1927,6 +1877,9 @@ tannus.graphics.CanvasProgram = function(c) {
 };
 $hxClasses["tannus.graphics.CanvasProgram"] = tannus.graphics.CanvasProgram;
 tannus.graphics.CanvasProgram.__name__ = ["tannus","graphics","CanvasProgram"];
+tannus.graphics.CanvasProgram.error = function(msg) {
+	throw "CanvasProgramError: " + msg;
+};
 tannus.graphics.CanvasProgram.prototype = {
 	get_c: function() {
 		return this.canvas.get_c();
@@ -1951,6 +1904,29 @@ tannus.graphics.CanvasProgram.prototype = {
 	,set_lineWidth: function(lw) {
 		this.op(tannus.graphics.CanvasProgramComponent.SetLineWidth(lw));
 		return this.canvas.get_c().lineWidth;
+	}
+	,get_lineCap: function() {
+		return this.canvas.get_c().lineCap;
+	}
+	,set_lineCap: function(lc) {
+		lc = lc.toLowerCase();
+		var elc;
+		switch(lc) {
+		case "butt":
+			elc = tannus.graphics.LineCap.Butt;
+			break;
+		case "round":
+			elc = tannus.graphics.LineCap.Round;
+			break;
+		case "square":
+			elc = tannus.graphics.LineCap.Square;
+			break;
+		default:
+			throw "CanvasProgramError: " + ("[program].lineCap must be (butt, round, square); \"" + lc + "\" provided");
+			elc = tannus.graphics.LineCap.Butt;
+		}
+		this.op(tannus.graphics.CanvasProgramComponent.SetLineCap(elc));
+		return this.canvas.get_c().lineCap;
 	}
 	,op: function(node) {
 		this.ops.push(node);
@@ -1991,22 +1967,23 @@ tannus.graphics.CanvasProgram.prototype = {
 		return tannus.graphics.CanvasState.fromCanvasContext(this.canvas.get_c());
 	}
 	,__class__: tannus.graphics.CanvasProgram
-	,__properties__: {set_lineWidth:"set_lineWidth",get_lineWidth:"get_lineWidth",set_strokeStyle:"set_strokeStyle",get_strokeStyle:"get_strokeStyle",set_fillStyle:"set_fillStyle",get_fillStyle:"get_fillStyle",get_c:"get_c"}
+	,__properties__: {set_lineCap:"set_lineCap",get_lineCap:"get_lineCap",set_lineWidth:"set_lineWidth",get_lineWidth:"get_lineWidth",set_strokeStyle:"set_strokeStyle",get_strokeStyle:"get_strokeStyle",set_fillStyle:"set_fillStyle",get_fillStyle:"get_fillStyle",get_c:"get_c"}
 };
-tannus.graphics.CanvasProgramComponent = { __ename__ : ["tannus","graphics","CanvasProgramComponent"], __constructs__ : ["SetFillStyle","SetStrokeStyle","SetLineWidth","MoveTo","BeginSubpath","CloseSubpath","LineTo","Stroke","Fill"] };
+tannus.graphics.CanvasProgramComponent = { __ename__ : ["tannus","graphics","CanvasProgramComponent"], __constructs__ : ["SetFillStyle","SetStrokeStyle","SetLineWidth","SetLineCap","MoveTo","BeginSubpath","CloseSubpath","LineTo","Stroke","Fill"] };
 tannus.graphics.CanvasProgramComponent.SetFillStyle = function(val) { var $x = ["SetFillStyle",0,val]; $x.__enum__ = tannus.graphics.CanvasProgramComponent; $x.toString = $estr; return $x; };
 tannus.graphics.CanvasProgramComponent.SetStrokeStyle = function(val) { var $x = ["SetStrokeStyle",1,val]; $x.__enum__ = tannus.graphics.CanvasProgramComponent; $x.toString = $estr; return $x; };
 tannus.graphics.CanvasProgramComponent.SetLineWidth = function(lw) { var $x = ["SetLineWidth",2,lw]; $x.__enum__ = tannus.graphics.CanvasProgramComponent; $x.toString = $estr; return $x; };
-tannus.graphics.CanvasProgramComponent.MoveTo = function(x,y) { var $x = ["MoveTo",3,x,y]; $x.__enum__ = tannus.graphics.CanvasProgramComponent; $x.toString = $estr; return $x; };
-tannus.graphics.CanvasProgramComponent.BeginSubpath = ["BeginSubpath",4];
+tannus.graphics.CanvasProgramComponent.SetLineCap = function(lc) { var $x = ["SetLineCap",3,lc]; $x.__enum__ = tannus.graphics.CanvasProgramComponent; $x.toString = $estr; return $x; };
+tannus.graphics.CanvasProgramComponent.MoveTo = function(x,y) { var $x = ["MoveTo",4,x,y]; $x.__enum__ = tannus.graphics.CanvasProgramComponent; $x.toString = $estr; return $x; };
+tannus.graphics.CanvasProgramComponent.BeginSubpath = ["BeginSubpath",5];
 tannus.graphics.CanvasProgramComponent.BeginSubpath.toString = $estr;
 tannus.graphics.CanvasProgramComponent.BeginSubpath.__enum__ = tannus.graphics.CanvasProgramComponent;
-tannus.graphics.CanvasProgramComponent.CloseSubpath = ["CloseSubpath",5];
+tannus.graphics.CanvasProgramComponent.CloseSubpath = ["CloseSubpath",6];
 tannus.graphics.CanvasProgramComponent.CloseSubpath.toString = $estr;
 tannus.graphics.CanvasProgramComponent.CloseSubpath.__enum__ = tannus.graphics.CanvasProgramComponent;
-tannus.graphics.CanvasProgramComponent.LineTo = function(x,y,state) { var $x = ["LineTo",6,x,y,state]; $x.__enum__ = tannus.graphics.CanvasProgramComponent; $x.toString = $estr; return $x; };
-tannus.graphics.CanvasProgramComponent.Stroke = function(state) { var $x = ["Stroke",7,state]; $x.__enum__ = tannus.graphics.CanvasProgramComponent; $x.toString = $estr; return $x; };
-tannus.graphics.CanvasProgramComponent.Fill = function(state) { var $x = ["Fill",8,state]; $x.__enum__ = tannus.graphics.CanvasProgramComponent; $x.toString = $estr; return $x; };
+tannus.graphics.CanvasProgramComponent.LineTo = function(x,y,state) { var $x = ["LineTo",7,x,y,state]; $x.__enum__ = tannus.graphics.CanvasProgramComponent; $x.toString = $estr; return $x; };
+tannus.graphics.CanvasProgramComponent.Stroke = function(state) { var $x = ["Stroke",8,state]; $x.__enum__ = tannus.graphics.CanvasProgramComponent; $x.toString = $estr; return $x; };
+tannus.graphics.CanvasProgramComponent.Fill = function(state) { var $x = ["Fill",9,state]; $x.__enum__ = tannus.graphics.CanvasProgramComponent; $x.toString = $estr; return $x; };
 tannus.graphics._CanvasProgramOperation = {};
 tannus.graphics._CanvasProgramOperation.CanvasProgramOperation_Impl_ = {};
 $hxClasses["tannus.graphics._CanvasProgramOperation.CanvasProgramOperation_Impl_"] = tannus.graphics._CanvasProgramOperation.CanvasProgramOperation_Impl_;
@@ -2021,28 +1998,28 @@ tannus.graphics._CanvasProgramOperation.CanvasProgramOperation_Impl_.execute = f
 	}
 	c = can._c;
 	switch(this1[1]) {
-	case 4:
+	case 5:
 		c.beginPath();
 		break;
-	case 5:
+	case 6:
 		c.closePath();
 		break;
-	case 3:
+	case 4:
 		var y = this1[3];
 		var x = this1[2];
 		c.moveTo(x,y);
 		break;
-	case 6:
+	case 7:
 		var state = this1[4];
 		var y1 = this1[3];
 		var x1 = this1[2];
 		c.lineTo(x1,y1);
 		break;
-	case 8:
+	case 9:
 		var state1 = this1[2];
 		c.fill();
 		break;
-	case 7:
+	case 8:
 		var state2 = this1[2];
 		c.stroke();
 		break;
@@ -2057,6 +2034,20 @@ tannus.graphics._CanvasProgramOperation.CanvasProgramOperation_Impl_.execute = f
 	case 2:
 		var lw = this1[2];
 		c.lineWidth = lw;
+		break;
+	case 3:
+		var lc = this1[2];
+		switch(lc[1]) {
+		case 0:
+			c.lineCap = "butt";
+			break;
+		case 1:
+			c.lineCap = "round";
+			break;
+		case 2:
+			c.lineCap = "square";
+			break;
+		}
 		break;
 	}
 };
@@ -2135,6 +2126,16 @@ tannus.graphics.CanvasStyles.prototype = $extend(tannus.core.EventDispatcher.pro
 	,__class__: tannus.graphics.CanvasStyles
 	,__properties__: {set_fillString:"set_fillString",get_fillString:"get_fillString",get_c:"get_c"}
 });
+tannus.graphics.LineCap = { __ename__ : ["tannus","graphics","LineCap"], __constructs__ : ["Butt","Round","Square"] };
+tannus.graphics.LineCap.Butt = ["Butt",0];
+tannus.graphics.LineCap.Butt.toString = $estr;
+tannus.graphics.LineCap.Butt.__enum__ = tannus.graphics.LineCap;
+tannus.graphics.LineCap.Round = ["Round",1];
+tannus.graphics.LineCap.Round.toString = $estr;
+tannus.graphics.LineCap.Round.__enum__ = tannus.graphics.LineCap;
+tannus.graphics.LineCap.Square = ["Square",2];
+tannus.graphics.LineCap.Square.toString = $estr;
+tannus.graphics.LineCap.Square.__enum__ = tannus.graphics.LineCap;
 tannus.io = {};
 tannus.io._Byte = {};
 tannus.io._Byte.Byte_Impl_ = {};

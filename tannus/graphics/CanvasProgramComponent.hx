@@ -4,6 +4,8 @@ import tannus.graphics.Canvas;
 import tannus.graphics.CanvasContext;
 import tannus.graphics.CanvasState;
 
+import tannus.graphics.LineCap;
+
 enum CanvasProgramComponent {
 /*
  === State-Modification Components ===
@@ -16,6 +18,9 @@ enum CanvasProgramComponent {
 
 	//- Assign 'lineWidth'
 	SetLineWidth(lw : Float);
+
+	//- Assign 'lineCap'
+	SetLineCap(lc : LineCap);
 
 	MoveTo(x:Float, y:Float);
 
