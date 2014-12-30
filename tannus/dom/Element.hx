@@ -3,6 +3,7 @@ package tannus.dom;
 import tannus.core.EventDispatcher;
 import tannus.core.Destructible;
 import tannus.utils.Value;
+import tannus.io.Ptr;
 import tannus.utils.Pointer;
 import tannus.utils.Setter;
 import tannus.utils.Maybe;
@@ -160,6 +161,11 @@ abstract Element (js.JQuery) {
 	public inline function new(e : Dynamic):Void {
 		this = new js.JQuery(e);
 	}
+	
+	public var element(get, never):JSElement;
+	private inline function get_element():JSElement {
+		return this.get(0);
+	}
 
 	private var self(get, never):Element;
 	private inline function get_self():Element {
@@ -238,6 +244,23 @@ abstract Element (js.JQuery) {
 		});
 	}
 
+	public static inline function bindPtr(el:Element, v:Ptr<String>):Void {
+		var myval = Ptr.create(el.val);
+		var orig = v.v;
+
+		el.on('change keyup', function(event : Dynamic):Void {
+			if (myval.v != "" && myval.v != null) {
+
+				v &= myval;
+
+			} else {
+
+				v &= orig;
+
+			}
+		});
+	}
+
 	@:to
 	public inline function toDOMElement():js.html.Element {
 		return (this.get(0));
@@ -249,3 +272,4 @@ abstract Element (js.JQuery) {
 	}
 }
 
+private typedef JSElement = js.html.Element;
