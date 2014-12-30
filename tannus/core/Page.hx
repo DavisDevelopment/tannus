@@ -4,17 +4,23 @@ import tannus.core.EventDispatcher;
 import tannus.core.Route;
 import tannus.core.Object;
 
-import tannus.utils.Pointer;
+import tannus.io.Ptr;
+import tannus.ui.Window;
 
 class Page extends EventDispatcher {
-	private var route:Route;
-	#if tojs
-		public var parameters:Object;
-	#else
-		public var parameters:Map<String, String>;
-	#end
+	//- the route that instantiated [this] class
+	private var route : Route;
 	
-	public var hash:Pointer<String>;
+	//- all parameters provided by [this.route]
+	public var parameters : Map<String, String>;
+	
+	//- pointer to [window.location.hash]
+	public var hash : Ptr<String>;
+
+	//- pointer to window title
+	public var title : Ptr<String>;
+
+
 	public var root:String;
 
 	public function new(taken_route:Route):Void {
@@ -22,13 +28,14 @@ class Page extends EventDispatcher {
 
 		this.route = taken_route;
 		this.root = js.Browser.window.location.host;
-		this.hash = Pointer.literal(js.Browser.window.location.hash);
 		
-		#if tojs
-			this.parameters = Object.fromStringMap(cast this.route.uri_parameters);
-		#else
-			this.parameters = this.route.uri_parameters;
-		#end
+		this.parameters = this.route.uri_parameters;
+
+		//- create pointer to window-title
+		this.title = Ptr.create( Window.title );
+
+		//- create pointer to url-hash
+		this.hash = Ptr.create( js.Browser.window.location.hash );
 
 		this._init();
 	}
