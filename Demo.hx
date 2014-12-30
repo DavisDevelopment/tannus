@@ -15,7 +15,7 @@ class Demo extends Application {
 
 	public function stuff():Void {
 		
-		route(':dir/home', null, pages.Home);
+		route('index.html', null, pages.Home);
 		route(':dir/home/make_super_form', null, pages.SuperForm);
 
 	}

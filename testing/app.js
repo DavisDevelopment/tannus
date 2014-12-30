@@ -22,9 +22,9 @@ tannus.core.EventDispatcher.prototype = {
 	}
 	,allHandlers: function(channel) {
 		var _g = this;
-		return new tannus.utils.CPointer(function() {
+		return function() {
 			if(_g.handlers.exists(channel)) return Lambda.array(_g.handlers.get(channel)); else return [];
-		});
+		};
 	}
 	,callHandler: function(handler,data) {
 		handler.call(data);
@@ -34,7 +34,7 @@ tannus.core.EventDispatcher.prototype = {
 		if(channelExists) {
 			var handlerSet;
 			var this1 = this.allHandlers(channel);
-			handlerSet = this1.getValue();
+			handlerSet = this1();
 			if(handlerSet.length == 0) return false;
 			var _g = 0;
 			while(_g < handlerSet.length) {
@@ -65,7 +65,7 @@ tannus.core.EventDispatcher.prototype = {
 	,broadcast: function(channel,data,mappr) {
 		var recipients;
 		var this1 = this.allHandlers(channel);
-		recipients = this1.getValue();
+		recipients = this1();
 		var _g = 0;
 		while(_g < recipients.length) {
 			var handl = recipients[_g];
@@ -117,15 +117,21 @@ tannus.core.EventDispatcher.prototype = {
 };
 tannus.Application = $hx_exports.tannus.Application = function() {
 	tannus.core.EventDispatcher.call(this);
-	var subs = tannus.utils.CompileTimeClassList.get("null,true,tannus.core.promises.Promise");
-	console.log(subs);
 	this.router = new tannus.core.Router();
+	this.init();
 };
 $hxClasses["tannus.Application"] = tannus.Application;
 tannus.Application.__name__ = ["tannus","Application"];
 tannus.Application.__super__ = tannus.core.EventDispatcher;
 tannus.Application.prototype = $extend(tannus.core.EventDispatcher.prototype,{
-	route: function(url,func,pageClass) {
+	init: function() {
+		var _g = this;
+		window.onhashchange = function(x) {
+			_g.emit("hash-change",window.location.hash);
+			console.log("FEWPDEWP");
+		};
+	}
+	,route: function(url,func,pageClass) {
 		var rout = new tannus.core.Route(url);
 		if(pageClass != null) rout.page_class = pageClass;
 		rout.on("take",function(pg) {
@@ -141,27 +147,19 @@ tannus.Application.prototype = $extend(tannus.core.EventDispatcher.prototype,{
 });
 var Demo = function() {
 	tannus.Application.call(this);
-	this.init();
+	this.stuff();
 };
 $hxClasses["Demo"] = Demo;
 Demo.__name__ = ["Demo"];
 Demo.main = function() {
 	var app = new Demo();
-	console.log("Application starting..");
 	app.start();
 };
 Demo.__super__ = tannus.Application;
 Demo.prototype = $extend(tannus.Application.prototype,{
-	init: function() {
-		var heading = new js.JQuery("h1");
-		var css;
-		var existing = heading.data("__styles__");
-		if(existing != null && js.Boot.__instanceof(existing,tannus.dom.CStyleSet)) css = js.Boot.__cast(existing , tannus.dom.CStyleSet); else {
-			var yocss = new tannus.dom.CStyleSet(heading);
-			heading.data("__styles__",yocss);
-			css = yocss;
-		}
-		console.log(css);
+	stuff: function() {
+		this.route("index.html",null,pages.Home);
+		this.route(":dir/home/make_super_form",null,pages.SuperForm);
 	}
 	,__class__: Demo
 });
@@ -251,6 +249,12 @@ HxOverrides.indexOf = function(a,obj,i) {
 		i++;
 	}
 	return -1;
+};
+HxOverrides.remove = function(a,obj) {
+	var i = HxOverrides.indexOf(a,obj,0);
+	if(i == -1) return false;
+	a.splice(i,1);
+	return true;
 };
 HxOverrides.iter = function(a) {
 	return { cur : 0, arr : a, hasNext : function() {
@@ -917,6 +921,121 @@ js.Boot.__isNativeObj = function(o) {
 js.Boot.__resolveNativeClass = function(name) {
 	if(typeof window != "undefined") return window[name]; else return global[name];
 };
+tannus.core.Page = function(taken_route) {
+	tannus.core.EventDispatcher.call(this);
+	this.route = taken_route;
+	this.root = window.location.host;
+	this.hash = function() {
+		return window.location.hash;
+	};
+	this.parameters = this.route.uri_parameters;
+	this._init();
+};
+$hxClasses["tannus.core.Page"] = tannus.core.Page;
+tannus.core.Page.__name__ = ["tannus","core","Page"];
+tannus.core.Page.__super__ = tannus.core.EventDispatcher;
+tannus.core.Page.prototype = $extend(tannus.core.EventDispatcher.prototype,{
+	_init: function() {
+		var _g = this;
+		var win;
+		var obj = window;
+		var this1;
+		if(tannus.utils.Types.basictype(obj) == "StringMap") this1 = tannus.utils.MapTools.toDynamic(obj); else this1 = obj;
+		win = this1;
+		var name;
+		var this2;
+		if(tannus.utils.Types.basictype("onhashchange") == "StringMap") this2 = tannus.utils.MapTools.toDynamic("onhashchange"); else this2 = "onhashchange";
+		name = this2;
+		var value;
+		var this3;
+		if(tannus.utils.Types.basictype(function() {
+			_g.emit("hashchange",_g.hash);
+		}) == "StringMap") this3 = tannus.utils.MapTools.toDynamic(function() {
+			_g.emit("hashchange",_g.hash);
+		}); else this3 = function() {
+			_g.emit("hashchange",_g.hash);
+		};
+		value = this3;
+		Reflect.setProperty(win,Std.string(name),value);
+	}
+	,__class__: tannus.core.Page
+});
+var pages = {};
+pages.Home = function(r) {
+	tannus.core.Page.call(this,r);
+	this.init();
+};
+$hxClasses["pages.Home"] = pages.Home;
+pages.Home.__name__ = ["pages","Home"];
+pages.Home.__super__ = tannus.core.Page;
+pages.Home.prototype = $extend(tannus.core.Page.prototype,{
+	init: function() {
+		var r = new tannus.math.Random();
+		var rand_a = function() {
+			return new tannus.math.Random();
+		};
+		var rand_b = function(value) {
+			r = value;
+		};
+		var _g = 0;
+		while(_g < 10) {
+			var i = _g++;
+			console.log(Std.string(rand_a()));
+		}
+	}
+	,__class__: pages.Home
+});
+pages.SuperForm = function(route) {
+	tannus.core.Page.call(this,route);
+	this.init();
+};
+$hxClasses["pages.SuperForm"] = pages.SuperForm;
+pages.SuperForm.__name__ = ["pages","SuperForm"];
+pages.SuperForm.__super__ = tannus.core.Page;
+pages.SuperForm.prototype = $extend(tannus.core.Page.prototype,{
+	init: function() {
+		var msg = "Hello, Cheeks";
+		var cheeks = "Cheeks! :3";
+		var message = (function() {
+			var val = new tannus.utils.CValue(function() {
+				return msg;
+			},function(value) {
+				msg = value;
+			});
+			val.__destructor = function() {
+				msg = null;
+			};
+			(function() {
+				msg = null;
+			});
+			return val;
+		})();
+		var cheek = (function() {
+			var val1 = new tannus.utils.CValue(function() {
+				return message.get();
+			},function(value1) {
+				message.set(value1);
+				value1;
+			});
+			val1.__destructor = function() {
+				message.set(null);
+				null;
+			};
+			(function() {
+				message.set(null);
+				null;
+			});
+			return val1;
+		})();
+		console.log(message.get());
+		console.log(cheek.get());
+		message.set("In the near future, cool sh!t will occur");
+		cheek.set("I will om-nom those cheeks");
+		console.log(message.get());
+		message.destroy();
+	}
+	,__class__: pages.SuperForm
+});
 tannus.core.Destructible = function() { };
 $hxClasses["tannus.core.Destructible"] = tannus.core.Destructible;
 tannus.core.Destructible.__name__ = ["tannus","core","Destructible"];
@@ -1147,45 +1266,6 @@ tannus.core._Object.Object_Impl_.fromString = function(str) {
 	if(tannus.utils.Types.basictype(str) == "StringMap") this1 = tannus.utils.MapTools.toDynamic(str); else this1 = str;
 	return this1;
 };
-tannus.core.Page = $hx_exports.tannus.core.Page = function(taken_route) {
-	tannus.core.EventDispatcher.call(this);
-	this.route = taken_route;
-	this.root = window.location.host;
-	this.hash = new tannus.utils.CPointer(function() {
-		return window.location.hash;
-	});
-	this.parameters = this.route.uri_parameters;
-	this._init();
-};
-$hxClasses["tannus.core.Page"] = tannus.core.Page;
-tannus.core.Page.__name__ = ["tannus","core","Page"];
-tannus.core.Page.__super__ = tannus.core.EventDispatcher;
-tannus.core.Page.prototype = $extend(tannus.core.EventDispatcher.prototype,{
-	_init: function() {
-		var _g = this;
-		var win;
-		var obj = window;
-		var this1;
-		if(tannus.utils.Types.basictype(obj) == "StringMap") this1 = tannus.utils.MapTools.toDynamic(obj); else this1 = obj;
-		win = this1;
-		var name;
-		var this2;
-		if(tannus.utils.Types.basictype("onhashchange") == "StringMap") this2 = tannus.utils.MapTools.toDynamic("onhashchange"); else this2 = "onhashchange";
-		name = this2;
-		var value;
-		var this3;
-		if(tannus.utils.Types.basictype(function() {
-			_g.emit("hashchange",_g.hash);
-		}) == "StringMap") this3 = tannus.utils.MapTools.toDynamic(function() {
-			_g.emit("hashchange",_g.hash);
-		}); else this3 = function() {
-			_g.emit("hashchange",_g.hash);
-		};
-		value = this3;
-		Reflect.setProperty(win,Std.string(name),value);
-	}
-	,__class__: tannus.core.Page
-});
 tannus.core.Route = function(descriptor) {
 	tannus.core.EventDispatcher.call(this);
 	this.page_class = tannus.core.Page;
@@ -1275,73 +1355,17 @@ tannus.core.Router.prototype = {
 	}
 	,__class__: tannus.core.Router
 };
-tannus.core.Task = function(stuff_to_do) {
-	tannus.core.EventDispatcher.call(this);
-	this.start = stuff_to_do;
-	this.on("complete",null);
-	null;
-	this.vars = new haxe.ds.StringMap();
-};
-$hxClasses["tannus.core.Task"] = tannus.core.Task;
-tannus.core.Task.__name__ = ["tannus","core","Task"];
-tannus.core.Task.__super__ = tannus.core.EventDispatcher;
-tannus.core.Task.prototype = $extend(tannus.core.EventDispatcher.prototype,{
-	give: function(name,value) {
-		var v = value;
-		this.vars.set(name,v);
-		v;
-	}
-	,get: function(name) {
-		return this.vars.get(name);
-	}
-	,begin: function() {
-		this.start(this);
-	}
-	,get_complete: function() {
-		var _g = this;
-		return function() {
-			_g.emit("complete",null);
-		};
-	}
-	,set_complete: function(ncomplete) {
-		this.on("complete",ncomplete);
-		return ncomplete;
-	}
-	,__class__: tannus.core.Task
-	,__properties__: {set_complete:"set_complete",get_complete:"get_complete"}
-});
-tannus.core.promises = {};
-tannus.core.promises.Promise = function() {
-	tannus.core.EventDispatcher.call(this);
-	this.value = null;
-	this.done = false;
-};
-$hxClasses["tannus.core.promises.Promise"] = tannus.core.promises.Promise;
-tannus.core.promises.Promise.__name__ = ["tannus","core","promises","Promise"];
-tannus.core.promises.Promise.__super__ = tannus.core.EventDispatcher;
-tannus.core.promises.Promise.prototype = $extend(tannus.core.EventDispatcher.prototype,{
-	init: function() {
-		var _g = this;
-		this.getter.on("complete",function() {
-			_g.value = _g.getter.get("value");
-			_g.done = true;
-			_g.emit("ready",_g.value);
-		});
-		this.getter.begin();
-	}
-	,await: function(callback) {
-		if(!this.done) this.on("ready",callback); else callback(this.value);
-	}
-	,__class__: tannus.core.promises.Promise
-});
 tannus.dom = {};
 tannus.dom._Element = {};
 tannus.dom._Element.Element_Impl_ = {};
 $hxClasses["tannus.dom._Element.Element_Impl_"] = tannus.dom._Element.Element_Impl_;
 tannus.dom._Element.Element_Impl_.__name__ = ["tannus","dom","_Element","Element_Impl_"];
-tannus.dom._Element.Element_Impl_.__properties__ = {get_css:"get_css"}
+tannus.dom._Element.Element_Impl_.__properties__ = {set_val:"set_val",get_val:"get_val",get_tag:"get_tag",set_html:"set_html",get_html:"get_html",set_text:"set_text",get_text:"get_text",get_css:"get_css",get_self:"get_self"}
 tannus.dom._Element.Element_Impl_._new = function(e) {
 	return new js.JQuery(e);
+};
+tannus.dom._Element.Element_Impl_.get_self = function(this1) {
+	return new js.JQuery(this1.selector);
 };
 tannus.dom._Element.Element_Impl_.get = function(this1,name) {
 	return this1.attr(name);
@@ -1358,6 +1382,62 @@ tannus.dom._Element.Element_Impl_.get_css = function(this1) {
 		return yocss;
 	}
 };
+tannus.dom._Element.Element_Impl_.get_text = function(this1) {
+	var txt = this1.text();
+	if(txt == null) return ""; else return txt;
+};
+tannus.dom._Element.Element_Impl_.set_text = function(this1,newtext) {
+	var t;
+	if(newtext != null) t = newtext; else t = "";
+	this1.text(t);
+	return t;
+};
+tannus.dom._Element.Element_Impl_.get_html = function(this1) {
+	var markup = this1.html();
+	if(markup == null) return ""; else return markup;
+};
+tannus.dom._Element.Element_Impl_.set_html = function(this1,nhtml) {
+	var h;
+	if(nhtml != null) h = nhtml; else h = "";
+	this1.html(h);
+	return h;
+};
+tannus.dom._Element.Element_Impl_.get_tag = function(this1) {
+	return this1.context.tagName;
+};
+tannus.dom._Element.Element_Impl_.get_val = function(this1) {
+	return this1.val();
+};
+tannus.dom._Element.Element_Impl_.set_val = function(this1,v) {
+	this1.val(v);
+	return this1.val();
+};
+tannus.dom._Element.Element_Impl_.bindValue = function(el,v) {
+	var myval = (function() {
+		var val = new tannus.utils.CValue(function() {
+			return el.val();
+		},function(value) {
+			el.val(value);
+			el.val();
+		});
+		val.__destructor = function() {
+			el.val(null);
+			el.val();
+		};
+		(function() {
+			el.val(null);
+			el.val();
+		});
+		return val;
+	})();
+	var orig = v.get();
+	el.on("change keyup",function(event) {
+		if(myval.get() != "" && myval.get() != null) {
+			var other = myval.get();
+			v.set(other);
+		} else v.set(orig);
+	});
+};
 tannus.dom._Element.Element_Impl_.toDOMElement = function(this1) {
 	return this1.get(0);
 };
@@ -1370,6 +1450,15 @@ $hxClasses["tannus.dom._StyleSet.StyleSet_Impl_"] = tannus.dom._StyleSet.StyleSe
 tannus.dom._StyleSet.StyleSet_Impl_.__name__ = ["tannus","dom","_StyleSet","StyleSet_Impl_"];
 tannus.dom._StyleSet.StyleSet_Impl_._new = function(e) {
 	return new tannus.dom.CStyleSet(e);
+};
+tannus.dom._StyleSet.StyleSet_Impl_.iterator = function(this1) {
+	return this1.styleMap.keys();
+};
+tannus.dom._StyleSet.StyleSet_Impl_.get = function(this1,name) {
+	return this1.getProperty(name);
+};
+tannus.dom._StyleSet.StyleSet_Impl_.set = function(this1,name,val) {
+	this1.setProperty(name,val);
 };
 tannus.dom.CStyleSet = function(e) {
 	this.e = e;
@@ -1391,9 +1480,294 @@ tannus.dom.CStyleSet.prototype = {
 			value;
 		}
 	}
+	,getProperty: function(name) {
+		var result = this.styleMap.get(name);
+		if(result == null) return ""; else return result;
+	}
+	,setProperty: function(name,val) {
+		var map = new haxe.ds.StringMap();
+		var v = val;
+		map.set(name,v);
+		v;
+		this.setProperties(map);
+	}
+	,setProperties: function(ncss) {
+		var cssm = this.e.attr("style");
+		var cssa;
+		if(cssm == null) cssa = ""; else cssa = cssm;
+		var cssMap = new haxe.ds.StringMap();
+		if(cssa != "") {
+			var props = cssa.split(";").filter(function(x) {
+				return x != "";
+			});
+			var _g = 0;
+			while(_g < props.length) {
+				var prop = props[_g];
+				++_g;
+				var pair = prop.split(":");
+				var v = pair[1];
+				cssMap.set(pair[0],v);
+				v;
+			}
+		}
+		var pairs = [];
+		var $it0 = ncss.keys();
+		while( $it0.hasNext() ) {
+			var key = $it0.next();
+			var value = Std.string(ncss.get(key));
+			cssMap.set(key,value);
+			value;
+			pairs.push("" + key + ": " + value);
+		}
+		var this1 = this.e;
+		var val = pairs.join(";");
+		this1.attr("style",val);
+		this1.attr("style");
+	}
 	,__class__: tannus.dom.CStyleSet
 };
 tannus.io = {};
+tannus.io._Byte = {};
+tannus.io._Byte.Byte_Impl_ = {};
+$hxClasses["tannus.io._Byte.Byte_Impl_"] = tannus.io._Byte.Byte_Impl_;
+tannus.io._Byte.Byte_Impl_.__name__ = ["tannus","io","_Byte","Byte_Impl_"];
+tannus.io._Byte.Byte_Impl_.__properties__ = {get_isalphanumeric:"get_isalphanumeric",get_isspace:"get_isspace",get_isletter:"get_isletter",get_isnumeric:"get_isnumeric",get_char:"get_char",get_self:"get_self"}
+tannus.io._Byte.Byte_Impl_._new = function(i) {
+	return i;
+};
+tannus.io._Byte.Byte_Impl_.get_self = function(this1) {
+	return this1;
+};
+tannus.io._Byte.Byte_Impl_.get_char = function(this1) {
+	var s = String.fromCharCode(this1);
+	var this2;
+	this2 = s;
+	if(s.length != 1) throw "TypeError: Cannot unify \"" + s + "\" with Char";
+	return this2;
+};
+tannus.io._Byte.Byte_Impl_.get_isnumeric = function(this1) {
+	var this2;
+	var s = String.fromCharCode(this1);
+	var this3;
+	this3 = s;
+	if(s.length != 1) throw "TypeError: Cannot unify \"" + s + "\" with Char";
+	this2 = this3;
+	return new EReg("[0-9]","").match(this2);
+};
+tannus.io._Byte.Byte_Impl_.get_isletter = function(this1) {
+	var this2;
+	var s = String.fromCharCode(this1);
+	var this3;
+	this3 = s;
+	if(s.length != 1) throw "TypeError: Cannot unify \"" + s + "\" with Char";
+	this2 = this3;
+	return new EReg("[A-Z]","i").match(this2);
+};
+tannus.io._Byte.Byte_Impl_.get_isspace = function(this1) {
+	var this2;
+	var s = String.fromCharCode(this1);
+	var this3;
+	this3 = s;
+	if(s.length != 1) throw "TypeError: Cannot unify \"" + s + "\" with Char";
+	this2 = this3;
+	return Lambda.has([9,10,11,12,13,32],HxOverrides.cca(this2,0));
+};
+tannus.io._Byte.Byte_Impl_.get_isalphanumeric = function(this1) {
+	var this2;
+	var s = String.fromCharCode(this1);
+	var this3;
+	this3 = s;
+	if(s.length != 1) throw "TypeError: Cannot unify \"" + s + "\" with Char";
+	this2 = this3;
+	return new EReg("[0-9]","").match(this2) || new EReg("[A-Z]","i").match(this2);
+};
+tannus.io._Byte.Byte_Impl_.toString = function(this1) {
+	return String.fromCharCode(this1);
+};
+tannus.io._Byte.Byte_Impl_.toInt = function(this1) {
+	return this1;
+};
+tannus.io._Byte.Byte_Impl_.toChar = function(this1) {
+	var s = String.fromCharCode(this1);
+	var this2;
+	this2 = s;
+	if(s.length != 1) throw "TypeError: Cannot unify \"" + s + "\" with Char";
+	return this2;
+};
+tannus.io._Byte.Byte_Impl_.isInt = function(one,other) {
+	return one == other;
+};
+tannus.io._Byte.Byte_Impl_.isString = function(one,other) {
+	return one == HxOverrides.cca(other,0);
+};
+tannus.io._Byte.Byte_Impl_.isNotInt = function(one,other) {
+	return one != other;
+};
+tannus.io._Byte.Byte_Impl_.isNotString = function(one,other) {
+	return one != HxOverrides.cca(other,0);
+};
+tannus.io._Byte.Byte_Impl_.fromInt = function(i) {
+	return i;
+};
+tannus.io._Byte.Byte_Impl_.fromString = function(str) {
+	var i = HxOverrides.cca(str,0);
+	return i;
+};
+tannus.io._ByteArray = {};
+tannus.io._ByteArray.ByteArray_Impl_ = {};
+$hxClasses["tannus.io._ByteArray.ByteArray_Impl_"] = tannus.io._ByteArray.ByteArray_Impl_;
+tannus.io._ByteArray.ByteArray_Impl_.__name__ = ["tannus","io","_ByteArray","ByteArray_Impl_"];
+tannus.io._ByteArray.ByteArray_Impl_.__properties__ = {get_empty:"get_empty",get_self:"get_self"}
+tannus.io._ByteArray.ByteArray_Impl_._new = function(a) {
+	return a;
+};
+tannus.io._ByteArray.ByteArray_Impl_.has = function(this1,b) {
+	return Lambda.has(this1,b);
+};
+tannus.io._ByteArray.ByteArray_Impl_.get = function(this1,i) {
+	return this1[i];
+};
+tannus.io._ByteArray.ByteArray_Impl_.set = function(this1,i,b) {
+	this1[i] = b;
+};
+tannus.io._ByteArray.ByteArray_Impl_.plus = function(this1,that) {
+	return this1.concat(that);
+};
+tannus.io._ByteArray.ByteArray_Impl_.append = function(this1,that) {
+	this1 = this1.concat(that);
+	return this1;
+};
+tannus.io._ByteArray.ByteArray_Impl_.get_self = function(this1) {
+	return this1;
+};
+tannus.io._ByteArray.ByteArray_Impl_.get_empty = function(this1) {
+	return this1.length != 0;
+};
+tannus.io._ByteArray.ByteArray_Impl_.toIntArray = function(this1) {
+	return this1.map(function(x) {
+		return x;
+	});
+};
+tannus.io._ByteArray.ByteArray_Impl_.toCharArray = function(this1) {
+	return this1.map(function(x) {
+		var s = String.fromCharCode(x);
+		var this2;
+		this2 = s;
+		if(s.length != 1) throw "TypeError: Cannot unify \"" + s + "\" with Char";
+		return this2;
+	});
+};
+tannus.io._ByteArray.ByteArray_Impl_.toString = function(this1) {
+	return this1.map(function(x) {
+		var s = String.fromCharCode(x);
+		var this2;
+		this2 = s;
+		if(s.length != 1) throw "TypeError: Cannot unify \"" + s + "\" with Char";
+		return this2;
+	}).join("");
+};
+tannus.io._ByteArray.ByteArray_Impl_.fromIntArray = function(ia) {
+	var ba = [];
+	var _g = 0;
+	while(_g < ia.length) {
+		var x = ia[_g];
+		++_g;
+		ba.push(x);
+	}
+	return ba;
+};
+tannus.io._ByteArray.ByteArray_Impl_.fromCharArray = function(ca) {
+	var ba = [];
+	var _g = 0;
+	while(_g < ca.length) {
+		var x = ca[_g];
+		++_g;
+		ba.push((function($this) {
+			var $r;
+			var i = HxOverrides.cca(x,0);
+			$r = i;
+			return $r;
+		}(this)));
+	}
+	return ba;
+};
+tannus.io._ByteArray.ByteArray_Impl_.fromString = function(str) {
+	var ba = [];
+	var sa = str.split("");
+	var _g = 0;
+	while(_g < sa.length) {
+		var s = sa[_g];
+		++_g;
+		ba.push((function($this) {
+			var $r;
+			var i = HxOverrides.cca(s,0);
+			$r = i;
+			return $r;
+		}(this)));
+	}
+	return ba;
+};
+tannus.io._Char = {};
+tannus.io._Char.Char_Impl_ = {};
+$hxClasses["tannus.io._Char.Char_Impl_"] = tannus.io._Char.Char_Impl_;
+tannus.io._Char.Char_Impl_.__name__ = ["tannus","io","_Char","Char_Impl_"];
+tannus.io._Char.Char_Impl_.__properties__ = {get_whitespace:"get_whitespace",get_alphanumeric:"get_alphanumeric",get_letter:"get_letter",get_numeric:"get_numeric",set_charCode:"set_charCode",get_charCode:"get_charCode",get_self:"get_self"}
+tannus.io._Char.Char_Impl_._new = function(s) {
+	var this1;
+	this1 = s;
+	if(s.length != 1) throw "TypeError: Cannot unify \"" + s + "\" with Char";
+	return this1;
+};
+tannus.io._Char.Char_Impl_.toByte = function(this1) {
+	var i = HxOverrides.cca(this1,0);
+	return i;
+};
+tannus.io._Char.Char_Impl_.compareToString = function(this1,that) {
+	return this1 == that;
+};
+tannus.io._Char.Char_Impl_.ncompareToString = function(this1,that) {
+	return this1 != that;
+};
+tannus.io._Char.Char_Impl_.repeat = function(this1,times) {
+	var res = "";
+	var _g = 0;
+	while(_g < times) {
+		var x = _g++;
+		res += this1;
+	}
+	return res;
+};
+tannus.io._Char.Char_Impl_.isNumeric = function(this1) {
+	return new EReg("[0-9]","").match(this1);
+};
+tannus.io._Char.Char_Impl_.isLetter = function(this1) {
+	return new EReg("[A-Z]","i").match(this1);
+};
+tannus.io._Char.Char_Impl_.isSpace = function(this1) {
+	return Lambda.has([9,10,11,12,13,32],HxOverrides.cca(this1,0));
+};
+tannus.io._Char.Char_Impl_.get_self = function(this1) {
+	return this1;
+};
+tannus.io._Char.Char_Impl_.get_charCode = function(this1) {
+	return HxOverrides.cca(this1,0);
+};
+tannus.io._Char.Char_Impl_.set_charCode = function(this1,ncc) {
+	this1 = String.fromCharCode(ncc);
+	return HxOverrides.cca(this1,0);
+};
+tannus.io._Char.Char_Impl_.get_numeric = function(this1) {
+	return new EReg("[0-9]","").match(this1);
+};
+tannus.io._Char.Char_Impl_.get_letter = function(this1) {
+	return new EReg("[A-Z]","i").match(this1);
+};
+tannus.io._Char.Char_Impl_.get_alphanumeric = function(this1) {
+	return new EReg("[0-9]","").match(this1) || new EReg("[A-Z]","i").match(this1);
+};
+tannus.io._Char.Char_Impl_.get_whitespace = function(this1) {
+	return Lambda.has([9,10,11,12,13,32],HxOverrides.cca(this1,0));
+};
 tannus.io.Handle = function(obj) {
 	this.value = obj;
 };
@@ -1530,6 +1904,156 @@ tannus.io.Memory.uniqueIdInt = function() {
 	var id = tannus.io.Memory.state;
 	tannus.io.Memory.state++;
 	return id;
+};
+tannus.io._Ptr = {};
+tannus.io._Ptr.Ptr_Impl_ = {};
+$hxClasses["tannus.io._Ptr.Ptr_Impl_"] = tannus.io._Ptr.Ptr_Impl_;
+tannus.io._Ptr.Ptr_Impl_.__name__ = ["tannus","io","_Ptr","Ptr_Impl_"];
+tannus.io._Ptr.Ptr_Impl_.__properties__ = {set_v:"set_v",get_v:"get_v"}
+tannus.io._Ptr.Ptr_Impl_._new = function(gtr,str) {
+	return { a : gtr, b : str};
+};
+tannus.io._Ptr.Ptr_Impl_.get = function(this1) {
+	return this1.a();
+};
+tannus.io._Ptr.Ptr_Impl_.set = function(this1,v) {
+	this1.b(v);
+	return;
+};
+tannus.io._Ptr.Ptr_Impl_.get_v = function(this1) {
+	return this1.a();
+};
+tannus.io._Ptr.Ptr_Impl_.set_v = function(this1,val) {
+	this1.b(val);
+	return val;
+};
+tannus.io._Ptr.Ptr_Impl_.setValue = function(this1,val) {
+	this1.b(val);
+};
+tannus.io._Ptr.Ptr_Impl_.setPointer = function(this1,val) {
+	var value = val();
+	this1.b(value);
+};
+tannus.io._Ptr.Ptr_Impl_.setPtr = function(this1,val) {
+	var value = val.a();
+	this1.b(value);
+};
+tannus.io._Ptr.Ptr_Impl_.too = function(this1) {
+	return this1.a();
+};
+tannus.io._Ptr.Ptr_Impl_.toString = function(this1) {
+	return Std.string(this1.a());
+};
+tannus.math = {};
+tannus.math.Random = function(seed) {
+	if(seed != null) this.state = seed; else this.state = Math.floor(Math.random() * 2147483647);
+};
+$hxClasses["tannus.math.Random"] = tannus.math.Random;
+tannus.math.Random.__name__ = ["tannus","math","Random"];
+tannus.math.Random.stringSeed = function(seed) {
+	var state = 0;
+	var ba;
+	var ba1 = [];
+	var sa = seed.split("");
+	var _g = 0;
+	while(_g < sa.length) {
+		var s = sa[_g];
+		++_g;
+		ba1.push((function($this) {
+			var $r;
+			var i = HxOverrides.cca(s,0);
+			$r = i;
+			return $r;
+		}(this)));
+	}
+	ba = ba1;
+	var $it0 = HxOverrides.iter(ba);
+	while( $it0.hasNext() ) {
+		var bit = $it0.next();
+		seed += bit;
+	}
+	return new tannus.math.Random(state);
+};
+tannus.math.Random.prototype = {
+	nextInt: function() {
+		this.state = (1103515245.0 * this.state + 12345) % 2147483647;
+		return this.state;
+	}
+	,nextFloat: function() {
+		return this.nextInt() / 2147483647;
+	}
+	,reset: function(value) {
+		this.state = value;
+	}
+	,randint: function(min,max) {
+		return Math.floor(this.nextFloat() * (max - min + 1) + min);
+	}
+	,randbool: function() {
+		return this.randint(0,1) == 1;
+	}
+	,choice: function(set) {
+		return set[this.randint(0,set.length - 1)];
+	}
+	,shuffle: function(set) {
+		var copy = set.slice();
+		var result = [];
+		while(copy.length != 1) {
+			var el = this.choice(copy);
+			HxOverrides.remove(copy,el);
+			result.push(el);
+		}
+		return result;
+	}
+	,__class__: tannus.math.Random
+};
+tannus.math.TMath = function() { };
+$hxClasses["tannus.math.TMath"] = tannus.math.TMath;
+tannus.math.TMath.__name__ = ["tannus","math","TMath"];
+tannus.math.TMath.toRadians = function(degrees) {
+	return degrees * 3.141592653589793 / 180;
+};
+tannus.math.TMath.toDegrees = function(radians) {
+	return radians * 180 / 3.141592653589793;
+};
+tannus.math.TMath.max = function(a,b) {
+	if(a > b) return a; else return b;
+};
+tannus.math.TMath.min = function(a,b) {
+	if(a < b) return a; else return b;
+};
+tannus.math.TMath.average = function(values) {
+	var sum = 0;
+	var _g = 0;
+	while(_g < values.length) {
+		var n = values[_g];
+		++_g;
+		sum += n;
+	}
+	return sum / values.length;
+};
+tannus.math.TMath.largest = function(items,predicate) {
+	var highest = 0;
+	var $it0 = $iterator(items)();
+	while( $it0.hasNext() ) {
+		var item = $it0.next();
+		highest = tannus.math.TMath.max(highest,predicate(item));
+	}
+	return highest;
+};
+tannus.math.TMath.smallest = function(items,predicate) {
+	var lowest = 0;
+	var $it0 = $iterator(items)();
+	while( $it0.hasNext() ) {
+		var item = $it0.next();
+		lowest = tannus.math.TMath.min(lowest,predicate(item));
+	}
+	return lowest;
+};
+tannus.math.TMath.clamp = function(value,min,max) {
+	if(value < min) return min; else if(value > max) return max; else return value;
+};
+tannus.math.TMath.sign = function(value) {
+	if(value < 0) return -1; else if(value > 0) return 1; else return 0;
 };
 tannus.ore = {};
 tannus.ore.Compiler = function(opList) {
@@ -3222,24 +3746,17 @@ tannus.utils._Pointer = {};
 tannus.utils._Pointer.Pointer_Impl_ = {};
 $hxClasses["tannus.utils._Pointer.Pointer_Impl_"] = tannus.utils._Pointer.Pointer_Impl_;
 tannus.utils._Pointer.Pointer_Impl_.__name__ = ["tannus","utils","_Pointer","Pointer_Impl_"];
-tannus.utils._Pointer.Pointer_Impl_._new = function(getter) {
-	return new tannus.utils.CPointer(getter);
+tannus.utils._Pointer.Pointer_Impl_._new = function(f) {
+	return f;
 };
 tannus.utils._Pointer.Pointer_Impl_.get = function(this1) {
-	return this1.getValue();
-};
-tannus.utils._Pointer.Pointer_Impl_.reassignToValue = function(this1,other) {
-	this1.getter = function() {
-		return other;
-	};
+	return this1();
 };
 tannus.utils._Pointer.Pointer_Impl_.reassignToPointer = function(this1,other) {
-	this1.getter = function() {
-		return other.getValue();
-	};
+	this1 = other;
 };
-tannus.utils._Pointer.Pointer_Impl_.getter = function(gtr) {
-	return new tannus.utils.CPointer(gtr);
+tannus.utils._Pointer.Pointer_Impl_.toString = function(self) {
+	return self();
 };
 tannus.utils.CPointer = function(gtr) {
 	this.getter = gtr;
@@ -3317,19 +3834,11 @@ tannus.utils._Setter = {};
 tannus.utils._Setter.Setter_Impl_ = {};
 $hxClasses["tannus.utils._Setter.Setter_Impl_"] = tannus.utils._Setter.Setter_Impl_;
 tannus.utils._Setter.Setter_Impl_.__name__ = ["tannus","utils","_Setter","Setter_Impl_"];
-tannus.utils._Setter.Setter_Impl_._new = function(setterFunc) {
-	return new tannus.utils.CSetter(setterFunc);
+tannus.utils._Setter.Setter_Impl_._new = function(f) {
+	return f;
 };
 tannus.utils._Setter.Setter_Impl_.set = function(this1,value) {
-	this1._func(value);
-};
-tannus.utils.CSetter = function(f) {
-	this._func = f;
-};
-$hxClasses["tannus.utils.CSetter"] = tannus.utils.CSetter;
-tannus.utils.CSetter.__name__ = ["tannus","utils","CSetter"];
-tannus.utils.CSetter.prototype = {
-	__class__: tannus.utils.CSetter
+	this1(value);
 };
 tannus.utils.Types = function() { };
 $hxClasses["tannus.utils.Types"] = tannus.utils.Types;
@@ -3466,6 +3975,7 @@ tannus.utils._Value = {};
 tannus.utils._Value.Value_Impl_ = {};
 $hxClasses["tannus.utils._Value.Value_Impl_"] = tannus.utils._Value.Value_Impl_;
 tannus.utils._Value.Value_Impl_.__name__ = ["tannus","utils","_Value","Value_Impl_"];
+tannus.utils._Value.Value_Impl_.__properties__ = {set_v:"set_v",get_v:"get_v",get_self:"get_self"}
 tannus.utils._Value.Value_Impl_._new = function(g,s) {
 	return new tannus.utils.CValue(g,s);
 };
@@ -3475,21 +3985,50 @@ tannus.utils._Value.Value_Impl_.get = function(this1) {
 tannus.utils._Value.Value_Impl_.set = function(this1,nv) {
 	return this1.set(nv);
 };
+tannus.utils._Value.Value_Impl_.get_self = function(this1) {
+	return this1;
+};
+tannus.utils._Value.Value_Impl_.get_v = function(this1) {
+	return this1.get();
+};
+tannus.utils._Value.Value_Impl_.set_v = function(this1,nv) {
+	this1.set(nv);
+	return nv;
+};
 tannus.utils._Value.Value_Impl_.bind = function(this1,other) {
 	other.on("change",function() {
 		this1.set(other.get());
 	});
 };
+tannus.utils._Value.Value_Impl_.dereference = function(this1) {
+	return this1.get();
+};
 tannus.utils._Value.Value_Impl_.literalSet = function(this1,other) {
 	return this1.set(other);
 };
 tannus.utils._Value.Value_Impl_.pointerSet = function(this1,other) {
-	return this1.set(other.getValue());
+	return this1.set(other());
 };
 tannus.utils._Value.Value_Impl_.valueSet = function(this1,other) {
 	return this1.set(other.get());
 };
 tannus.utils._Value.Value_Impl_.toType = function(this1) {
+	return this1.get();
+};
+tannus.utils._Value.Value_Impl_.toString = function(self) {
+	return self.get();
+};
+tannus.utils._Value.Value_Impl_.all = function(vals) {
+	var this1 = new tannus.utils.CValue(function() {
+		return vals[0];
+	},function(s) {
+		var _g = 0;
+		while(_g < vals.length) {
+			var x = vals[_g];
+			++_g;
+			x.set(s);
+		}
+	});
 	return this1.get();
 };
 tannus.utils.CValue = function(g,s) {
@@ -3503,10 +4042,10 @@ tannus.utils.CValue.__name__ = ["tannus","utils","CValue"];
 tannus.utils.CValue.__super__ = tannus.core.EventDispatcher;
 tannus.utils.CValue.prototype = $extend(tannus.core.EventDispatcher.prototype,{
 	get: function() {
-		return this.gtr.getValue();
+		return this.gtr();
 	}
 	,set: function(nv) {
-		this.str._func(nv);
+		this.str(nv);
 		this.emit("change",this);
 		return this.get();
 	}
@@ -3521,6 +4060,64 @@ tannus.utils.CValue.prototype = $extend(tannus.core.EventDispatcher.prototype,{
 	,__class__: tannus.utils.CValue
 	,__properties__: {set_ondestroy:"set_ondestroy"}
 });
+tannus.utils.tuples = {};
+tannus.utils.tuples._TwoTuple = {};
+tannus.utils.tuples._TwoTuple.TwoTuple_Impl_ = {};
+$hxClasses["tannus.utils.tuples._TwoTuple.TwoTuple_Impl_"] = tannus.utils.tuples._TwoTuple.TwoTuple_Impl_;
+tannus.utils.tuples._TwoTuple.TwoTuple_Impl_.__name__ = ["tannus","utils","tuples","_TwoTuple","TwoTuple_Impl_"];
+tannus.utils.tuples._TwoTuple.TwoTuple_Impl_.__properties__ = {set_two:"set_two",get_two:"get_two",set_one:"set_one",get_one:"get_one",get_self:"get_self"}
+tannus.utils.tuples._TwoTuple.TwoTuple_Impl_._new = function(a,b) {
+	return { a : a, b : b};
+};
+tannus.utils.tuples._TwoTuple.TwoTuple_Impl_.get_self = function(this1) {
+	return this1;
+};
+tannus.utils.tuples._TwoTuple.TwoTuple_Impl_.toArray = function(this1) {
+	return [this1.a,this1.b];
+};
+tannus.utils.tuples._TwoTuple.TwoTuple_Impl_.get = function(this1,index) {
+	switch(index) {
+	case 0:
+		return this1.a;
+	case 1:
+		return this1.b;
+	default:
+		throw "Cannot access index " + index + " of TwoTuple";
+	}
+};
+tannus.utils.tuples._TwoTuple.TwoTuple_Impl_.set = function(this1,index,v) {
+	switch(index) {
+	case 0:
+		var this2 = this1;
+		this2.a = v;
+		this2.a;
+		break;
+	case 1:
+		var this3 = this1;
+		this3.b = v;
+		this3.b;
+		break;
+	default:
+		throw "Cannot access index " + index + " of TwoTuple";
+	}
+};
+tannus.utils.tuples._TwoTuple.TwoTuple_Impl_.get_one = function(this1) {
+	return this1.a;
+};
+tannus.utils.tuples._TwoTuple.TwoTuple_Impl_.set_one = function(this1,na) {
+	this1.a = na;
+	return this1.a;
+};
+tannus.utils.tuples._TwoTuple.TwoTuple_Impl_.get_two = function(this1) {
+	return this1.b;
+};
+tannus.utils.tuples._TwoTuple.TwoTuple_Impl_.set_two = function(this1,nb) {
+	this1.b = nb;
+	return this1.b;
+};
+tannus.utils.tuples._TwoTuple.TwoTuple_Impl_.toString = function(this1) {
+	return "(" + Std.string(this1.a) + ", " + Std.string(this1.b) + ")";
+};
 function $iterator(o) { if( o instanceof Array ) return function() { return HxOverrides.iter(o); }; return typeof(o.iterator) == 'function' ? $bind(o,o.iterator) : o.iterator; }
 var $_, $fid = 0;
 function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id__ = $fid++; var f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; o.hx__closures__[m.__id__] = f; } return f; }
@@ -3540,6 +4137,16 @@ var Bool = Boolean;
 Bool.__ename__ = ["Bool"];
 var Class = $hxClasses.Class = { __name__ : ["Class"]};
 var Enum = { };
+if(Array.prototype.map == null) Array.prototype.map = function(f) {
+	var a = [];
+	var _g1 = 0;
+	var _g = this.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		a[i] = f(this[i]);
+	}
+	return a;
+};
 if(Array.prototype.filter == null) Array.prototype.filter = function(f1) {
 	var a1 = [];
 	var _g11 = 0;
@@ -3559,11 +4166,23 @@ tannus.ore.Compiler.BoolOperators = new haxe.ds.StringMap();
 haxe.crypto.Base64.CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 haxe.crypto.Base64.BYTES = haxe.io.Bytes.ofString(haxe.crypto.Base64.CHARS);
 js.Boot.__toStr = {}.toString;
+tannus.io._Char.Char_Impl_.STRICT = true;
+tannus.math.TMath.E = 2.718281828459045;
+tannus.math.TMath.LN2 = 0.6931471805599453;
+tannus.math.TMath.LN10 = 2.302585092994046;
+tannus.math.TMath.LOG2E = 1.4426950408889634;
+tannus.math.TMath.LOG10E = 0.43429448190325176;
+tannus.math.TMath.PI = 3.141592653589793;
+tannus.math.TMath.SQRT1_2 = 0.7071067811865476;
+tannus.math.TMath.SQRT2 = 1.4142135623730951;
+tannus.math.TMath.INT_MIN = -2147483648;
+tannus.math.TMath.INT_MAX = 2147483647;
+tannus.math.TMath.FLOAT_MIN = -1.79769313486231e+308;
+tannus.math.TMath.FLOAT_MAX = 1.79769313486231e+308;
 tannus.ore.ObjectRegEx.selectors = new haxe.ds.StringMap();
 tannus.ore.ObjectRegEx.helpers = new haxe.ds.StringMap();
 tannus.ore.ObjectRegEx.memoize = true;
 tannus.utils._Buffer.Buffer_Impl_.__meta__ = { statics : { fromFloatArray : { from : null}}};
-tannus.utils.CompileTimeClassList.__meta__ = { obj : { classLists : [["null,true,tannus.core.promises.Promise",""]]}};
 tannus.utils.PathTools.PATH_DELIMITER = "/";
 Demo.main();
 })(typeof window != "undefined" ? window : exports);

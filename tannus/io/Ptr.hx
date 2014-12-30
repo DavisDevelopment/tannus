@@ -49,7 +49,16 @@ abstract Ptr <T> (TwoTuple<Pointer<T>, Setter<T>>) {
 		return (this.one.get());
 	}
 
+	@:to
+	public inline function toString():String {
+		return Std.string(this.one.get());
+	}
+
 	public static macro function create <T> (e : ExprOf<T>):ExprOf<Ptr<T>> {
 		return macro (new tannus.io.Ptr(tannus.utils.Pointer.literal($e), tannus.utils.Setter.create($e)));
+	}
+
+	public static macro function dual <T> (get, set):ExprOf<Ptr<T>> {
+		return macro (new tannus.io.Ptr(tannus.utils.Pointer.literal($get), tannus.utils.Setter.create($set)));
 	}
 }

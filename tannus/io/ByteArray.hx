@@ -6,6 +6,7 @@ import tannus.io.Char;
 
 @:forward(
 	length,
+	iterator,
 	push,
 	pop,
 	shift,

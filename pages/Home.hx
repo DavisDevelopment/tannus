@@ -4,6 +4,7 @@ import tannus.core.Page;
 import tannus.core.Route;
 import tannus.io.Ptr;
 import tannus.dom.Element;
+import tannus.math.Random;
 
 class Home extends Page {
 	public function new(r:Route):Void {
@@ -13,23 +14,13 @@ class Home extends Page {
 	}
 
 	public function init():Void {
-		//- Get the Heading Element
-		var greeting_el:Element = new Element('#greeting');
-		
-		//- Create the "Pointer"
-		var greeting = Ptr.create(greeting_el.text);
-		
-		//- Get reference to the Element's Styles
-		var styles = greeting_el.css;
+		var r:Random = new Random();
 
-		//- Pointer to the Color of the Element
-		var color = Ptr.create(styles['color']);
-		
-		//- Assign "text" field
-		greeting &= "Hello, Squirrel!";
+		var rand = Ptr.dual((new Random()), r);
 
-		//- Assign "color" style
-		color &= "red";
+		for (i in 0...10) {
+			trace( rand );
+		}
 	}
 
 }

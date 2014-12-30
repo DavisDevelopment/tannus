@@ -1,4 +1,4 @@
 
 -main Demo
--js ../app.js
+-js testing/app.js
 -D debug
