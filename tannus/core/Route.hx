@@ -10,9 +10,12 @@ import tannus.utils.RegEx;
 import tannus.core.EventDispatcher;
 import tannus.core.Page;
 
+import tannus.utils.Path;
+
 using tannus.utils.PathTools;
 using StringTools;
 
+@:expose
 class Route extends EventDispatcher {
 	public var page_class:Class<Page>;
 	public var uri_parameters:Map<String, String>;
@@ -56,6 +59,14 @@ class Route extends EventDispatcher {
 				if (descriptor.endsWith('/')) return true;
 				break;
 			}
+			
+			//- Catch-All Wildcard
+			else if (descriptor == '*' || descriptor == '/*') {
+				return true;
+
+				break;
+			}
+
 			//- Parametric URL Segment
 			else if (mypiece.startsWith(':')) {
 				var piecekey:String = mypiece.substring(1);
@@ -68,6 +79,39 @@ class Route extends EventDispatcher {
 				uri_parameters[piecekey] = piece;
 				continue;
 			}
+
+			//- Wildcard Segment
+			else if (mypiece.indexOf('*') != -1) {
+				var ppath:Path = mypiece;
+				
+				//- if this segment is just "*"
+				if (mypiece == '*') {
+					if (piece == null) {
+						failed = true;
+					}
+				}
+
+				//- if this segment fits the pattern "*.[extension]"
+				else if (ppath.basename == '*') {
+					var rpath:Path = piece;
+					
+					//- Only verify that the extension-names match
+					if (rpath.extension != ppath.extension) {
+						failed = true;
+					}
+				}
+
+				//- if this segment fits the pattern "[basename].*"
+				else if (ppath.extension == '*') {
+					var rpath:Path = piece;
+
+					//- Only verify that the basenames match
+					if (rpath.basename != ppath.basename) {
+						failed = true;
+					}
+				}
+			}
+
 			//- RegExp URL Segment
 			else if (mypiece.startsWith('(') && mypiece.endsWith(')')) {
 				mypiece = mypiece.substring(1, mypiece.length - 1);
@@ -79,6 +123,8 @@ class Route extends EventDispatcher {
 					break;
 				}
 			}
+
+			//- Literal Segment
 			else {
 				if (mypiece == piece) {
 					continue;
