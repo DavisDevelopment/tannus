@@ -1,14 +1,44 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>TanMar Pointer-Binding Demo</title>
+	<title>Tannus Graphics API Demo</title>
+
+	<link href="foundation/foundation.min.css" rel="stylesheet" type="text/css" />
+	<link href="styles.css" rel="stylesheet" type="text/css" />
+
 	<script src="jquery.min.js"></script>
 </head>
 <body>
-	<div id="wrapper">
-		<h1 id="greeting"></h1>
-	</div>
+<div id="wrapper" class="row">
+		<div class="large-4 columns">
+			<canvas class="" id="stage"></canvas>
+		</div>
+		<div class="large-8 columns">
+			<div class="row right">
+				<h4>Drawing Parameters</h4>
+				<hr>
+				<div class="row">
+					<ul class='button-group'>
+						<li><button id='new-program' class='small button'>New Program</button></li>
+						<li><button id='run-program' class='small button'>Run Program</button></li>
+					</ul>
+				</div>
 
-	<script src="app.js"></script>
+				<div class="row">
+					<h2 class='label'>Line Color</h2>
+					<input id="line-color-input" type="text"></input>
+				</div>
+
+				<div class="row">
+					<h2 class='label'>Line Thickness</h2>
+					<input id="line-width-input" type="text"></input>
+				</div>
+			</div>
+		</div>
+</div>
+
+<script src="foundation/foundation.min.js"></script>
+<script src="app.js"></script>
+
 </body>
 </html>

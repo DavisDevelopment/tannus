@@ -1,6 +1,7 @@
 (function ($hx_exports) { "use strict";
 $hx_exports.tannus = $hx_exports.tannus || {};
-$hx_exports.tannus.core = $hx_exports.tannus.core || {};
+$hx_exports.tannus.geom = $hx_exports.tannus.geom || {};
+;$hx_exports.tannus.core = $hx_exports.tannus.core || {};
 var console = (1,eval)('this').console || {log:function(){}};
 var $hxClasses = {},$estr = function() { return js.Boot.__string_rec(this,''); };
 function $extend(from, fields) {
@@ -381,6 +382,16 @@ StringTools.endsWith = function(s,end) {
 };
 StringTools.replace = function(s,sub,by) {
 	return s.split(sub).join(by);
+};
+StringTools.hex = function(n,digits) {
+	var s = "";
+	var hexChars = "0123456789ABCDEF";
+	do {
+		s = hexChars.charAt(n & 15) + s;
+		n >>>= 4;
+	} while(n > 0);
+	if(digits != null) while(s.length < digits) s = "0" + s;
+	return s;
 };
 StringTools.fastCodeAt = function(s,index) {
 	return s.charCodeAt(index);
@@ -970,18 +981,61 @@ pages.Home.__name__ = ["pages","Home"];
 pages.Home.__super__ = tannus.core.Page;
 pages.Home.prototype = $extend(tannus.core.Page.prototype,{
 	init: function() {
-		var r = new tannus.math.Random();
-		var rand_a = function() {
-			return new tannus.math.Random();
-		};
-		var rand_b = function(value) {
-			r = value;
-		};
-		var _g = 0;
-		while(_g < 10) {
-			var i = _g++;
-			console.log(Std.string(rand_a()));
-		}
+		var canvas_el = new js.JQuery("#stage");
+		this.canvas = new tannus.graphics.Canvas(canvas_el.get(0));
+		this.canvas.canvas.width = Math.round(320);
+		this.canvas.canvas.height = Math.round(240);
+		var c = this.canvas.get_c();
+		this.toolMenu();
+	}
+	,toolMenu: function() {
+		var _g = this;
+		this.current_program = this.canvas.startProgram();
+		var linecol_input = new js.JQuery("#line-color-input");
+		var linewidth_input = new js.JQuery("#line-width-input");
+		linewidth_input.val("1");
+		linewidth_input.val();
+		linecol_input.val("black");
+		linecol_input.val();
+		var new_prog = new js.JQuery("#new-program");
+		var run_prog = new js.JQuery("#run-program");
+		run_prog.on("click",function(e) {
+			_g.canvas.clear();
+			_g.current_program.execute();
+		});
+		this.initEvents(linecol_input,linewidth_input);
+	}
+	,initEvents: function(lci,lwi) {
+		var _g = this;
+		var c = this.canvas.get_c();
+		var lastPos = null;
+		var focused = false;
+		this.canvas.on("mousedown",function(e) {
+			focused = true;
+		});
+		this.canvas.on("mouseup",function(e1) {
+			focused = false;
+			lastPos = null;
+		});
+		this.canvas.on("mouseleave",function(e2) {
+			lastPos = null;
+		});
+		this.canvas.on("mousemove",function(e3) {
+			if(focused) {
+				var pos = e3.pos;
+				console.log(e3);
+				if(lastPos != null) {
+					_g.current_program.beginPath();
+					_g.current_program.set_strokeStyle(lci.val());
+					_g.current_program.set_lineWidth(Std.parseFloat(lwi.val()));
+					_g.current_program.moveTo(lastPos.x,lastPos.y);
+					_g.current_program.lineTo(pos.x,pos.y);
+					_g.current_program.stroke();
+					_g.current_program.closePath();
+				}
+				lastPos = pos;
+			}
+		});
 	}
 	,__class__: pages.Home
 });
@@ -1137,6 +1191,30 @@ tannus.core._Object.Object_Impl_.merge = function(this1,other) {
 		var key = _g1[_g];
 		++_g;
 		if(!(this1[key] != void(0))) {
+			var name;
+			var this2;
+			if(tannus.utils.Types.basictype(key) == "StringMap") this2 = tannus.utils.MapTools.toDynamic(key); else this2 = key;
+			name = this2;
+			var value;
+			var key1;
+			var this3;
+			if(tannus.utils.Types.basictype(key) == "StringMap") this3 = tannus.utils.MapTools.toDynamic(key); else this3 = key;
+			key1 = this3;
+			var obj = Reflect.getProperty(other,Std.string(key1));
+			var this4;
+			if(tannus.utils.Types.basictype(obj) == "StringMap") this4 = tannus.utils.MapTools.toDynamic(obj); else this4 = obj;
+			value = this4;
+			Reflect.setProperty(this1,Std.string(name),value);
+		}
+	}
+};
+tannus.core._Object.Object_Impl_.copyFrom = function(this1,other) {
+	var _g = 0;
+	var _g1 = Reflect.fields(this1);
+	while(_g < _g1.length) {
+		var key = _g1[_g];
+		++_g;
+		if(other[key] != void(0)) {
 			var name;
 			var this2;
 			if(tannus.utils.Types.basictype(key) == "StringMap") this2 = tannus.utils.MapTools.toDynamic(key); else this2 = key;
@@ -1360,9 +1438,12 @@ tannus.dom._Element = {};
 tannus.dom._Element.Element_Impl_ = {};
 $hxClasses["tannus.dom._Element.Element_Impl_"] = tannus.dom._Element.Element_Impl_;
 tannus.dom._Element.Element_Impl_.__name__ = ["tannus","dom","_Element","Element_Impl_"];
-tannus.dom._Element.Element_Impl_.__properties__ = {set_val:"set_val",get_val:"get_val",get_tag:"get_tag",set_html:"set_html",get_html:"get_html",set_text:"set_text",get_text:"get_text",get_css:"get_css",get_self:"get_self"}
+tannus.dom._Element.Element_Impl_.__properties__ = {set_val:"set_val",get_val:"get_val",get_tag:"get_tag",set_html:"set_html",get_html:"get_html",set_text:"set_text",get_text:"get_text",get_css:"get_css",get_self:"get_self",get_element:"get_element"}
 tannus.dom._Element.Element_Impl_._new = function(e) {
 	return new js.JQuery(e);
+};
+tannus.dom._Element.Element_Impl_.get_element = function(this1) {
+	return this1.get(0);
 };
 tannus.dom._Element.Element_Impl_.get_self = function(this1) {
 	return new js.JQuery(this1.selector);
@@ -1436,6 +1517,22 @@ tannus.dom._Element.Element_Impl_.bindValue = function(el,v) {
 			var other = myval.get();
 			v.set(other);
 		} else v.set(orig);
+	});
+};
+tannus.dom._Element.Element_Impl_.bindPtr = function(el,v) {
+	var myval_a = function() {
+		return el.val();
+	};
+	var myval_b = function(value) {
+		el.val(value);
+		el.val();
+	};
+	var orig = v.a();
+	el.on("change keyup",function(event) {
+		if(myval_a() != "" && myval_a() != null) {
+			var val = myval_a();
+			v.b(val);
+		} else v.b(orig);
 	});
 };
 tannus.dom._Element.Element_Impl_.toDOMElement = function(this1) {
@@ -1526,6 +1623,518 @@ tannus.dom.CStyleSet.prototype = {
 	}
 	,__class__: tannus.dom.CStyleSet
 };
+tannus.events = {};
+tannus.events.Event = function(name,isDefaultPreventable,action) {
+	this.type = name;
+	if(isDefaultPreventable == null) this.defaultPreventable = true; else this.defaultPreventable = isDefaultPreventable;
+	this._defaultPrevented = false;
+	if(action == null) this.defaultAction = function() {
+		null;
+	}; else this.defaultAction = action;
+};
+$hxClasses["tannus.events.Event"] = tannus.events.Event;
+tannus.events.Event.__name__ = ["tannus","events","Event"];
+tannus.events.Event.prototype = {
+	get_defaultPrevented: function() {
+		return this._defaultPrevented;
+	}
+	,preventDefault: function() {
+		if(this.defaultPreventable) return this._defaultPrevented = true; else return false;
+	}
+	,complete: function() {
+		if(!this._defaultPrevented) this.defaultAction();
+	}
+	,__class__: tannus.events.Event
+	,__properties__: {get_defaultPrevented:"get_defaultPrevented"}
+};
+tannus.events.MouseEvent = function(name,pos,isDefaultPreventable,altkey,shiftkey,ctrlkey,metakey,btn,action) {
+	tannus.events.Event.call(this,name,isDefaultPreventable,action);
+	if(altkey == null) this.altKey = false; else this.altKey = altkey;
+	if(shiftkey == null) this.shiftKey = false; else this.shiftKey = shiftkey;
+	if(ctrlkey == null) this.ctrlKey = false; else this.ctrlKey = ctrlkey;
+	if(metakey == null) this.metaKey = false; else this.metaKey = metakey;
+	var this1 = btn;
+	var safe = true;
+	if(safe == null) safe = true;
+	if(safe && this1 == null) throw "Cannot extract from null";
+	this.button = this1;
+	this.pos = pos;
+};
+$hxClasses["tannus.events.MouseEvent"] = tannus.events.MouseEvent;
+tannus.events.MouseEvent.__name__ = ["tannus","events","MouseEvent"];
+tannus.events.MouseEvent.fromJqEvent = function(evt,cancelable) {
+	var num = function(x) {
+		return Math.round(Std.parseFloat(Std.string(x)));
+	};
+	var bewl = function(x1) {
+		return Std.string(x1) == "true";
+	};
+	return new tannus.events.MouseEvent(Std.string(evt.type),new tannus.geom.Point(num(evt.clientX),num(evt.clientY)),cancelable,bewl(evt.altKey),bewl(evt.shiftKey),bewl(evt.ctrlKey),bewl(evt.metaKey),num(evt.button));
+};
+tannus.events.MouseEvent.__super__ = tannus.events.Event;
+tannus.events.MouseEvent.prototype = $extend(tannus.events.Event.prototype,{
+	__class__: tannus.events.MouseEvent
+});
+tannus.geom = {};
+tannus.geom.Line = $hx_exports.tannus.geom.Line = function(start,end) {
+	this.start = start;
+	this.end = end;
+};
+$hxClasses["tannus.geom.Line"] = tannus.geom.Line;
+tannus.geom.Line.__name__ = ["tannus","geom","Line"];
+tannus.geom.Line.prototype = {
+	rect: function() {
+		var x = Math.min(this.start.x,this.end.x);
+		var y = Math.min(this.start.y,this.end.y);
+		var width = Math.max(this.start.x,this.end.x) - x;
+		var height = Math.max(this.start.y,this.end.y) - y;
+		return new tannus.geom.Rectangle(x,y,width,height);
+	}
+	,__class__: tannus.geom.Line
+};
+tannus.geom.Point = $hx_exports.tannus.geom.Point = function(x,y,z) {
+	if(z == null) z = 0;
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	this.x = x;
+	this.y = y;
+	this.z = z;
+};
+$hxClasses["tannus.geom.Point"] = tannus.geom.Point;
+tannus.geom.Point.__name__ = ["tannus","geom","Point"];
+tannus.geom.Point.prototype = {
+	clone: function() {
+		return new tannus.geom.Point(this.x,this.y,this.z);
+	}
+	,equals: function(other) {
+		return this.x == other.x && this.y == other.y && this.z == other.z;
+	}
+	,relativeTo: function(other) {
+		return new tannus.geom.Point(other.x - this.x,other.y - this.y,other.z - this.z);
+	}
+	,offsetFactorOf: function(rect) {
+		return rect.relateTo(this);
+	}
+	,toString: function() {
+		return "Point(" + this.x + ", " + this.y + ", " + this.z + ")";
+	}
+	,__class__: tannus.geom.Point
+};
+tannus.geom.Rectangle = $hx_exports.tannus.geom.Rectangle = function(x,y,width,height) {
+	if(height == null) height = 0;
+	if(width == null) width = 0;
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	this.x = x;
+	this.y = y;
+	this.width = width;
+	this.height = height;
+};
+$hxClasses["tannus.geom.Rectangle"] = tannus.geom.Rectangle;
+tannus.geom.Rectangle.__name__ = ["tannus","geom","Rectangle"];
+tannus.geom.Rectangle.fromRelationship = function(vect,rect) {
+	return new tannus.geom.Rectangle(rect.width * vect.x,rect.height * vect.y,rect.width * vect.width,rect.height * vect.height);
+};
+tannus.geom.Rectangle.prototype = {
+	clone: function() {
+		return new tannus.geom.Rectangle(this.x,this.y,this.width,this.height);
+	}
+	,area: function() {
+		return this.width * this.height;
+	}
+	,equals: function(other) {
+		return this.x == other.x && this.y == other.y && this.width == other.width && this.height == other.height;
+	}
+	,corners: function() {
+		var points = [];
+		points.push(new tannus.geom.Point(this.x,this.y));
+		points.push(new tannus.geom.Point(this.x + this.width,this.y));
+		points.push(new tannus.geom.Point(this.x + this.width,this.y + this.height));
+		points.push(new tannus.geom.Point(this.x,this.y + this.height));
+		return points;
+	}
+	,topLeft: function() {
+		return new tannus.geom.Point(this.x,this.y);
+	}
+	,topRight: function() {
+		return new tannus.geom.Point(this.x + this.width,this.y);
+	}
+	,bottomLeft: function() {
+		return new tannus.geom.Point(this.x,this.y + this.height);
+	}
+	,bottomRight: function() {
+		return new tannus.geom.Point(this.x + this.width,this.y + this.height);
+	}
+	,contains: function(cx,cy) {
+		return cx > this.x && cx < this.x + this.width && (cy > this.y && cy < this.y + this.height);
+	}
+	,containsPoint: function(point) {
+		return this.contains(point.x,point.y);
+	}
+	,containsRect: function(rect) {
+		var pts = this.corners();
+		var _g = 0;
+		while(_g < pts.length) {
+			var pt = pts[_g];
+			++_g;
+			if(!this.containsPoint(pt)) return false;
+		}
+		return true;
+	}
+	,intersects: function(other) {
+		var pts = other.corners();
+		var _g = 0;
+		while(_g < pts.length) {
+			var pt = pts[_g];
+			++_g;
+			if(this.containsPoint(pt)) return true;
+		}
+		return false;
+	}
+	,relationshipTo: function(other) {
+		return new tannus.geom.Rectangle(this.x / other.width,this.y / other.height,this.width / other.width,this.height / other.height);
+	}
+	,relateTo: function(pt) {
+		var rx = pt.x;
+		var ry = pt.y;
+		rx = rx / this.width;
+		ry = ry / this.height;
+		return new tannus.geom.Point(rx,ry);
+	}
+	,isEmpty: function() {
+		return this.x == 0 && this.y == 0 && this.width == 0 && this.height == 0;
+	}
+	,orientation: function() {
+		if(this.width > this.height) return tannus.utils.Orientation.OLandscape; else if(this.width < this.height) return tannus.utils.Orientation.OPortrait; else if(this.width == this.height) return tannus.utils.Orientation.OSquare; else throw "WhatTheFuck: " + Std.string(this);
+	}
+	,toString: function() {
+		return "Rectangle(" + this.x + ", " + this.y + ", " + this.width + ", " + this.height + ")";
+	}
+	,__class__: tannus.geom.Rectangle
+};
+tannus.graphics = {};
+tannus.graphics.Canvas = function(c) {
+	tannus.core.EventDispatcher.call(this);
+	var alternate = window.document.createElement("canvas");
+	if(c == null) this.canvas = alternate; else this.canvas = c;
+	this._c = null;
+	this._style = null;
+	this.initializeEvents();
+};
+$hxClasses["tannus.graphics.Canvas"] = tannus.graphics.Canvas;
+tannus.graphics.Canvas.__name__ = ["tannus","graphics","Canvas"];
+tannus.graphics.Canvas.cerror = function(message) {
+	throw "CanvasError: " + message;
+};
+tannus.graphics.Canvas.__super__ = tannus.core.EventDispatcher;
+tannus.graphics.Canvas.prototype = $extend(tannus.core.EventDispatcher.prototype,{
+	get_c: function() {
+		if(this._c == null) {
+			if(this.canvas.width > 0 && this.canvas.height > 0) this._c = this.canvas.getContext("2d"); else throw "CanvasError: " + "Cannot draw on a Canvas whose width and height are 0! Have they been set?";
+		}
+		return this._c;
+	}
+	,get_style: function() {
+		if(this._style == null) {
+			if((function($this) {
+				var $r;
+				if($this._c == null) {
+					if($this.canvas.width > 0 && $this.canvas.height > 0) $this._c = $this.canvas.getContext("2d"); else throw "CanvasError: " + "Cannot draw on a Canvas whose width and height are 0! Have they been set?";
+				}
+				$r = $this._c;
+				return $r;
+			}(this)) != null) null;
+			this._style = new tannus.graphics.CanvasStyles(this);
+		}
+		return this._style;
+	}
+	,get_width: function() {
+		return this.canvas.width;
+	}
+	,set_width: function(nw) {
+		return this.canvas.width = Math.round(nw);
+	}
+	,get_height: function() {
+		return this.canvas.height;
+	}
+	,set_height: function(nh) {
+		return this.canvas.height = Math.round(nh);
+	}
+	,clear: function() {
+		((function($this) {
+			var $r;
+			if($this._c == null) {
+				if($this.canvas.width > 0 && $this.canvas.height > 0) $this._c = $this.canvas.getContext("2d"); else throw "CanvasError: " + "Cannot draw on a Canvas whose width and height are 0! Have they been set?";
+			}
+			$r = $this._c;
+			return $r;
+		}(this))).clearRect(0,0,this.canvas.width,this.canvas.height);
+	}
+	,startProgram: function() {
+		return new tannus.graphics.CanvasProgram(this);
+	}
+	,initializeEvents: function() {
+		this.initializeMouseEvents();
+	}
+	,initializeMouseEvents: function() {
+		var _g = this;
+		var canvas_el = new js.JQuery(this.canvas);
+		var event_names = ["click","mousedown","mouseup","mouseenter","mouseleave","mousemove"];
+		var bindEvent = function(name) {
+			var memit = (function(f,a1) {
+				return function(a2) {
+					f(a1,a2);
+				};
+			})($bind(_g,_g.emit),name);
+			canvas_el.on(name,function(e) {
+				var pos = _g.getMousePosition(e);
+				var mevent = tannus.events.MouseEvent.fromJqEvent(e,false);
+				mevent.pos = pos;
+				memit(mevent);
+			});
+		};
+		var _g1 = 0;
+		while(_g1 < event_names.length) {
+			var ename = event_names[_g1];
+			++_g1;
+			bindEvent(ename);
+		}
+	}
+	,getMousePosition: function(e) {
+		var rect = this.canvas.getBoundingClientRect();
+		return new tannus.geom.Point(e.clientX - rect.left,e.clientY - rect.top);
+	}
+	,__class__: tannus.graphics.Canvas
+	,__properties__: {set_height:"set_height",get_height:"get_height",set_width:"set_width",get_width:"get_width",get_style:"get_style",get_c:"get_c"}
+});
+tannus.graphics._CanvasContext = {};
+tannus.graphics._CanvasContext.CanvasContext_Impl_ = {};
+$hxClasses["tannus.graphics._CanvasContext.CanvasContext_Impl_"] = tannus.graphics._CanvasContext.CanvasContext_Impl_;
+tannus.graphics._CanvasContext.CanvasContext_Impl_.__name__ = ["tannus","graphics","_CanvasContext","CanvasContext_Impl_"];
+tannus.graphics._CanvasContext.CanvasContext_Impl_.__properties__ = {get_self:"get_self"}
+tannus.graphics._CanvasContext.CanvasContext_Impl_._new = function(c) {
+	return c;
+};
+tannus.graphics._CanvasContext.CanvasContext_Impl_.get_self = function(this1) {
+	return this1;
+};
+tannus.graphics._CanvasContext.CanvasContext_Impl_.circle = function(this1,x,y,radius) {
+	this1.arc(x,y,radius,0,2 * Math.PI,false);
+};
+tannus.graphics.CanvasProgram = function(c) {
+	this.canvas = c;
+	this.ops = [];
+};
+$hxClasses["tannus.graphics.CanvasProgram"] = tannus.graphics.CanvasProgram;
+tannus.graphics.CanvasProgram.__name__ = ["tannus","graphics","CanvasProgram"];
+tannus.graphics.CanvasProgram.prototype = {
+	get_c: function() {
+		return this.canvas.get_c();
+	}
+	,get_fillStyle: function() {
+		return this.canvas.get_c().fillStyle;
+	}
+	,set_fillStyle: function(fs) {
+		this.op(tannus.graphics.CanvasProgramComponent.SetFillStyle(fs));
+		return this.canvas.get_c().fillStyle;
+	}
+	,get_strokeStyle: function() {
+		return this.canvas.get_c().strokeStyle;
+	}
+	,set_strokeStyle: function(ss) {
+		this.op(tannus.graphics.CanvasProgramComponent.SetStrokeStyle(ss));
+		return this.canvas.get_c().strokeStyle;
+	}
+	,get_lineWidth: function() {
+		return this.canvas.get_c().lineWidth;
+	}
+	,set_lineWidth: function(lw) {
+		this.op(tannus.graphics.CanvasProgramComponent.SetLineWidth(lw));
+		return this.canvas.get_c().lineWidth;
+	}
+	,op: function(node) {
+		this.ops.push(node);
+	}
+	,moveTo: function(x,y) {
+		this.op(tannus.graphics.CanvasProgramComponent.MoveTo(x,y));
+	}
+	,beginPath: function() {
+		this.ops.push(tannus.graphics.CanvasProgramComponent.BeginSubpath);
+	}
+	,closePath: function() {
+		this.ops.push(tannus.graphics.CanvasProgramComponent.CloseSubpath);
+	}
+	,lineTo: function(x,y) {
+		this.op(tannus.graphics.CanvasProgramComponent.LineTo(x,y,this.state()));
+	}
+	,fill: function() {
+		this.op(tannus.graphics.CanvasProgramComponent.Fill(this.state()));
+	}
+	,stroke: function() {
+		this.op(tannus.graphics.CanvasProgramComponent.Stroke(this.state()));
+	}
+	,execute: function() {
+		console.log(this.ops);
+		var c = this.canvas.get_c();
+		c.beginPath();
+		var _g = 0;
+		var _g1 = this.ops;
+		while(_g < _g1.length) {
+			var token = _g1[_g];
+			++_g;
+			var op = token;
+			tannus.graphics._CanvasProgramOperation.CanvasProgramOperation_Impl_.execute(op,this.canvas);
+		}
+		c.closePath();
+	}
+	,state: function() {
+		return tannus.graphics.CanvasState.fromCanvasContext(this.canvas.get_c());
+	}
+	,__class__: tannus.graphics.CanvasProgram
+	,__properties__: {set_lineWidth:"set_lineWidth",get_lineWidth:"get_lineWidth",set_strokeStyle:"set_strokeStyle",get_strokeStyle:"get_strokeStyle",set_fillStyle:"set_fillStyle",get_fillStyle:"get_fillStyle",get_c:"get_c"}
+};
+tannus.graphics.CanvasProgramComponent = { __ename__ : ["tannus","graphics","CanvasProgramComponent"], __constructs__ : ["SetFillStyle","SetStrokeStyle","SetLineWidth","MoveTo","BeginSubpath","CloseSubpath","LineTo","Stroke","Fill"] };
+tannus.graphics.CanvasProgramComponent.SetFillStyle = function(val) { var $x = ["SetFillStyle",0,val]; $x.__enum__ = tannus.graphics.CanvasProgramComponent; $x.toString = $estr; return $x; };
+tannus.graphics.CanvasProgramComponent.SetStrokeStyle = function(val) { var $x = ["SetStrokeStyle",1,val]; $x.__enum__ = tannus.graphics.CanvasProgramComponent; $x.toString = $estr; return $x; };
+tannus.graphics.CanvasProgramComponent.SetLineWidth = function(lw) { var $x = ["SetLineWidth",2,lw]; $x.__enum__ = tannus.graphics.CanvasProgramComponent; $x.toString = $estr; return $x; };
+tannus.graphics.CanvasProgramComponent.MoveTo = function(x,y) { var $x = ["MoveTo",3,x,y]; $x.__enum__ = tannus.graphics.CanvasProgramComponent; $x.toString = $estr; return $x; };
+tannus.graphics.CanvasProgramComponent.BeginSubpath = ["BeginSubpath",4];
+tannus.graphics.CanvasProgramComponent.BeginSubpath.toString = $estr;
+tannus.graphics.CanvasProgramComponent.BeginSubpath.__enum__ = tannus.graphics.CanvasProgramComponent;
+tannus.graphics.CanvasProgramComponent.CloseSubpath = ["CloseSubpath",5];
+tannus.graphics.CanvasProgramComponent.CloseSubpath.toString = $estr;
+tannus.graphics.CanvasProgramComponent.CloseSubpath.__enum__ = tannus.graphics.CanvasProgramComponent;
+tannus.graphics.CanvasProgramComponent.LineTo = function(x,y,state) { var $x = ["LineTo",6,x,y,state]; $x.__enum__ = tannus.graphics.CanvasProgramComponent; $x.toString = $estr; return $x; };
+tannus.graphics.CanvasProgramComponent.Stroke = function(state) { var $x = ["Stroke",7,state]; $x.__enum__ = tannus.graphics.CanvasProgramComponent; $x.toString = $estr; return $x; };
+tannus.graphics.CanvasProgramComponent.Fill = function(state) { var $x = ["Fill",8,state]; $x.__enum__ = tannus.graphics.CanvasProgramComponent; $x.toString = $estr; return $x; };
+tannus.graphics._CanvasProgramOperation = {};
+tannus.graphics._CanvasProgramOperation.CanvasProgramOperation_Impl_ = {};
+$hxClasses["tannus.graphics._CanvasProgramOperation.CanvasProgramOperation_Impl_"] = tannus.graphics._CanvasProgramOperation.CanvasProgramOperation_Impl_;
+tannus.graphics._CanvasProgramOperation.CanvasProgramOperation_Impl_.__name__ = ["tannus","graphics","_CanvasProgramOperation","CanvasProgramOperation_Impl_"];
+tannus.graphics._CanvasProgramOperation.CanvasProgramOperation_Impl_._new = function(comp) {
+	return comp;
+};
+tannus.graphics._CanvasProgramOperation.CanvasProgramOperation_Impl_.execute = function(this1,can) {
+	var c;
+	if(can._c == null) {
+		if(can.canvas.width > 0 && can.canvas.height > 0) can._c = can.canvas.getContext("2d"); else throw "CanvasError: " + "Cannot draw on a Canvas whose width and height are 0! Have they been set?";
+	}
+	c = can._c;
+	switch(this1[1]) {
+	case 4:
+		c.beginPath();
+		break;
+	case 5:
+		c.closePath();
+		break;
+	case 3:
+		var y = this1[3];
+		var x = this1[2];
+		c.moveTo(x,y);
+		break;
+	case 6:
+		var state = this1[4];
+		var y1 = this1[3];
+		var x1 = this1[2];
+		c.lineTo(x1,y1);
+		break;
+	case 8:
+		var state1 = this1[2];
+		c.fill();
+		break;
+	case 7:
+		var state2 = this1[2];
+		c.stroke();
+		break;
+	case 0:
+		var fs = this1[2];
+		c.fillStyle = fs;
+		break;
+	case 1:
+		var ss = this1[2];
+		c.strokeStyle = ss;
+		break;
+	case 2:
+		var lw = this1[2];
+		c.lineWidth = lw;
+		break;
+	}
+};
+tannus.graphics.CanvasState = function() {
+	this.fillStyle = "black";
+	this.font = "10px sans-serif";
+	this.globalAlpha = 0;
+	this.imageSmoothingEnabled = true;
+	this.lineCap = "butt";
+	this.lineWidth = 1;
+	this.lineJoin = "miter";
+	this.fillStyle = "black";
+	this.width = 0;
+	this.height = 0;
+};
+$hxClasses["tannus.graphics.CanvasState"] = tannus.graphics.CanvasState;
+tannus.graphics.CanvasState.__name__ = ["tannus","graphics","CanvasState"];
+tannus.graphics.CanvasState.fromCanvasContext = function(c) {
+	var state = new tannus.graphics.CanvasState();
+	var fields = Reflect.fields(c);
+	var _g = 0;
+	while(_g < fields.length) {
+		var key = fields[_g];
+		++_g;
+		var value = Reflect.getProperty(c,key);
+		if(value != null) Reflect.setProperty(state,key,value);
+	}
+	return state;
+};
+tannus.graphics.CanvasState.prototype = {
+	apply: function(can) {
+		can.canvas.width = Math.round(this.width);
+		can.canvas.height = Math.round(this.height);
+		var fields = Reflect.fields((function($this) {
+			var $r;
+			if(can._c == null) {
+				if(can.canvas.width > 0 && can.canvas.height > 0) can._c = can.canvas.getContext("2d"); else throw "CanvasError: " + "Cannot draw on a Canvas whose width and height are 0! Have they been set?";
+			}
+			$r = can._c;
+			return $r;
+		}(this)));
+		var _g = 0;
+		while(_g < fields.length) {
+			var key = fields[_g];
+			++_g;
+			var value = Reflect.getProperty(this,key);
+			if(value != null) Reflect.setProperty((function($this) {
+				var $r;
+				if(can._c == null) {
+					if(can.canvas.width > 0 && can.canvas.height > 0) can._c = can.canvas.getContext("2d"); else throw "CanvasError: " + "Cannot draw on a Canvas whose width and height are 0! Have they been set?";
+				}
+				$r = can._c;
+				return $r;
+			}(this)),key,value);
+		}
+	}
+	,__class__: tannus.graphics.CanvasState
+};
+tannus.graphics.CanvasStyles = function(canvas) {
+	tannus.core.EventDispatcher.call(this);
+	this.owner = canvas;
+};
+$hxClasses["tannus.graphics.CanvasStyles"] = tannus.graphics.CanvasStyles;
+tannus.graphics.CanvasStyles.__name__ = ["tannus","graphics","CanvasStyles"];
+tannus.graphics.CanvasStyles.__super__ = tannus.core.EventDispatcher;
+tannus.graphics.CanvasStyles.prototype = $extend(tannus.core.EventDispatcher.prototype,{
+	get_c: function() {
+		return this.owner.get_c();
+	}
+	,get_fillString: function() {
+		return this.owner.get_c().fillStyle;
+	}
+	,set_fillString: function(nfs) {
+		return this.owner.get_c().fillStyle = nfs;
+	}
+	,__class__: tannus.graphics.CanvasStyles
+	,__properties__: {set_fillString:"set_fillString",get_fillString:"get_fillString",get_c:"get_c"}
+});
 tannus.io = {};
 tannus.io._Byte = {};
 tannus.io._Byte.Byte_Impl_ = {};
@@ -1767,6 +2376,65 @@ tannus.io._Char.Char_Impl_.get_alphanumeric = function(this1) {
 };
 tannus.io._Char.Char_Impl_.get_whitespace = function(this1) {
 	return Lambda.has([9,10,11,12,13,32],HxOverrides.cca(this1,0));
+};
+tannus.io._Color = {};
+tannus.io._Color.Color_Impl_ = {};
+$hxClasses["tannus.io._Color.Color_Impl_"] = tannus.io._Color.Color_Impl_;
+tannus.io._Color.Color_Impl_.__name__ = ["tannus","io","_Color","Color_Impl_"];
+tannus.io._Color.Color_Impl_.__properties__ = {set_alpha:"set_alpha",get_alpha:"get_alpha",set_blue:"set_blue",get_blue:"get_blue",set_green:"set_green",get_green:"get_green",set_red:"set_red",get_red:"get_red",get_self:"get_self"}
+tannus.io._Color.Color_Impl_._new = function(r,g,b,a) {
+	if(a == null) a = 0;
+	if(b == null) b = 0;
+	if(g == null) g = 0;
+	if(r == null) r = 0;
+	return [r,g,b,a];
+};
+tannus.io._Color.Color_Impl_.get_self = function(this1) {
+	return this1;
+};
+tannus.io._Color.Color_Impl_.get_red = function(this1) {
+	return this1[0];
+};
+tannus.io._Color.Color_Impl_.set_red = function(this1,r) {
+	this1[0] = r;
+	return r;
+};
+tannus.io._Color.Color_Impl_.get_green = function(this1) {
+	return this1[1];
+};
+tannus.io._Color.Color_Impl_.set_green = function(this1,r) {
+	this1[1] = r;
+	return r;
+};
+tannus.io._Color.Color_Impl_.get_blue = function(this1) {
+	return this1[2];
+};
+tannus.io._Color.Color_Impl_.set_blue = function(this1,r) {
+	this1[2] = r;
+	return r;
+};
+tannus.io._Color.Color_Impl_.get_alpha = function(this1) {
+	return this1[3];
+};
+tannus.io._Color.Color_Impl_.set_alpha = function(this1,r) {
+	this1[3] = r;
+	return r;
+};
+tannus.io._Color.Color_Impl_.toString = function(this1) {
+	if(this1[3] != 0) return "rgba(" + this1[0] + ", " + this1[1] + ", " + this1[2] + ", " + this1[3] + ")"; else return "#" + ((function($this) {
+		var $r;
+		var _g = [];
+		{
+			var _g1 = 0;
+			while(_g1 < this1.length) {
+				var x = this1[_g1];
+				++_g1;
+				_g.push(StringTools.hex(x,2));
+			}
+		}
+		$r = _g;
+		return $r;
+	}(this))).slice(0,3).join("");
 };
 tannus.io.Handle = function(obj) {
 	this.value = obj;
@@ -3018,6 +3686,137 @@ tannus.ore.Utils.smallest = function(list) {
 	}
 	return smallest;
 };
+tannus.ui = {};
+tannus.ui.Window = function() { };
+$hxClasses["tannus.ui.Window"] = tannus.ui.Window;
+tannus.ui.Window.__name__ = ["tannus","ui","Window"];
+tannus.ui.Window.__properties__ = {get_viewport:"get_viewport",set_title:"set_title",get_title:"get_title"}
+tannus.ui.Window.get_title = function() {
+	return Std.string(window.document.title);
+};
+tannus.ui.Window.set_title = function(ntitle) {
+	window.document.title = ntitle;
+	return Std.string(window.document.title);
+};
+tannus.ui.Window.get_viewport = function() {
+	var viewWidth = 0;
+	var viewHeight = 0;
+	var win;
+	var obj = window;
+	var this1;
+	if(tannus.utils.Types.basictype(obj) == "StringMap") this1 = tannus.utils.MapTools.toDynamic(obj); else this1 = obj;
+	win = this1;
+	var doc;
+	var obj1 = window.document;
+	var this2;
+	if(tannus.utils.Types.basictype(obj1) == "StringMap") this2 = tannus.utils.MapTools.toDynamic(obj1); else this2 = obj1;
+	doc = this2;
+	if(win.innerWidth != void(0)) {
+		var key;
+		var this3;
+		if(tannus.utils.Types.basictype("innerWidth") == "StringMap") this3 = tannus.utils.MapTools.toDynamic("innerWidth"); else this3 = "innerWidth";
+		key = this3;
+		var obj2 = Reflect.getProperty(win,Std.string(key));
+		var this4;
+		if(tannus.utils.Types.basictype(obj2) == "StringMap") this4 = tannus.utils.MapTools.toDynamic(obj2); else this4 = obj2;
+		viewWidth = this4;
+		var key1;
+		var this5;
+		if(tannus.utils.Types.basictype("innerHeight") == "StringMap") this5 = tannus.utils.MapTools.toDynamic("innerHeight"); else this5 = "innerHeight";
+		key1 = this5;
+		var obj3 = Reflect.getProperty(win,Std.string(key1));
+		var this6;
+		if(tannus.utils.Types.basictype(obj3) == "StringMap") this6 = tannus.utils.MapTools.toDynamic(obj3); else this6 = obj3;
+		viewHeight = this6;
+	} else if(doc.documentElement != void(0) && (function($this) {
+		var $r;
+		var this7;
+		{
+			var key2;
+			var this8;
+			if(tannus.utils.Types.basictype("documentElement") == "StringMap") this8 = tannus.utils.MapTools.toDynamic("documentElement"); else this8 = "documentElement";
+			key2 = this8;
+			var obj4 = Reflect.getProperty(doc,Std.string(key2));
+			var this9;
+			if(tannus.utils.Types.basictype(obj4) == "StringMap") this9 = tannus.utils.MapTools.toDynamic(obj4); else this9 = obj4;
+			this7 = this9;
+		}
+		$r = this7.clientWidth != void(0);
+		return $r;
+	}(this)) && (function($this) {
+		var $r;
+		var this10;
+		{
+			var this11;
+			var key4;
+			var this12;
+			if(tannus.utils.Types.basictype("documentElement") == "StringMap") this12 = tannus.utils.MapTools.toDynamic("documentElement"); else this12 = "documentElement";
+			key4 = this12;
+			var obj5 = Reflect.getProperty(doc,Std.string(key4));
+			var this13;
+			if(tannus.utils.Types.basictype(obj5) == "StringMap") this13 = tannus.utils.MapTools.toDynamic(obj5); else this13 = obj5;
+			this11 = this13;
+			var key3;
+			var this14;
+			if(tannus.utils.Types.basictype("clientWidth") == "StringMap") this14 = tannus.utils.MapTools.toDynamic("clientWidth"); else this14 = "clientWidth";
+			key3 = this14;
+			var obj6 = Reflect.getProperty(this11,Std.string(key3));
+			var this15;
+			if(tannus.utils.Types.basictype(obj6) == "StringMap") this15 = tannus.utils.MapTools.toDynamic(obj6); else this15 = obj6;
+			this10 = this15;
+		}
+		$r = this10;
+		return $r;
+	}(this)) != 0) {
+		var this16;
+		var key6;
+		var this17;
+		if(tannus.utils.Types.basictype("documentElement") == "StringMap") this17 = tannus.utils.MapTools.toDynamic("documentElement"); else this17 = "documentElement";
+		key6 = this17;
+		var obj7 = Reflect.getProperty(doc,Std.string(key6));
+		var this18;
+		if(tannus.utils.Types.basictype(obj7) == "StringMap") this18 = tannus.utils.MapTools.toDynamic(obj7); else this18 = obj7;
+		this16 = this18;
+		var key5;
+		var this19;
+		if(tannus.utils.Types.basictype("clientWidth") == "StringMap") this19 = tannus.utils.MapTools.toDynamic("clientWidth"); else this19 = "clientWidth";
+		key5 = this19;
+		var obj8 = Reflect.getProperty(this16,Std.string(key5));
+		var this20;
+		if(tannus.utils.Types.basictype(obj8) == "StringMap") this20 = tannus.utils.MapTools.toDynamic(obj8); else this20 = obj8;
+		viewWidth = this20;
+		var this21;
+		var key8;
+		var this22;
+		if(tannus.utils.Types.basictype("documentElement") == "StringMap") this22 = tannus.utils.MapTools.toDynamic("documentElement"); else this22 = "documentElement";
+		key8 = this22;
+		var obj9 = Reflect.getProperty(doc,Std.string(key8));
+		var this23;
+		if(tannus.utils.Types.basictype(obj9) == "StringMap") this23 = tannus.utils.MapTools.toDynamic(obj9); else this23 = obj9;
+		this21 = this23;
+		var key7;
+		var this24;
+		if(tannus.utils.Types.basictype("clientHeight") == "StringMap") this24 = tannus.utils.MapTools.toDynamic("clientHeight"); else this24 = "clientHeight";
+		key7 = this24;
+		var obj10 = Reflect.getProperty(this21,Std.string(key7));
+		var this25;
+		if(tannus.utils.Types.basictype(obj10) == "StringMap") this25 = tannus.utils.MapTools.toDynamic(obj10); else this25 = obj10;
+		viewHeight = this25;
+	} else {
+		var bytag;
+		var key9;
+		var this26;
+		if(tannus.utils.Types.basictype("getElementsByTagName") == "StringMap") this26 = tannus.utils.MapTools.toDynamic("getElementsByTagName"); else this26 = "getElementsByTagName";
+		key9 = this26;
+		var obj11 = Reflect.getProperty(doc,Std.string(key9));
+		var this27;
+		if(tannus.utils.Types.basictype(obj11) == "StringMap") this27 = tannus.utils.MapTools.toDynamic(obj11); else this27 = obj11;
+		bytag = this27;
+		viewWidth = bytag("body")[0].clientWidth;
+		viewHeight = bytag("body")[0].clientHeight;
+	}
+	return new tannus.geom.Rectangle(0,0,viewWidth,viewHeight);
+};
 tannus.utils = {};
 tannus.utils._Buffer = {};
 tannus.utils._Buffer.Buffer_Impl_ = {};
@@ -3617,6 +4416,16 @@ tannus.utils._Maybe.Maybe_Impl_.get_self = function(this1) {
 tannus.utils._Maybe.Maybe_Impl_.get_exists = function(this1) {
 	return this1 != null;
 };
+tannus.utils.Orientation = { __ename__ : ["tannus","utils","Orientation"], __constructs__ : ["OLandscape","OPortrait","OSquare"] };
+tannus.utils.Orientation.OLandscape = ["OLandscape",0];
+tannus.utils.Orientation.OLandscape.toString = $estr;
+tannus.utils.Orientation.OLandscape.__enum__ = tannus.utils.Orientation;
+tannus.utils.Orientation.OPortrait = ["OPortrait",1];
+tannus.utils.Orientation.OPortrait.toString = $estr;
+tannus.utils.Orientation.OPortrait.__enum__ = tannus.utils.Orientation;
+tannus.utils.Orientation.OSquare = ["OSquare",2];
+tannus.utils.Orientation.OSquare.toString = $estr;
+tannus.utils.Orientation.OSquare.__enum__ = tannus.utils.Orientation;
 tannus.utils._Path = {};
 tannus.utils._Path.Path_Impl_ = {};
 $hxClasses["tannus.utils._Path.Path_Impl_"] = tannus.utils._Path.Path_Impl_;
