@@ -24,6 +24,12 @@ abstract CanvasProgramOperation ( CPC ) from CPC to CPC {
 			case CPC.CloseSubpath:
 				c.closePath();
 
+			case CPC.Arc(x, y, radius, startAngle, endAngle, anticlockwise):
+				c.arc(x, y, radius, startAngle, endAngle, anticlockwise);
+
+			case CPC.ArcTo(x1, y1, x2, y2, radius):
+				c.arcTo(x1, y1, x2, y2, radius);
+
 			case CPC.MoveTo(x, y):
 				c.moveTo(x, y);
 
@@ -55,6 +61,15 @@ abstract CanvasProgramOperation ( CPC ) from CPC to CPC {
 					case LineCap.Round: 'round';
 
 					case LineCap.Square: 'square';
+				});
+
+			case CPC.SetLineJoin( lj ):
+				c.lineJoin = (switch (lj) {
+					case LineJoin.Round: 'round';
+
+					case LineJoin.Bevel: 'bevel';
+
+					case LineJoin.Miter: 'miter';
 				});
 
 			default:

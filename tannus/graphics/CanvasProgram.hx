@@ -11,7 +11,9 @@ import tannus.graphics.CanvasState;
 import tannus.graphics.Canvas;
 
 import tannus.graphics.CanvasProgramOperation;
+
 import tannus.graphics.LineCap;
+import tannus.graphics.LineJoin;
 
 class CanvasProgram {
 	//- The canvas we're acting on
@@ -83,10 +85,41 @@ class CanvasProgram {
 		op(CPC.SetLineCap(elc));
 		return lineCap;
 	}
+
+	//- the manner in which lines are joined
+	public var lineJoin(get, set):String;
+	private inline function get_lineJoin():String {
+		return (c.lineJoin);
+	}
+	private inline function set_lineJoin(lj : String):String {
+		lj = lj.toLowerCase();
+
+		var elj = (switch (lj) {
+			case 'miter': LineJoin.Miter;
+			case 'bevel': LineJoin.Bevel;
+			case 'round': LineJoin.Round;
+			default:
+				error( '[program].lineJoin must be (miter, bevel, round); "$lj" provided' );
+				LineJoin.Miter;
+		});
+
+		op(CPC.SetLineJoin(elj));
+		return lineJoin;
+	}
 	
 	//- Add an operation onto the stack
 	private inline function op(node : CPC):Void {
 		ops.push( node );
+	}
+
+	//- Draw an arc
+	public function arc(x:Float, y:Float, radius:Float, startAngle:Float, endAngle:Float, anticlockwise:Bool):Void {
+		op(CPC.Arc(x, y, radius, startAngle, endAngle, anticlockwise));
+	}
+
+	//- Draw an arc **to** a given point
+	public function arcTo(x1:Float, y1:Float, x2:Float, y2:Float, radius:Float):Void {
+		op(CPC.ArcTo(x1, y1, x2, y2, radius));
 	}
 	
 	//- Move to given position

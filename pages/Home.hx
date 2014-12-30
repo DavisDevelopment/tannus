@@ -12,6 +12,8 @@ import tannus.graphics.CanvasProgram;
 
 import tannus.events.MouseEvent;
 
+import pages.Tests;
+
 class Home extends Page {
 	public var canvas : Canvas;
 
@@ -31,15 +33,16 @@ class Home extends Page {
 		this.canvas = new Canvas(cast canvas_el.element);
 
 		//- set it's dimensions
-		canvas.width = 320;
-		canvas.height = 240;
+		canvas.width = 640;
+		canvas.height = 480;
 		
 		//- Get a reference to the drawing context
 		var c = canvas.c;
 
 		toolMenu();
-	}
 
+	}
+	
 	/**
 	  * Initialize the tool-menu
 	  */
@@ -53,6 +56,7 @@ class Home extends Page {
 		linecol_input.val = 'black';
 
 		current_program.lineCap = 'round';
+		current_program.lineJoin = 'bevel';
 
 		/*
 		 == Program-Buttons ==
