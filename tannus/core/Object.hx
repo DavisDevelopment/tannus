@@ -82,6 +82,15 @@ abstract Object (Dynamic) {
 		}
 	}
 
+	//- Copy the values of all fields of [this] from [other]
+	public function copyFrom(other : Object):Void {
+		for (key in self.keys()) {
+			if (other.exists(key)) {
+				self[key] = other[key];
+			}
+		}
+	}
+
 	//- Test Whether the given object is matched by the given OReg expression
 	public inline function is(description : String):Bool {
 		return ObjectRegEx.compile(description).test(this);
