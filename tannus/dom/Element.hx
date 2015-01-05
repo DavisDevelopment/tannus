@@ -270,6 +270,14 @@ abstract Element (js.JQuery) {
 	public inline function toDOMElements():Array<js.html.Element> {
 		return (this.get());
 	}
+
+	/**
+	  * Alias to constructor
+	  */
+	public static inline function select(sel : Dynamic):Element {
+		
+		return (new Element( sel ));
+	}
 }
 
 private typedef JSElement = js.html.Element;
