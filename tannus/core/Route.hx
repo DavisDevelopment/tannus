@@ -148,6 +148,7 @@ class Route extends EventDispatcher {
 
 	public function take():Void {
 		var this_page:Page = Type.createInstance(page_class, [this]);
+		
 		this.emit('take', this_page);
 	}
 }
