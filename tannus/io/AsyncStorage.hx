@@ -18,19 +18,19 @@ class AsyncStorage {
 	/**
 	  * Removes [key] from the registry
 	  */
-	public function remove(key:String, done:Callback<Void>):Void {
+	public function remove(key:String, done:VoidCallback):Void {
 		unimp();
 
-		done(null);
+		done();
 	}
 
 	/**
 	  * Removes all entries from the registry
 	  */
-	public function clear(done : Callback<Void>):Void {
+	public function clear(done : VoidCallback):Void {
 		unimp();
 
-		done(null);
+		done();
 	}
 
 	/**
@@ -45,10 +45,10 @@ class AsyncStorage {
 	/**
 	  * Adds [value] to the registry under the name [key]
 	  */
-	public function set(key:String, val:String, done:Callback<Void>):Void {
+	public function set(key:String, val:String, done:VoidCallback):Void {
 		unimp();
 
-		done(null);
+		done();
 	}
 	
 	/**
