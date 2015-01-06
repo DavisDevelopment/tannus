@@ -4,7 +4,9 @@ import tannus.utils.Value;
 import tannus.utils.Path;
 import tannus.Application;
 import tannus.core.Page;
+
 import tannus.dom.Element;
+import tannus.dom.widgets.*;
 
 class Demo extends Application {
 	public function new():Void {

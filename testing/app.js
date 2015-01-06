@@ -268,7 +268,7 @@ var Lambda = function() { };
 $hxClasses["Lambda"] = Lambda;
 Lambda.__name__ = ["Lambda"];
 Lambda.array = function(it) {
-	var a = new Array();
+	var a = [];
 	var $it0 = $iterator(it)();
 	while( $it0.hasNext() ) {
 		var i = $it0.next();
@@ -515,7 +515,7 @@ haxe.io.Bytes = function(length,b) {
 $hxClasses["haxe.io.Bytes"] = haxe.io.Bytes;
 haxe.io.Bytes.__name__ = ["haxe","io","Bytes"];
 haxe.io.Bytes.alloc = function(length) {
-	var a = new Array();
+	var a = [];
 	var _g = 0;
 	while(_g < length) {
 		var i = _g++;
@@ -524,7 +524,7 @@ haxe.io.Bytes.alloc = function(length) {
 	return new haxe.io.Bytes(length,a);
 };
 haxe.io.Bytes.ofString = function(s) {
-	var a = new Array();
+	var a = [];
 	var i = 0;
 	while(i < s.length) {
 		var c = StringTools.fastCodeAt(s,i++);
@@ -645,7 +645,7 @@ haxe.crypto.BaseCode.prototype = {
 		return out;
 	}
 	,initTable: function() {
-		var tbl = new Array();
+		var tbl = [];
 		var _g = 0;
 		while(_g < 256) {
 			var i = _g++;
@@ -725,32 +725,6 @@ haxe.ds.StringMap.prototype = {
 	}
 	,__class__: haxe.ds.StringMap
 };
-haxe.io.BytesBuffer = function() { };
-$hxClasses["haxe.io.BytesBuffer"] = haxe.io.BytesBuffer;
-haxe.io.BytesBuffer.__name__ = ["haxe","io","BytesBuffer"];
-haxe.io.BytesBuffer.prototype = {
-	__class__: haxe.io.BytesBuffer
-};
-haxe.io.Input = function() { };
-$hxClasses["haxe.io.Input"] = haxe.io.Input;
-haxe.io.Input.__name__ = ["haxe","io","Input"];
-haxe.io.BytesInput = function() { };
-$hxClasses["haxe.io.BytesInput"] = haxe.io.BytesInput;
-haxe.io.BytesInput.__name__ = ["haxe","io","BytesInput"];
-haxe.io.BytesInput.__super__ = haxe.io.Input;
-haxe.io.BytesInput.prototype = $extend(haxe.io.Input.prototype,{
-	__class__: haxe.io.BytesInput
-});
-haxe.io.Output = function() { };
-$hxClasses["haxe.io.Output"] = haxe.io.Output;
-haxe.io.Output.__name__ = ["haxe","io","Output"];
-haxe.io.BytesOutput = function() { };
-$hxClasses["haxe.io.BytesOutput"] = haxe.io.BytesOutput;
-haxe.io.BytesOutput.__name__ = ["haxe","io","BytesOutput"];
-haxe.io.BytesOutput.__super__ = haxe.io.Output;
-haxe.io.BytesOutput.prototype = $extend(haxe.io.Output.prototype,{
-	__class__: haxe.io.BytesOutput
-});
 haxe.io.Eof = function() { };
 $hxClasses["haxe.io.Eof"] = haxe.io.Eof;
 haxe.io.Eof.__name__ = ["haxe","io","Eof"];
@@ -971,9 +945,6 @@ js.Boot.__isNativeObj = function(o) {
 js.Boot.__resolveNativeClass = function(name) {
 	if(typeof window != "undefined") return window[name]; else return global[name];
 };
-js.Browser = function() { };
-$hxClasses["js.Browser"] = js.Browser;
-js.Browser.__name__ = ["js","Browser"];
 tannus.core.Page = function(taken_route) {
 	tannus.core.EventDispatcher.call(this);
 	this.route = taken_route;
@@ -1031,142 +1002,64 @@ pages.Home.__name__ = ["pages","Home"];
 pages.Home.__super__ = tannus.core.Page;
 pages.Home.prototype = $extend(tannus.core.Page.prototype,{
 	init: function() {
-		var canvas_el = new js.JQuery("#stage");
-		this.canvas = new tannus.graphics.Canvas(canvas_el.get(0));
-		this.canvas.canvas.width = Math.round(640);
-		this.canvas.canvas.height = Math.round(480);
-		var c = this.canvas.get_c();
-		this.toolMenu();
-	}
-	,toolMenu: function() {
-		var _g = this;
-		this.current_program = this.canvas.startProgram();
-		var linecol_input = new js.JQuery("#line-color-input");
-		var linewidth_input = new js.JQuery("#line-width-input");
-		linewidth_input.val("1");
-		linewidth_input.val();
-		linecol_input.val("black");
-		linecol_input.val();
-		this.current_program.set_lineCap("round");
-		this.current_program.set_lineJoin("bevel");
-		var new_prog = new js.JQuery("#new-program");
-		var run_prog = new js.JQuery("#run-program");
-		run_prog.on("click",function(e) {
-			_g.canvas.clear();
-			_g.current_program.execute();
-		});
-		this.initEvents(linecol_input,linewidth_input);
-	}
-	,initEvents: function(lci,lwi) {
-		var _g = this;
-		var c = this.canvas.get_c();
-		var lastPos = null;
-		var focused = false;
-		this.canvas.on("mousedown",function(e) {
-			focused = true;
-		});
-		this.canvas.on("mouseup",function(e1) {
-			focused = false;
-			lastPos = null;
-		});
-		this.canvas.on("mouseleave",function(e2) {
-			lastPos = null;
-		});
-		this.canvas.on("mousemove",function(e3) {
-			if(focused) {
-				var pos = e3.pos;
-				console.log(e3);
-				if(lastPos != null) {
-					_g.current_program.beginPath();
-					_g.current_program.set_strokeStyle(lci.val());
-					_g.current_program.set_lineWidth(Std.parseFloat(lwi.val()));
-					_g.current_program.moveTo(lastPos.x,lastPos.y);
-					_g.current_program.lineTo(pos.x,pos.y);
-					_g.current_program.stroke();
-					_g.current_program.closePath();
-				}
-				lastPos = pos;
-			}
-		});
+		var dropdown = new tannus.dom.widgets.DropdownButton();
+		var cheeks = dropdown.button("Cheeks");
+		dropdown.appendTo("#wrapper");
+		dropdown.set_text("Magical Menu");
 	}
 	,__class__: pages.Home
 });
-pages.Tests = function() { };
-$hxClasses["pages.Tests"] = pages.Tests;
-pages.Tests.__name__ = ["pages","Tests"];
-pages.Tests.timeDrawOps = function(canvas,reps,opcount) {
-	var program = canvas.startProgram();
-	var r;
-	var _g = 0;
-	while(_g < opcount) {
-		var opn = _g++;
-		r = new tannus.math.Random();
-		var fill;
-		var r1 = r.randint(0,255);
-		var g = r.randint(0,255);
-		var b = r.randint(0,255);
-		fill = [r1,g,b,0];
-		var stroke;
-		var r2 = r.randint(0,255);
-		var g1 = r.randint(0,255);
-		var b1 = r.randint(0,255);
-		stroke = [r2,g1,b1,0];
-		program.beginPath();
-		program.set_fillStyle((fill[3] != 0?"rgba(" + fill[0] + ", " + fill[1] + ", " + fill[2] + ", " + fill[3] + ")":"#" + ((function($this) {
-			var $r;
-			var _g1 = [];
-			{
-				var _g11 = 0;
-				while(_g11 < fill.length) {
-					var x = fill[_g11];
-					++_g11;
-					_g1.push(StringTools.hex(x,2));
-				}
-			}
-			$r = _g1;
-			return $r;
-		}(this))).slice(0,3).join("")) + "");
-		program.set_strokeStyle((fill[3] != 0?"rgba(" + fill[0] + ", " + fill[1] + ", " + fill[2] + ", " + fill[3] + ")":"#" + ((function($this) {
-			var $r;
-			var _g2 = [];
-			{
-				var _g12 = 0;
-				while(_g12 < fill.length) {
-					var x1 = fill[_g12];
-					++_g12;
-					_g2.push(StringTools.hex(x1,2));
-				}
-			}
-			$r = _g2;
-			return $r;
-		}(this))).slice(0,3).join("")) + "");
-		program.op(tannus.graphics.CanvasProgramComponent.SetLineWidth(3));
-		program.canvas.get_c().lineWidth;
-		program.arc(r.randint(0,Math.round(canvas.canvas.width)),r.randint(0,Math.round(canvas.canvas.height)),r.randint(12,30),0,2 * Math.PI,false);
-		program.fill();
-		program.stroke();
-		program.closePath();
+tannus.graphics = {};
+tannus.graphics.SurfaceDrawable = function() { };
+$hxClasses["tannus.graphics.SurfaceDrawable"] = tannus.graphics.SurfaceDrawable;
+tannus.graphics.SurfaceDrawable.__name__ = ["tannus","graphics","SurfaceDrawable"];
+tannus.graphics.SurfaceDrawable.prototype = {
+	__class__: tannus.graphics.SurfaceDrawable
+};
+pages.Rect = function(x,y,width,height) {
+	this.rect = new tannus.geom.Rectangle(x,y,width,height);
+};
+$hxClasses["pages.Rect"] = pages.Rect;
+pages.Rect.__name__ = ["pages","Rect"];
+pages.Rect.__interfaces__ = [tannus.graphics.SurfaceDrawable];
+pages.Rect.prototype = {
+	drawTo: function(surface,x,y) {
+		var c = surface.canvas.get_c();
+		c.save();
+		c.beginPath();
+		c.rect(x,y,this.rect.width,this.rect.height);
+		c.stroke();
+		c.fill();
+		c.closePath();
+		c.restore();
+		console.log("Rectangle Blitted");
 	}
-	var times = new Array();
-	var performOps = function() {
-		canvas.clear();
-		var executionTime = (function() {
-			var start = new Date().getTime();
-			program.execute();
-			var end = new Date().getTime();
-			var took = end - start;
-			return took;
-		})();
-		times.push(executionTime);
-	};
-	var _g3 = 0;
-	while(_g3 < reps) {
-		var rep = _g3++;
-		performOps();
+	,get_x: function() {
+		return this.rect.x;
 	}
-	console.log(times);
-	var avg_time = tannus.math.TMath.average(times);
-	return avg_time;
+	,set_x: function(nx) {
+		return this.rect.x = nx;
+	}
+	,get_y: function() {
+		return this.rect.y;
+	}
+	,set_y: function(ny) {
+		return this.rect.y = ny;
+	}
+	,get_width: function() {
+		return this.rect.width;
+	}
+	,set_width: function(nw) {
+		return this.rect.width = nw;
+	}
+	,get_height: function() {
+		return this.rect.height;
+	}
+	,set_height: function(nh) {
+		return this.rect.height = nh;
+	}
+	,__class__: pages.Rect
+	,__properties__: {set_height:"set_height",get_height:"get_height",set_width:"set_width",get_width:"get_width",set_y:"set_y",get_y:"get_y",set_x:"set_x",get_x:"get_x"}
 };
 tannus.core.Destructible = function() { };
 $hxClasses["tannus.core.Destructible"] = tannus.core.Destructible;
@@ -1506,7 +1399,7 @@ tannus.core.Route.prototype = $extend(tannus.core.EventDispatcher.prototype,{
 	,__class__: tannus.core.Route
 });
 tannus.core.Router = function() {
-	this.routes = new Array();
+	this.routes = [];
 };
 $hxClasses["tannus.core.Router"] = tannus.core.Router;
 tannus.core.Router.__name__ = ["tannus","core","Router"];
@@ -1633,6 +1526,9 @@ tannus.dom._Element.Element_Impl_.toDOMElement = function(this1) {
 tannus.dom._Element.Element_Impl_.toDOMElements = function(this1) {
 	return this1.get();
 };
+tannus.dom._Element.Element_Impl_.select = function(sel) {
+	return new js.JQuery(sel);
+};
 tannus.dom._StyleSet = {};
 tannus.dom._StyleSet.StyleSet_Impl_ = {};
 $hxClasses["tannus.dom._StyleSet.StyleSet_Impl_"] = tannus.dom._StyleSet.StyleSet_Impl_;
@@ -1699,7 +1595,7 @@ tannus.dom.CStyleSet.prototype = {
 				v;
 			}
 		}
-		var pairs = new Array();
+		var pairs = [];
 		var $it0 = ncss.keys();
 		while( $it0.hasNext() ) {
 			var key = $it0.next();
@@ -1714,6 +1610,110 @@ tannus.dom.CStyleSet.prototype = {
 		this1.attr("style");
 	}
 	,__class__: tannus.dom.CStyleSet
+};
+tannus.dom.widgets = {};
+tannus.dom.widgets.DropdownButton = function() {
+	tannus.core.EventDispatcher.call(this);
+	var id = tannus.io.Memory.uniqueIdString("dropdown-");
+	this.el = new js.JQuery("<button></button>");
+	var this1 = this.el;
+	this1.attr("href","#");
+	this1.attr("href");
+	var this2 = this.el;
+	this2.attr("data-dropdown",id);
+	this2.attr("data-dropdown");
+	var this3 = this.el;
+	this3.attr("aria-controls",id);
+	this3.attr("aria-controls");
+	var this4 = this.el;
+	this4.attr("aria-expanded","false");
+	this4.attr("aria-expanded");
+	var this5 = this.el;
+	this5.attr("class","button dropdown");
+	this5.attr("class");
+	this.btnList = new js.JQuery("<ul></ul>");
+	var l = this.btnList;
+	l.attr("id",id);
+	l.attr("id");
+	l.attr("data-dropdown-content","");
+	l.attr("data-dropdown-content");
+	l.attr("class","f-dropdown");
+	l.attr("class");
+	l.attr("role","menu");
+	l.attr("role");
+	l.attr("aria-hidden","true");
+	l.attr("aria-hidden");
+	l.attr("tabindex","-1");
+	l.attr("tabindex");
+};
+$hxClasses["tannus.dom.widgets.DropdownButton"] = tannus.dom.widgets.DropdownButton;
+tannus.dom.widgets.DropdownButton.__name__ = ["tannus","dom","widgets","DropdownButton"];
+tannus.dom.widgets.DropdownButton.__super__ = tannus.core.EventDispatcher;
+tannus.dom.widgets.DropdownButton.prototype = $extend(tannus.core.EventDispatcher.prototype,{
+	item: function(e) {
+		var item = new js.JQuery("<li></li>");
+		item.appendTo(this.btnList.get(0));
+		if(e != null) item.append(e.get(0));
+		return item;
+	}
+	,button: function(text) {
+		var btn = new tannus.dom.widgets.DropdownItem(this);
+		var li = this.item();
+		btn.appendTo(li);
+		btn.set_text(text);
+		return btn;
+	}
+	,appendTo: function(sel) {
+		var parentel = new js.JQuery(sel);
+		parentel.append(this.el.get(0));
+		parentel.append(this.btnList.get(0));
+		var doc;
+		var sel1 = window.document;
+		doc = new js.JQuery(sel1);
+		doc.foundation();
+	}
+	,get_text: function() {
+		var txt = this.el.text();
+		if(txt == null) return ""; else return txt;
+	}
+	,set_text: function(txt) {
+		var t;
+		if(txt != null) t = txt; else t = "";
+		this.el.text(t);
+		return t;
+	}
+	,__class__: tannus.dom.widgets.DropdownButton
+	,__properties__: {set_text:"set_text",get_text:"get_text"}
+});
+tannus.dom.widgets.DropdownItem = function(set) {
+	this.parent = set;
+	this.el = new js.JQuery("<a href=\"#\"></a>");
+	this.id = tannus.io.Memory.uniqueIdString("dropdown-item-");
+	this.init();
+};
+$hxClasses["tannus.dom.widgets.DropdownItem"] = tannus.dom.widgets.DropdownItem;
+tannus.dom.widgets.DropdownItem.__name__ = ["tannus","dom","widgets","DropdownItem"];
+tannus.dom.widgets.DropdownItem.prototype = {
+	init: function() {
+		var this1 = this.el;
+		this1.attr("id",this.id);
+		this1.attr("id");
+	}
+	,appendTo: function(parentel) {
+		parentel.append(this.el.get(0));
+	}
+	,get_text: function() {
+		var txt = this.el.text();
+		if(txt == null) return ""; else return txt;
+	}
+	,set_text: function(nt) {
+		var t;
+		if(nt != null) t = nt; else t = "";
+		this.el.text(t);
+		return t;
+	}
+	,__class__: tannus.dom.widgets.DropdownItem
+	,__properties__: {set_text:"set_text",get_text:"get_text"}
 };
 tannus.events = {};
 tannus.events.Event = function(name,isDefaultPreventable,action) {
@@ -1761,13 +1761,139 @@ tannus.events.MouseEvent.fromJqEvent = function(evt,cancelable) {
 	var bewl = function(x1) {
 		return Std.string(x1) == "true";
 	};
-	return new tannus.events.MouseEvent(Std.string(evt.type),new tannus.geom.Point(num(evt.clientX),num(evt.clientY)),cancelable,bewl(evt.altKey),bewl(evt.shiftKey),bewl(evt.ctrlKey),bewl(evt.metaKey),num(evt.button));
+	return new tannus.events.MouseEvent(Std.string(evt.type),(function($this) {
+		var $r;
+		var x2 = num(evt.clientX);
+		var y = num(evt.clientY);
+		$r = [x2,y,0];
+		return $r;
+	}(this)),cancelable,bewl(evt.altKey),bewl(evt.shiftKey),bewl(evt.ctrlKey),bewl(evt.metaKey),num(evt.button));
 };
 tannus.events.MouseEvent.__super__ = tannus.events.Event;
 tannus.events.MouseEvent.prototype = $extend(tannus.events.Event.prototype,{
 	__class__: tannus.events.MouseEvent
 });
 tannus.geom = {};
+tannus.geom._Angle = {};
+tannus.geom._Angle.Angle_Impl_ = {};
+$hxClasses["tannus.geom._Angle.Angle_Impl_"] = tannus.geom._Angle.Angle_Impl_;
+tannus.geom._Angle.Angle_Impl_.__name__ = ["tannus","geom","_Angle","Angle_Impl_"];
+tannus.geom._Angle.Angle_Impl_.__properties__ = {get_radians:"get_radians",get_degrees:"get_degrees"}
+tannus.geom._Angle.Angle_Impl_._new = function(angl) {
+	return angl;
+};
+tannus.geom._Angle.Angle_Impl_.plus = function(this1,num) {
+	return this1 + num;
+};
+tannus.geom._Angle.Angle_Impl_.get_degrees = function(this1) {
+	return this1;
+};
+tannus.geom._Angle.Angle_Impl_.get_radians = function(this1) {
+	return this1 * 0.0174532925199432955;
+};
+tannus.geom._Angle.Angle_Impl_.fromDegrees = function(fl) {
+	return fl;
+};
+tannus.geom._Angle.Angle_Impl_.fromRadians = function(fl) {
+	return fl * 0.0174532925199432955;
+};
+tannus.geom._BoundRectangle = {};
+tannus.geom._BoundRectangle.BoundRectangle_Impl_ = {};
+$hxClasses["tannus.geom._BoundRectangle.BoundRectangle_Impl_"] = tannus.geom._BoundRectangle.BoundRectangle_Impl_;
+tannus.geom._BoundRectangle.BoundRectangle_Impl_.__name__ = ["tannus","geom","_BoundRectangle","BoundRectangle_Impl_"];
+tannus.geom._BoundRectangle.BoundRectangle_Impl_._new = function(_x,_y,_w,_h) {
+	return new tannus.geom.CBoundRectangle(_x,_y,_w,_h);
+};
+tannus.geom._BoundRectangle.BoundRectangle_Impl_.toRectangle = function(this1) {
+	return new tannus.geom.Rectangle(this1.get_x(),this1.get_y(),this1._w.a(),this1._h.a());
+};
+tannus.geom._BoundRectangle.BoundRectangle_Impl_.toString = function(this1) {
+	return "Rectangle(" + this1.get_x() + ", " + this1.get_y() + ", " + this1._w.a() + ", " + this1._h.a() + ")";
+};
+tannus.geom.CBoundRectangle = function(_x,_y,_w,_h) {
+	this._x = _x;
+	this._y = _y;
+	this._w = _w;
+	this._h = _h;
+};
+$hxClasses["tannus.geom.CBoundRectangle"] = tannus.geom.CBoundRectangle;
+tannus.geom.CBoundRectangle.__name__ = ["tannus","geom","CBoundRectangle"];
+tannus.geom.CBoundRectangle.prototype = {
+	get_x: function() {
+		if(this._x != null) {
+			var this1;
+			var this2 = this._x;
+			var safe = true;
+			if(safe == null) safe = true;
+			if(safe && this2 == null) throw "Cannot extract from null";
+			this1 = this2;
+			return this1.a();
+		} else return 0;
+	}
+	,set_x: function(nx) {
+		if(this._x != null) {
+			var this1;
+			var this2 = this._x;
+			var safe = true;
+			if(safe == null) safe = true;
+			if(safe && this2 == null) throw "Cannot extract from null";
+			this1 = this2;
+			this1.b(nx);
+			var this3;
+			var this4 = this._x;
+			var safe1 = true;
+			if(safe1 == null) safe1 = true;
+			if(safe1 && this4 == null) throw "Cannot extract from null";
+			this3 = this4;
+			return this3.a();
+		} else return 0;
+	}
+	,get_y: function() {
+		if(this._y != null) {
+			var this1;
+			var this2 = this._y;
+			var safe = true;
+			if(safe == null) safe = true;
+			if(safe && this2 == null) throw "Cannot extract from null";
+			this1 = this2;
+			return this1.a();
+		} else return 0;
+	}
+	,set_y: function(ny) {
+		if(this._y != null) {
+			var this1;
+			var this2 = this._y;
+			var safe = true;
+			if(safe == null) safe = true;
+			if(safe && this2 == null) throw "Cannot extract from null";
+			this1 = this2;
+			this1.b(ny);
+			var this3;
+			var this4 = this._y;
+			var safe1 = true;
+			if(safe1 == null) safe1 = true;
+			if(safe1 && this4 == null) throw "Cannot extract from null";
+			this3 = this4;
+			return this3.a();
+		} else return 0;
+	}
+	,get_width: function() {
+		return this._w.a();
+	}
+	,set_width: function(nw) {
+		this._w.b(nw);
+		return this._w.a();
+	}
+	,get_height: function() {
+		return this._h.a();
+	}
+	,set_height: function(nh) {
+		this._h.b(nh);
+		return this._h.a();
+	}
+	,__class__: tannus.geom.CBoundRectangle
+	,__properties__: {set_height:"set_height",get_height:"get_height",set_width:"set_width",get_width:"get_width",set_y:"set_y",get_y:"get_y",set_x:"set_x",get_x:"get_x"}
+};
 tannus.geom.Line = $hx_exports.tannus.geom.Line = function(start,end) {
 	this.start = start;
 	this.end = end;
@@ -1776,41 +1902,186 @@ $hxClasses["tannus.geom.Line"] = tannus.geom.Line;
 tannus.geom.Line.__name__ = ["tannus","geom","Line"];
 tannus.geom.Line.prototype = {
 	rect: function() {
-		var x = Math.min(this.start.x,this.end.x);
-		var y = Math.min(this.start.y,this.end.y);
-		var width = Math.max(this.start.x,this.end.x) - x;
-		var height = Math.max(this.start.y,this.end.y) - y;
+		var x = Math.min(this.start[0],this.end[0]);
+		var y = Math.min(this.start[1],this.end[1]);
+		var width = Math.max(this.start[0],this.end[0]) - x;
+		var height = Math.max(this.start[1],this.end[1]) - y;
 		return new tannus.geom.Rectangle(x,y,width,height);
 	}
 	,__class__: tannus.geom.Line
 };
-tannus.geom.Point = $hx_exports.tannus.geom.Point = function(x,y,z) {
+tannus.geom.Path = function() {
+	this.nodes = [];
+};
+$hxClasses["tannus.geom.Path"] = tannus.geom.Path;
+tannus.geom.Path.__name__ = ["tannus","geom","Path"];
+tannus.geom.Path.prototype = {
+	iterator: function() {
+		return HxOverrides.iter(this.nodes);
+	}
+	,node: function(nod) {
+		this.nodes.push(nod);
+	}
+	,stop: function() {
+		this.nodes.push(tannus.geom.PathNode.PStop);
+	}
+	,line: function(sx,sy,ex,ey) {
+		this.node(tannus.geom.PathNode.PLine([sx,sy,0],[ex,ey,0]));
+	}
+	,rect: function(x,y,width,height) {
+		this.node(tannus.geom.PathNode.PRectangle(x,y,width,height));
+	}
+	,arc: function(x,y,radius,start,end) {
+		this.node(tannus.geom.PathNode.PArc(x,y,radius,start,end));
+	}
+	,quadraticCurve: function(ctrl,end) {
+		console.log("Quadratic Curves not yet implemented!");
+	}
+	,triangle: function(one,two,three) {
+		var substack = new tannus.geom.Path();
+		substack.line(one[0],one[1],two[0],two[1]);
+		substack.line(two[0],two[1],three[0],three[1]);
+		substack.line(three[0],three[1],one[0],one[1]);
+		var nodeset = substack.nodes;
+		this.node(tannus.geom.PathNode.PSubPath(nodeset));
+	}
+	,__class__: tannus.geom.Path
+};
+tannus.geom.PathNode = { __ename__ : ["tannus","geom","PathNode"], __constructs__ : ["PLine","PRectangle","PArc","PSubPath","PStop"] };
+tannus.geom.PathNode.PLine = function(start,end) { var $x = ["PLine",0,start,end]; $x.__enum__ = tannus.geom.PathNode; $x.toString = $estr; return $x; };
+tannus.geom.PathNode.PRectangle = function(x,y,width,height) { var $x = ["PRectangle",1,x,y,width,height]; $x.__enum__ = tannus.geom.PathNode; $x.toString = $estr; return $x; };
+tannus.geom.PathNode.PArc = function(x,y,radius,start,end) { var $x = ["PArc",2,x,y,radius,start,end]; $x.__enum__ = tannus.geom.PathNode; $x.toString = $estr; return $x; };
+tannus.geom.PathNode.PSubPath = function(nodes) { var $x = ["PSubPath",3,nodes]; $x.__enum__ = tannus.geom.PathNode; $x.toString = $estr; return $x; };
+tannus.geom.PathNode.PStop = ["PStop",4];
+tannus.geom.PathNode.PStop.toString = $estr;
+tannus.geom.PathNode.PStop.__enum__ = tannus.geom.PathNode;
+tannus.geom._Point = {};
+tannus.geom._Point.Point_Impl_ = {};
+$hxClasses["tannus.geom._Point.Point_Impl_"] = tannus.geom._Point.Point_Impl_;
+tannus.geom._Point.Point_Impl_.__name__ = ["tannus","geom","_Point","Point_Impl_"];
+tannus.geom._Point.Point_Impl_.__properties__ = {set_z:"set_z",get_z:"get_z",set_y:"set_y",get_y:"get_y",set_x:"set_x",get_x:"get_x",get_magnitude:"get_magnitude",set_nums:"set_nums",get_nums:"get_nums",get_self:"get_self"}
+tannus.geom._Point.Point_Impl_._new = function(x,y,z) {
 	if(z == null) z = 0;
 	if(y == null) y = 0;
 	if(x == null) x = 0;
-	this.x = x;
-	this.y = y;
-	this.z = z;
+	return [x,y,z];
 };
-$hxClasses["tannus.geom.Point"] = tannus.geom.Point;
-tannus.geom.Point.__name__ = ["tannus","geom","Point"];
-tannus.geom.Point.prototype = {
-	clone: function() {
-		return new tannus.geom.Point(this.x,this.y,this.z);
+tannus.geom._Point.Point_Impl_.clone = function(this1) {
+	return [this1[0],this1[1],this1[2]];
+};
+tannus.geom._Point.Point_Impl_.apply = function(this1,other,f) {
+	var _g = [];
+	var _g1 = 0;
+	while(_g1 < 3) {
+		var i = _g1++;
+		_g.push(f(this1[i],other[i]));
 	}
-	,equals: function(other) {
-		return this.x == other.x && this.y == other.y && this.z == other.z;
+	return _g;
+};
+tannus.geom._Point.Point_Impl_.checkAll = function(this1,other,f) {
+	var _g = 0;
+	while(_g < 3) {
+		var i = _g++;
+		var one = this1[i];
+		var two = other[i];
+		if(!f(one,two)) return false;
 	}
-	,relativeTo: function(other) {
-		return new tannus.geom.Point(other.x - this.x,other.y - this.y,other.z - this.z);
+	return true;
+};
+tannus.geom._Point.Point_Impl_.sum = function(this1,other) {
+	var _g = [];
+	var _g1 = 0;
+	while(_g1 < 3) {
+		var i = _g1++;
+		_g.push(this1[i] + other[i]);
 	}
-	,offsetFactorOf: function(rect) {
-		return rect.relateTo(this);
+	return _g;
+};
+tannus.geom._Point.Point_Impl_.dif = function(this1,other) {
+	var _g = [];
+	var _g1 = 0;
+	while(_g1 < 3) {
+		var i = _g1++;
+		_g.push(this1[i] - other[i]);
 	}
-	,toString: function() {
-		return "Point(" + this.x + ", " + this.y + ", " + this.z + ")";
+	return _g;
+};
+tannus.geom._Point.Point_Impl_.product = function(this1,other) {
+	var _g = [];
+	var _g1 = 0;
+	while(_g1 < 3) {
+		var i = _g1++;
+		_g.push(this1[i] * other[i]);
 	}
-	,__class__: tannus.geom.Point
+	return _g;
+};
+tannus.geom._Point.Point_Impl_.quotient = function(this1,other) {
+	var _g = [];
+	var _g1 = 0;
+	while(_g1 < 3) {
+		var i = _g1++;
+		_g.push(this1[i] / other[i]);
+	}
+	return _g;
+};
+tannus.geom._Point.Point_Impl_.equals = function(this1,other) {
+	return tannus.geom._Point.Point_Impl_.checkAll(this1,other,function(a,b) {
+		return a == b;
+	});
+};
+tannus.geom._Point.Point_Impl_.nequals = function(this1,other) {
+	return tannus.geom._Point.Point_Impl_.checkAll(this1,other,function(a,b) {
+		return a != b;
+	});
+};
+tannus.geom._Point.Point_Impl_.greaterThan = function(this1,other) {
+	return (function($this) {
+		var $r;
+		var this2 = this1;
+		$r = Math.sqrt(this2[0] * this2[0] + this2[1] * this2[1]);
+		return $r;
+	}(this)) > Math.sqrt(other[0] * other[0] + other[1] * other[1]);
+};
+tannus.geom._Point.Point_Impl_.lessThan = function(this1,other) {
+	return (function($this) {
+		var $r;
+		var this2 = this1;
+		$r = Math.sqrt(this2[0] * this2[0] + this2[1] * this2[1]);
+		return $r;
+	}(this)) < Math.sqrt(other[0] * other[0] + other[1] * other[1]);
+};
+tannus.geom._Point.Point_Impl_.get_self = function(this1) {
+	return this1;
+};
+tannus.geom._Point.Point_Impl_.get_nums = function(this1) {
+	return this1;
+};
+tannus.geom._Point.Point_Impl_.set_nums = function(this1,nms) {
+	this1[0] = nms[0];
+	this1[1] = nms[1];
+	this1[2] = nms[2];
+	return this1;
+};
+tannus.geom._Point.Point_Impl_.get_magnitude = function(this1) {
+	return Math.sqrt(this1[0] * this1[0] + this1[1] * this1[1]);
+};
+tannus.geom._Point.Point_Impl_.get_x = function(this1) {
+	return this1[0];
+};
+tannus.geom._Point.Point_Impl_.set_x = function(this1,nx) {
+	return this1[0] = nx;
+};
+tannus.geom._Point.Point_Impl_.get_y = function(this1) {
+	return this1[1];
+};
+tannus.geom._Point.Point_Impl_.set_y = function(this1,ny) {
+	return this1[1] = ny;
+};
+tannus.geom._Point.Point_Impl_.get_z = function(this1) {
+	return this1[2];
+};
+tannus.geom._Point.Point_Impl_.set_z = function(this1,nz) {
+	return this1[2] = nz;
 };
 tannus.geom.Rectangle = $hx_exports.tannus.geom.Rectangle = function(x,y,width,height) {
 	if(height == null) height = 0;
@@ -1838,30 +2109,30 @@ tannus.geom.Rectangle.prototype = {
 		return this.x == other.x && this.y == other.y && this.width == other.width && this.height == other.height;
 	}
 	,corners: function() {
-		var points = new Array();
-		points.push(new tannus.geom.Point(this.x,this.y));
-		points.push(new tannus.geom.Point(this.x + this.width,this.y));
-		points.push(new tannus.geom.Point(this.x + this.width,this.y + this.height));
-		points.push(new tannus.geom.Point(this.x,this.y + this.height));
+		var points = [];
+		points.push([this.x,this.y,0]);
+		points.push([this.x + this.width,this.y,0]);
+		points.push([this.x + this.width,this.y + this.height,0]);
+		points.push([this.x,this.y + this.height,0]);
 		return points;
 	}
 	,topLeft: function() {
-		return new tannus.geom.Point(this.x,this.y);
+		return [this.x,this.y,0];
 	}
 	,topRight: function() {
-		return new tannus.geom.Point(this.x + this.width,this.y);
+		return [this.x + this.width,this.y,0];
 	}
 	,bottomLeft: function() {
-		return new tannus.geom.Point(this.x,this.y + this.height);
+		return [this.x,this.y + this.height,0];
 	}
 	,bottomRight: function() {
-		return new tannus.geom.Point(this.x + this.width,this.y + this.height);
+		return [this.x + this.width,this.y + this.height,0];
 	}
 	,contains: function(cx,cy) {
 		return cx > this.x && cx < this.x + this.width && (cy > this.y && cy < this.y + this.height);
 	}
 	,containsPoint: function(point) {
-		return this.contains(point.x,point.y);
+		return this.contains(point[0],point[1]);
 	}
 	,containsRect: function(rect) {
 		var pts = this.corners();
@@ -1887,11 +2158,11 @@ tannus.geom.Rectangle.prototype = {
 		return new tannus.geom.Rectangle(this.x / other.width,this.y / other.height,this.width / other.width,this.height / other.height);
 	}
 	,relateTo: function(pt) {
-		var rx = pt.x;
-		var ry = pt.y;
+		var rx = pt[0];
+		var ry = pt[1];
 		rx = rx / this.width;
 		ry = ry / this.height;
-		return new tannus.geom.Point(rx,ry);
+		return [rx,ry,0];
 	}
 	,isEmpty: function() {
 		return this.x == 0 && this.y == 0 && this.width == 0 && this.height == 0;
@@ -1904,7 +2175,6 @@ tannus.geom.Rectangle.prototype = {
 	}
 	,__class__: tannus.geom.Rectangle
 };
-tannus.graphics = {};
 tannus.graphics.Canvas = function(c) {
 	tannus.core.EventDispatcher.call(this);
 	var alternate = window.document.createElement("canvas");
@@ -1994,7 +2264,7 @@ tannus.graphics.Canvas.prototype = $extend(tannus.core.EventDispatcher.prototype
 	}
 	,getMousePosition: function(e) {
 		var rect = this.canvas.getBoundingClientRect();
-		return new tannus.geom.Point(e.clientX - rect.left,e.clientY - rect.top);
+		return [e.clientX - rect.left,e.clientY - rect.top,0];
 	}
 	,__class__: tannus.graphics.Canvas
 	,__properties__: {set_height:"set_height",get_height:"get_height",set_width:"set_width",get_width:"get_width",get_style:"get_style",get_c:"get_c"}
@@ -2015,7 +2285,7 @@ tannus.graphics._CanvasContext.CanvasContext_Impl_.circle = function(this1,x,y,r
 };
 tannus.graphics.CanvasProgram = function(c) {
 	this.canvas = c;
-	this.ops = new Array();
+	this.ops = [];
 };
 $hxClasses["tannus.graphics.CanvasProgram"] = tannus.graphics.CanvasProgram;
 tannus.graphics.CanvasProgram.__name__ = ["tannus","graphics","CanvasProgram"];
@@ -2351,6 +2621,142 @@ tannus.graphics.LineJoin.Bevel.__enum__ = tannus.graphics.LineJoin;
 tannus.graphics.LineJoin.Miter = ["Miter",2];
 tannus.graphics.LineJoin.Miter.toString = $estr;
 tannus.graphics.LineJoin.Miter.__enum__ = tannus.graphics.LineJoin;
+tannus.graphics.Surface = function(can) {
+	var _g = this;
+	var alternate = new tannus.graphics.Canvas();
+	if(can == null) this.canvas = alternate; else this.canvas = can;
+	this._area = new tannus.geom.CBoundRectangle(null,null,{ a : function() {
+		return _g.canvas.canvas.width;
+	}, b : function(value) {
+		_g.canvas.canvas.width = Math.round(value);
+	}},{ a : function() {
+		return _g.canvas.canvas.height;
+	}, b : function(value1) {
+		_g.canvas.canvas.height = Math.round(value1);
+	}});
+};
+$hxClasses["tannus.graphics.Surface"] = tannus.graphics.Surface;
+tannus.graphics.Surface.__name__ = ["tannus","graphics","Surface"];
+tannus.graphics.Surface.create = function(sel) {
+	var el = new js.JQuery(sel);
+	var canvas = new tannus.graphics.Canvas(el.get(0));
+	return new tannus.graphics.Surface(canvas);
+};
+tannus.graphics.Surface.prototype = {
+	get_context: function() {
+		return this.canvas.get_c();
+	}
+	,resize: function(nw,nh) {
+		this.canvas.canvas.width = Math.round(nw);
+		this.canvas.canvas.height = Math.round(nh);
+	}
+	,blit: function(ent,x,y) {
+		ent.drawTo(this,x,y);
+	}
+	,drawPath: function(path,options) {
+		var c = this.canvas.get_c();
+		c.save();
+		c.beginPath();
+		c.beginPath();
+		if(options != null) {
+			var this1;
+			this1 = ((function($this) {
+				var $r;
+				var this2 = options;
+				var safe = true;
+				if(safe == null) safe = true;
+				if(safe && this2 == null) throw "Cannot extract from null";
+				$r = this2;
+				return $r;
+			}(this))).onStart;
+			if(this1 != null) (function(onstart) {
+				onstart(c);
+			})((function($this) {
+				var $r;
+				var this3 = this1;
+				var safe1 = true;
+				if(safe1 == null) safe1 = true;
+				if(safe1 && this3 == null) throw "Cannot extract from null";
+				$r = this3;
+				return $r;
+			}(this))); else null;
+		}
+		var $it0 = path.iterator();
+		while( $it0.hasNext() ) {
+			var node = $it0.next();
+			switch(node[1]) {
+			case 4:
+				c.closePath();
+				c.beginPath();
+				break;
+			case 0:
+				var end = node[3];
+				var start = node[2];
+				c.moveTo(start[0],start[1]);
+				c.lineTo(end[0],end[1]);
+				break;
+			case 2:
+				var end1 = node[6];
+				var start1 = node[5];
+				var radius = node[4];
+				var y = node[3];
+				var x = node[2];
+				c.arc(x,y,radius,start1 * 0.0174532925199432955,end1 * 0.0174532925199432955,false);
+				break;
+			default:
+				console.log(node);
+			}
+		}
+		if(options != null) {
+			var this4;
+			this4 = ((function($this) {
+				var $r;
+				var this5 = options;
+				var safe2 = true;
+				if(safe2 == null) safe2 = true;
+				if(safe2 && this5 == null) throw "Cannot extract from null";
+				$r = this5;
+				return $r;
+			}(this))).onComplete;
+			if(this4 != null) (function(oncomplete) {
+				oncomplete(c);
+			})((function($this) {
+				var $r;
+				var this6 = this4;
+				var safe3 = true;
+				if(safe3 == null) safe3 = true;
+				if(safe3 && this6 == null) throw "Cannot extract from null";
+				$r = this6;
+				return $r;
+			}(this))); else null;
+		}
+		c.closePath();
+		c.closePath();
+		c.restore();
+	}
+	,get_width: function() {
+		return this.canvas.canvas.width;
+	}
+	,set_width: function(nw) {
+		return this.canvas.canvas.width = Math.round(nw);
+	}
+	,get_height: function() {
+		return this.canvas.canvas.height;
+	}
+	,set_height: function(nh) {
+		return this.canvas.canvas.height = Math.round(nh);
+	}
+	,get_rect: function() {
+		return this._area;
+	}
+	,set_rect: function(nr) {
+		this._area.set_width(nr._w.a());
+		this._area.set_height(nr._h.a());
+		return this._area;
+	}
+	,__class__: tannus.graphics.Surface
+	,__properties__: {set_rect:"set_rect",get_rect:"get_rect",set_height:"set_height",get_height:"get_height",set_width:"set_width",get_width:"get_width",get_context:"get_context"}
+};
 tannus.io = {};
 tannus.io._Byte = {};
 tannus.io._Byte.Byte_Impl_ = {};
@@ -2492,7 +2898,7 @@ tannus.io._ByteArray.ByteArray_Impl_.toString = function(this1) {
 	}).join("");
 };
 tannus.io._ByteArray.ByteArray_Impl_.fromIntArray = function(ia) {
-	var ba = new Array();
+	var ba = [];
 	var _g = 0;
 	while(_g < ia.length) {
 		var x = ia[_g];
@@ -2502,7 +2908,7 @@ tannus.io._ByteArray.ByteArray_Impl_.fromIntArray = function(ia) {
 	return ba;
 };
 tannus.io._ByteArray.ByteArray_Impl_.fromCharArray = function(ca) {
-	var ba = new Array();
+	var ba = [];
 	var _g = 0;
 	while(_g < ca.length) {
 		var x = ca[_g];
@@ -2517,7 +2923,7 @@ tannus.io._ByteArray.ByteArray_Impl_.fromCharArray = function(ca) {
 	return ba;
 };
 tannus.io._ByteArray.ByteArray_Impl_.fromString = function(str) {
-	var ba = new Array();
+	var ba = [];
 	var sa = str.split("");
 	var _g = 0;
 	while(_g < sa.length) {
@@ -2837,7 +3243,7 @@ tannus.math.Random.__name__ = ["tannus","math","Random"];
 tannus.math.Random.stringSeed = function(seed) {
 	var state = 0;
 	var ba;
-	var ba1 = new Array();
+	var ba1 = [];
 	var sa = seed.split("");
 	var _g = 0;
 	while(_g < sa.length) {
@@ -2880,7 +3286,7 @@ tannus.math.Random.prototype = {
 	}
 	,shuffle: function(set) {
 		var copy = set.slice();
-		var result = new Array();
+		var result = [];
 		while(copy.length != 1) {
 			var el = this.choice(copy);
 			HxOverrides.remove(copy,el);
@@ -2942,7 +3348,7 @@ tannus.math.TMath.sign = function(value) {
 tannus.ore = {};
 tannus.ore.Compiler = function(opList) {
 	this.ops = opList;
-	this.testStack = new Array();
+	this.testStack = [];
 	this.helperFunctions = new haxe.ds.StringMap();
 	this.opFunctions = tannus.ore.Compiler.OpFunctions;
 	this.boolOperators = new haxe.ds.StringMap();
@@ -3180,7 +3586,7 @@ tannus.ore.Compiler.prototype = {
 		}
 	}
 	,compile: function() {
-		var conditionStack = new Array();
+		var conditionStack = [];
 		var op = this.next();
 		while(op != null) {
 			var test = this.compileOp(op);
@@ -3313,7 +3719,7 @@ tannus.ore.Lexer.prototype = {
 					};
 				})(groupString))();
 				if(HxOverrides.indexOf(group,tannus.ore.Token.TComma,0) != -1) {
-					var items = new Array();
+					var items = [];
 					var _g = 0;
 					while(_g < group.length) {
 						var tk = group[_g];
@@ -3382,7 +3788,7 @@ tannus.ore.ObjectRegEx.registerHelper = function(name,helper) {
 };
 tannus.ore.Parser = function(tokens) {
 	this.input = tokens;
-	this.ops = new Array();
+	this.ops = [];
 };
 $hxClasses["tannus.ore.Parser"] = tannus.ore.Parser;
 tannus.ore.Parser.__name__ = ["tannus","ore","Parser"];
@@ -3400,7 +3806,7 @@ tannus.ore.Parser.prototype = {
 		throw "SelectorParseError: Unexpected token " + Std.string(tk) + ".";
 	}
 	,parseTuple: function(items) {
-		var values = new Array();
+		var values = [];
 		var _g = 0;
 		while(_g < items.length) {
 			var tk = items[_g];
@@ -4252,7 +4658,7 @@ tannus.utils._Buffer.Buffer_Impl_.addInt = function(this1,other) {
 tannus.utils._Buffer.Buffer_Impl_.split = function(this1,delimiter) {
 	var index = 0;
 	var buf = this1;
-	var buffers = new Array();
+	var buffers = [];
 	var chunk;
 	var bytes = haxe.io.Bytes.alloc(0);
 	chunk = bytes;
@@ -4299,7 +4705,7 @@ tannus.utils._Buffer.Buffer_Impl_.split = function(this1,delimiter) {
 tannus.utils._Buffer.Buffer_Impl_.divide = function(this1,by) {
 	var index = 0;
 	var buf = this1;
-	var buffers = new Array();
+	var buffers = [];
 	while(index < buf.length) {
 		var piece;
 		var bytes = haxe.io.Bytes.alloc(by);
@@ -4326,7 +4732,7 @@ tannus.utils._Buffer.Buffer_Impl_.divide = function(this1,by) {
 tannus.utils._Buffer.Buffer_Impl_.repeat = function(this1,times) {
 	var int_list;
 	var this2 = this1;
-	var set = new Array();
+	var set = [];
 	var i = 0;
 	while(i < this2.length) {
 		set.push(this2.b[i]);
@@ -4414,7 +4820,7 @@ tannus.utils._Buffer.Buffer_Impl_.toString = function(this1) {
 	return this1.toString();
 };
 tannus.utils._Buffer.Buffer_Impl_.toArray = function(this1) {
-	var set = new Array();
+	var set = [];
 	var i = 0;
 	while(i < this1.length) {
 		set.push(this1.b[i]);
@@ -4426,7 +4832,7 @@ tannus.utils._Buffer.Buffer_Impl_.toInt32Array = function(this1) {
 	return new Int32Array((function($this) {
 		var $r;
 		var this2 = this1;
-		var set = new Array();
+		var set = [];
 		var i = 0;
 		while(i < this2.length) {
 			set.push(this2.b[i]);
@@ -4440,7 +4846,7 @@ tannus.utils._Buffer.Buffer_Impl_.toInt8Array = function(this1) {
 	return new Int8Array((function($this) {
 		var $r;
 		var this2 = this1;
-		var set = new Array();
+		var set = [];
 		var i = 0;
 		while(i < this2.length) {
 			set.push(this2.b[i]);
@@ -4617,6 +5023,17 @@ tannus.utils._Maybe.Maybe_Impl_.extract = function(this1,safe) {
 	if(safe && this1 == null) throw "Cannot extract from null";
 	return this1;
 };
+tannus.utils._Maybe.Maybe_Impl_.then = function(this1,callback) {
+	if(this1 != null) return callback((function($this) {
+		var $r;
+		var this2 = this1;
+		var safe = true;
+		if(safe == null) safe = true;
+		if(safe && this2 == null) throw "Cannot extract from null";
+		$r = this2;
+		return $r;
+	}(this))); else return null;
+};
 tannus.utils._Maybe.Maybe_Impl_.or = function(this1,alternate) {
 	if(this1 == null) return alternate; else return this1;
 };
@@ -4701,7 +5118,7 @@ tannus.utils.PathTools.parent = function(path) {
 tannus.utils.PathTools.ancestry = function(path) {
 	var pieces = tannus.utils.PathTools.split(path);
 	pieces.pop();
-	var results = new Array();
+	var results = [];
 	while(pieces.length > 0) {
 		results.push(tannus.utils.PathTools.join_split(pieces));
 		pieces.pop();
@@ -5157,8 +5574,6 @@ String.prototype.__class__ = $hxClasses.String = String;
 String.__name__ = ["String"];
 $hxClasses.Array = Array;
 Array.__name__ = ["Array"];
-Date.prototype.__class__ = $hxClasses.Date = Date;
-Date.__name__ = ["Date"];
 var Int = $hxClasses.Int = { __name__ : ["Int"]};
 var Dynamic = $hxClasses.Dynamic = { __name__ : ["Dynamic"]};
 var Float = $hxClasses.Float = Number;
