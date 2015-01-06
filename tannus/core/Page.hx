@@ -61,16 +61,16 @@ class Page extends EventDispatcher {
 		/**
 		  * Register an event-handler to [Window.onhashchange]
 		  */
-		var win:Object = new Object(js.Browser.window);
+		var win = js.Browser.window;
 
-		win['onhashchange'] = function():Void {
+		win.onhashchange = function(e : Dynamic):Void {
 			emit('hashchange', hash);
 		};
 
 		/**
 		  * List to the Window's "beforeunload" event
 		  */
-		win['onbeforeunload'] = function(e : Dynamic):Void {
+		win.onbeforeunload = function(e : Dynamic):Void {
 			emit('unload', e);
 		};
 
@@ -78,12 +78,12 @@ class Page extends EventDispatcher {
 		  * Listen to network-connectivity-status-change events
 		  */
 
-		win['onoffline'] = function(e : Dynamic):Void {
+		win.onoffline = function(e : Dynamic):Void {
 			emit('offline', this);
 			trace( e );
 		};
 
-		win['ononline'] = function(e : Dynamic):Void {
+		win.ononline = function(e : Dynamic):Void {
 			emit('online', this);
 			trace( e );
 		};
