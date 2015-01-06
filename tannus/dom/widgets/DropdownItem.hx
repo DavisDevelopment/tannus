@@ -60,4 +60,12 @@ class DropdownItem {
 	private inline function set_text(nt : String):String {
 		return (el.text = nt);
 	}
+
+	public var href(get, set):String;
+	private inline function get_href():String {
+		return (el[ 'href' ]);
+	}
+	private inline function set_href(nh : String):String {
+		return (el[ 'href' ] = nh);
+	}
 }

@@ -82,6 +82,19 @@ class DropdownButton extends EventDispatcher {
 		return btn;
 	}
 
+	
+	/**
+	  * Add a "link" to [this] Dropdown
+	  */
+	public function link(text:String, address:String):DropdownItem {
+		var lnk:DropdownItem = new DropdownItem( this );
+		var li = item();
+		lnk.appendTo( li );
+		lnk.text = text;
+		lnk.href = address;
+
+		return lnk;
+	}
 
 
 	/**
@@ -97,6 +110,24 @@ class DropdownButton extends EventDispatcher {
 
 		untyped {
 			doc.foundation();
+		}
+	}
+	
+	/**
+	  * If [className] is not already applied to [this] element, apply it
+	  */
+	public function activate(className : String):Void {
+		if (!el.is('.$className')) {
+			el.addClass( className );
+		}
+	}
+
+	/**
+	  * If [className] is applied to [this] element, remove it
+	  */
+	public function deactivate(className : String):Void {
+		if (el.is('.$className')) {
+			el.removeClass( className );
 		}
 	}
 
@@ -115,5 +146,69 @@ class DropdownButton extends EventDispatcher {
 	}
 	private inline function set_text(txt : String):String {
 		return (el.text = txt);
+	}
+
+
+	/**
+	  * The "size" of [this] Dropdown
+	  */
+	public var size(get, set):String;
+	private inline function get_size():String {
+		if (el.is('.tiny')) {
+			return 'tiny';
+		}
+		else if (el.is('.small')) {
+			return 'small';
+		}
+		else if (el.is('.large')) {
+			return 'large';
+		}
+		else if (el.is('.expand')) {
+			return 'expanded';
+		}
+		else {
+			return 'standard';
+		}
+	}
+	private inline function set_size(siz : String):String {
+		siz = siz.toLowerCase();
+		
+		switch (siz) {
+			case 'tiny': activate( 'tiny' );
+
+			case 'small': activate( 'small' );
+
+			case 'large': activate( 'large' );
+
+			case 'expanded': activate( 'expand' );
+
+			case 'standard': null;
+		}
+
+		return size;
+	}
+
+	/**
+	  * Whether [this] Dropdown is rounded
+	  */
+	public var rounded(get, set):Bool;
+	private inline function get_rounded():Bool {
+		return (el.is('.round'));
+	}
+	private inline function set_rounded(round : Bool):Bool {
+		(round ? activate : deactivate)( 'round' );
+		return round;
+	}
+
+	/**
+	  * Whether [this] Dropdown has radius'd corners
+	  */
+	public var radius(get, set):Bool;
+	private inline function get_radius():Bool {
+		return (el.is('.radius'));
+	}
+	private inline function set_radius(r : Bool):Bool {
+		(r ? activate : deactivate)( 'radius' );
+		return r;
 	}
 }
