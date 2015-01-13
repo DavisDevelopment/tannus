@@ -9,12 +9,12 @@ import tannus.dom.Element;
 class GeneratedPage extends Page implements Destructible implements Destructible {
 
 	//- The "root" element of [this] Page
-	public var root : Element;
+	public var base : Element;
 
 	public function new(route : Route):Void {
 		super( route );
 
-		this.root = body;
+		this.base = body;
 	}
 
 /*
@@ -72,7 +72,7 @@ class GeneratedPage extends Page implements Destructible implements Destructible
  === Class Methods ===
 */
 
-	public static inline function q(sel : Dynamic):Element {
+	public inline function q(sel : Dynamic):Element {
 		return (new Element( sel ));
 	}
 }
