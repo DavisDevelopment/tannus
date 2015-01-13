@@ -273,6 +273,20 @@ class BaseWidget extends EventDispatcher implements Destructible implements Upda
 		}
 	}
 
+	/**
+	  * Retrieves the current offset of [this] Widget as a Point
+	  */
+	public var pos(get, never):tannus.geom.Point;
+	private function get_pos():tannus.geom.Point {
+		var offs = el.offset();
+		var z = Std.parseInt(css['z-index']);
+		if (Math.isNaN(z)) {
+			z = 0;
+		}
+
+		return new tannus.geom.Point(offs.left, offs.top, z);
+	}
+
 
 	/**
 	  * Re-Initialize the Foundation Library
