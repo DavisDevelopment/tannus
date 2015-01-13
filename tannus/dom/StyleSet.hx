@@ -2,8 +2,91 @@ package tannus.dom;
 
 import js.html.CSSStyleDeclaration;
 import tannus.utils.Value;
+import tannus.io.Ptr;
 import tannus.utils.Maybe;
 import tannus.dom.Element;
+
+
+abstract StyleSet (Element) {
+	public inline function new(e : Element):Void {
+		this = e;
+	}
+	
+
+	/**
+	  * Internal Reference to [this] as a StyleSet object
+	  */
+	private var self(get, never):StyleSet;
+	private inline function get_self():StyleSet {
+		return (new StyleSet( this ));
+	}
+
+	/**
+	  * ArrayReading Accessor - usages:
+	  * - `this.get('color');`
+	  * -===============================
+	  * - `this['color'];`
+	  */
+	@:arrayAccess
+	public inline function get(key : String):Null<String> {
+		return (this.cs( key ));
+	}
+	
+	/**
+	  * ArrayWriting Acessor - usages:
+	  * - `this.set('color', 'red');`
+	  * -============================
+	  * - `this['color'] = 'red';`
+	  */
+	@:arrayAccess
+	public inline function set(key:String, value:String):Void {
+		this.cs(key, value);
+	}
+
+
+/*
+ === "Instance" Methods ===
+*/
+
+	/*
+	 * Returns a [Ptr] reference to the given css-style
+	 */
+	public function reference(key : String):Ptr<String> {
+		//- create 'Pointer' object
+		var ref:Ptr<String> = Ptr.create( self[key] );
+
+		//- do stuff to it
+		null;
+
+		return ref;
+	}
+	
+	
+	/**
+	  * Object-Write Operator | Increment by HashMap
+	  */
+	@:op(A += B)
+	public static function incrementByMap(styles:StyleSet, hash : Map<String, Dynamic>):Void {
+		for (key in hash.keys()) {
+
+			styles[key] = hash[key];
+		}
+	}
+
+	/**
+	  * Returns an array from the contents of an iterator
+	  */
+	private static inline function all <T> (i : Iterator <T>) :Array<T> {
+		return [for (item in i) item];
+	}
+}
+
+
+/**
+
+================================
+  ==== OLD IMPLEMENTATION ====
+================================
 
 abstract StyleSet (CStyleSet) {
 	public inline function new(e : Element):Void {
@@ -80,3 +163,5 @@ class CStyleSet {
 		e['style'] = (pairs.join(';'));
 	}
 }
+
+*/

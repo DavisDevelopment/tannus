@@ -8,6 +8,7 @@ import tannus.utils.Pointer;
 import tannus.utils.Setter;
 import tannus.utils.Maybe;
 import tannus.dom.StyleSet;
+import tannus.utils.HashWrap;
 
 
 @:forward(
@@ -172,6 +173,18 @@ abstract Element (js.JQuery) {
 		return new Element(untyped this.selector);
 	}
 
+	/**
+	  * Alias of jQuery.fn.css() method
+	  */
+	public inline function cs(name:String, ?value:String):Null<String> {
+		if (value != null) {
+			this.css(name, value);
+			return null;
+		} else {
+			return this.css( name );
+		}
+	}
+
 	@:arrayAccess
 	public inline function get(name : String):String {
 		return this.attr(name);
@@ -185,6 +198,17 @@ abstract Element (js.JQuery) {
 
 	public var css(get, never):StyleSet;
 	private inline function get_css():StyleSet {
+
+		return (new StyleSet( self ));
+	}
+
+	public var hash(get, never):tannus.utils.HashWrap;
+	private inline function get_hash():tannus.utils.HashWrap {
+		return (new HashWrap(this.data()));
+	}
+
+/**
+	private inline function get_css():StyleSet {
 		var existing:Null<Dynamic> = this.data( '__styles__' );
 		if (existing != null && Std.is(existing, CStyleSet)) {
 			return cast(existing, StyleSet);
@@ -194,6 +218,7 @@ abstract Element (js.JQuery) {
 			return yocss;
 		}
 	}
+*/
 
 	public var text(get, set):String;
 	private inline function get_text():String {
@@ -277,6 +302,13 @@ abstract Element (js.JQuery) {
 	public static inline function select(sel : Dynamic):Element {
 		
 		return (new Element( sel ));
+	}
+
+
+	@:from
+	public static inline function fromString(selectorString : String):Element {
+
+		return (new Element(selectorString));
 	}
 }
 
