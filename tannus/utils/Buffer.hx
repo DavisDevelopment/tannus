@@ -9,21 +9,29 @@ import openfl.utils.ByteArray;
 import js.html.Blob;
 #end
 
-//import gryffin.Utils;
 
+/**
+  * class Buffer - an attempt to unify several binary-data storage types one will likely
+  * work with regularly in Web Development. 
+  */
 @:forward(length)
-abstract Buffer(Bytes) {
-	private var self(get, never):Buffer;
-
+abstract Buffer(Bytes) from Bytes {
 	public inline function new(bytes : Bytes):Void {
 		this = bytes;
 	}
-
+	
+	/**
+	  * Internal reference to [this] as a Buffer
+	  */
+	private var self(get, never):Buffer;
 	private inline function get_self():Buffer {
 		return cast this;
 	}
-
-	public inline function slice(start:Int, ?end:Null<Int>):Buffer {
+	
+	/**
+	  * Return a subset of [this]
+	  */
+	public function slice(start:Int, ?end:Null<Int>):Buffer {
 		if (end == null) end = this.length;
 		if (end < 0) {
 			end = (this.length - end);
@@ -31,12 +39,18 @@ abstract Buffer(Bytes) {
 		var len:Int = (end - start) - 1;
 		return new Buffer(this.sub(start, len));
 	}
-
+	
+	/**
+	  * Return a "copy" of [this]
+	  */
 	public inline function copy():Buffer {
 		return Buffer.fromBytes(this).slice(0);
 	}
-
-	public inline function iterator():Iterator<Int> {
+	
+	/**
+	  * Return an iterator to iterate over all bytes in [this] Buffer
+	  */
+	public  function iterator():Iterator<Int> {
 		var buf:Buffer = new Buffer(this);
 		var i:Int = -1;
 
@@ -72,9 +86,6 @@ abstract Buffer(Bytes) {
 
 			i++;
 		}
-
-		//sum.blit(0, one, 0, one.length);
-		//sum.blit(one.length, other, 0, other.length);
 
 		return sum;
 	}
