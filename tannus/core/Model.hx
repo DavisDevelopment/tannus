@@ -33,8 +33,6 @@ class Model extends EventDispatcher {
  === Instance Methods ===
 */
 
-	
-	
 
 /*
  === Instance Fields ===

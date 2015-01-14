@@ -28,7 +28,8 @@ class CSetter {
 }
 */
 
-abstract Setter <T> (T -> Void) {
+abstract Setter <T> (T -> Void) from (T -> Void) to (T -> Void) {
+
 	public inline function new(f : T->Void):Void {
 		this = f;
 	}

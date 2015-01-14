@@ -3,6 +3,7 @@ package tannus.io;
 import tannus.core.Model;
 import tannus.io.SyncStorage;
 
+import tannus.utils.HashWrap;
 import tannus.utils.tuples.TwoTuple;
 
 import haxe.Serializer;
@@ -37,6 +38,21 @@ abstract ModelStorage ( TwoTuple<Model, Map<String, String>> ) {
 	public inline function set(key:String, value:Dynamic):Void {
 		records[key] = hash(value);
 		save();
+	}
+
+	@:op(A += B)
+	public static inline function appendMap(store:ModelStorage, extraData:Map<String, Dynamic>):Void {
+		for (key in extraData.keys()) {
+			store.set(key, hash(extraData.get(key)));
+		}
+	}
+
+	@:op(A += B)
+	public static inline function appendDynamic(store:ModelStorage, extraData:Dynamic):Void {
+		var data:HashWrap = new HashWrap( extraData );
+		for (key in data.keys()) {
+			store.set(key, hash(data.get(key)));
+		}
 	}
 
 
@@ -86,6 +102,21 @@ abstract ModelStorage ( TwoTuple<Model, Map<String, String>> ) {
 /*
  === Instance Methods ===
 */
+	
+	/**
+	  * Deletes all records stored under the name [key], if any
+	  */
+	public inline function remove(key : String):Void {
+		records.remove( key );
+		save();
+	}
+
+	/**
+	  * Determines whether [this] has a record under the key [key]
+	  */
+	public inline function has(key : String):Bool {
+		return (records.exists( key ));
+	}
 
 	/**
 	  * Initializes [this] Storage object in the Storage medium
