@@ -7,8 +7,8 @@ import tannus.utils.Maybe;
 import tannus.dom.Element;
 
 
-abstract StyleSet (Element) {
-	public inline function new(e : Element):Void {
+abstract StyleSet (Dynamic) {
+	public inline function new(e : Dynamic):Void {
 		this = e;
 	}
 	
@@ -18,7 +18,7 @@ abstract StyleSet (Element) {
 	  */
 	private var self(get, never):StyleSet;
 	private inline function get_self():StyleSet {
-		return (new StyleSet( this ));
+		return cast this;
 	}
 
 	/**
@@ -29,7 +29,7 @@ abstract StyleSet (Element) {
 	  */
 	@:arrayAccess
 	public inline function get(key : String):Null<String> {
-		return (this.cs( key ));
+		return (this.css( key ));
 	}
 	
 	/**
@@ -40,7 +40,7 @@ abstract StyleSet (Element) {
 	  */
 	@:arrayAccess
 	public inline function set(key:String, value:String):Void {
-		this.cs(key, value);
+		this.css(key, value);
 	}
 
 
