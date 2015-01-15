@@ -37,8 +37,7 @@ class ByteInput extends Input {
 			return i;
 		} else {
 			
-			onComplete.dispatch( this );
-			return -1;
+			throw (new haxe.io.Eof());
 		}
 	}
 }
