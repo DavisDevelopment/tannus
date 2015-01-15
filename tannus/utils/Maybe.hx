@@ -2,6 +2,9 @@ package tannus.utils;
 
 import tannus.utils.Value;
 
+/**
+  * Maybe Type - Abstract class to represent an object which may be null
+  */
 abstract Maybe <T> (Null<T>) from Null<T> {
 	public inline function new(v : Null<T>):Void {
 		this = v;
@@ -74,7 +77,11 @@ abstract Maybe <T> (Null<T>) from Null<T> {
 			return this;
 		}
 	}
-
+	
+	/**
+	  * If [this] != null, invokes [mapper] with [this] as it's argument, and returns the result
+	  * Otherwise, returns [alternate]
+	  */
 	public inline function runOr <S> (mapper:T->S, alternate:S):S {
 		if (self.exists) {
 			return mapper(untyped this);
@@ -83,6 +90,10 @@ abstract Maybe <T> (Null<T>) from Null<T> {
 		}
 	}
 
+	/**
+	  * If [this] != null, invokes [mapper] with [this] as it's argument, and returns the result
+	  * Otherwise, invoke [alternate] with no arguments, and return that result
+	  */
 	public inline function run <S> (mapper:T->S, alternate:Void->S):S {
 		if (self.exists) {
 			return mapper(untyped this);
@@ -99,7 +110,10 @@ abstract Maybe <T> (Null<T>) from Null<T> {
 	private inline function get_self():Maybe<T> {
 		return cast this;
 	}
-
+	
+	/**
+	  * Represents whether [this] isn't null
+	  */
 	public var exists(get, never):Bool;
 	private inline function get_exists():Bool {
 		return self.bool();
