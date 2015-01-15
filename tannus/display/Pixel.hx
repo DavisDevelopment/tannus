@@ -22,10 +22,6 @@ class Pixel extends EventDispatcher {
 
 	public function init():Void {
 		var me = this;
-
-		_color.on('change', function(e:Dynamic):Void {
-			me.emit('change-color', _color);
-		});
 	}
 
 	public function color():Color {
