@@ -52,7 +52,7 @@ abstract ByteArray (Array<Byte>) from Array<Byte> {
 
 	public var empty(get, never):Bool;
 	private inline function get_empty():Bool {
-		return (this.length != 0);
+		return (this.length == 0);
 	}
 
 	@:to
