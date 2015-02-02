@@ -16,6 +16,22 @@ abstract Ptr <T> (TwoTuple<Pointer<T>, Setter<T>>) {
 	}
 
 /*
+   == Instance Fields ==
+*/
+
+	/**
+	  * Field-Reference to [this] Pointer's Value
+	  */
+	public var value(get, set) : T;
+	private inline function get_value():T {
+		return (this.one.get());
+	}
+	private inline function set_value(newvalue : T):T {
+		this.two.set( newvalue );
+		return value;
+	}
+
+/*
  == Instance Methods ==
 */
 	
