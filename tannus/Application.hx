@@ -16,12 +16,15 @@ class Application extends EventDispatcher {
 
 		this.init();
 	}
+
+/* === Instance Methods === */
 	
 	/**
 	  * Initialize [this] Application
 	  */
 	public function init():Void {
-		
+		//- Add [this] Application instance to the list of instances
+		instances.push( this );
 	}
 
 	/**
@@ -58,5 +61,20 @@ class Application extends EventDispatcher {
 		var current:String = js.Browser.window.location.pathname;
 
 		this.router.run(current);
+	}
+
+/* === Class Methods === */
+
+	
+/* === Class Fields === */
+
+	/**
+	  * Array of all instances of Application
+	  */
+	private static var instances:Array<Application> = {new Array();};
+
+	public static var active(get, never):Null<Application>;
+	private static inline function get_active():Null<Application> {
+		return (instances[ 0 ]);
 	}
 }
