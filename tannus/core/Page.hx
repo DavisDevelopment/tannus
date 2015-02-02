@@ -20,7 +20,7 @@ class Page extends EventDispatcher {
 	public var hash : Ptr<String>;
 
 	//- pointer to window title
-	public var title : Ptr<String>;
+	private var _title : Ptr<String>;
 
 	//- Array of attached "components"
 	public var components : Array<Component>;
@@ -40,7 +40,7 @@ class Page extends EventDispatcher {
 		this.parameters = this.route.uri_parameters;
 
 		//- create pointer to window-title
-		this.title = Ptr.create( Window.title );
+		this._title = Ptr.create( Window.title );
 
 		//- create pointer to url-hash
 		this.hash = Ptr.create( js.Browser.window.location.hash );
@@ -62,6 +62,15 @@ class Page extends EventDispatcher {
 	public var application(get, never) : Null<Application>;
 	private inline function get_application():Null<Application> {
 		return Application.active;
+	}
+
+	public var title(get, set) : String;
+	private inline function get_title():String {
+		return (_title.value);
+	}
+	private inline function set_title(newtitle : String):String {
+		_title &= newtitle;
+		return _title.value;
 	}
 	
 	/**
