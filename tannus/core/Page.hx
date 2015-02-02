@@ -1,5 +1,6 @@
 package tannus.core;
 
+import tannus.Application;
 import tannus.core.EventDispatcher;
 import tannus.core.Route;
 import tannus.core.Object;
@@ -51,6 +52,16 @@ class Page extends EventDispatcher {
 		this.openStatus = STATUS_WAITING;
 
 		this._init();
+	}
+
+/* === Computed Instance Fields === */
+
+	/**
+	  * Internal Reference to the Application that's currently running
+	  */
+	public var application(get, never) : Null<Application>;
+	private inline function get_application():Null<Application> {
+		return Application.active;
 	}
 	
 	/**
@@ -118,6 +129,7 @@ class Page extends EventDispatcher {
 		
 	}
 
+/* === Class Fields === */
 
 	public static var STATUS_WAITING:Int = 0;
 	public static var STATUS_OPEN:Int = 1;
