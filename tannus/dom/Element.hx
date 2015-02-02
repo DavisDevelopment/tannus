@@ -172,6 +172,14 @@ abstract Element (js.JQuery) {
 	private inline function get_self():Element {
 		return new Element(untyped this.selector);
 	}
+	
+	/**
+	  * Quick field-refernce to whether the current Element instance actually references any HTML Elements
+	  */
+	public var exists(get, never):Bool;
+	private inline function get_exists():Bool {
+		return (this.get().length > 0);
+	}
 
 	/**
 	  * Alias of jQuery.fn.css() method
