@@ -9,6 +9,7 @@ import tannus.utils.Pointer;
 import tannus.io.Memory;
 
 import tannus.display.Stage;
+import tannus.display.CanvasContext;
 
 
 @:expose
@@ -60,14 +61,14 @@ class Entity extends EventDispatcher implements Destructible {
 	/*
 	 * Method in which Entity defines how to draw itself onto [Canvas]
 	 */
-	public function render(stage:Stage, surface:Dynamic):Void {
+	public function render(stage:Stage, surface:CanvasContext):Void {
 		super.emit('render', this);
 	}
 	
 	/*
 	 * Method in which Entity may perform per-frame logic and state-changes
 	 */
-	public function update(stage:Stage, surface:Dynamic):Void {
+	public function update(stage:Stage, surface:CanvasContext):Void {
 		super.emit('update', this);
 		for (fieldName in _pointerBindings.keys()) {
 			(new Object(this))[fieldName] = _pointerBindings[fieldName].get();	

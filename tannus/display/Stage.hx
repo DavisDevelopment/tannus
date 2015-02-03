@@ -146,7 +146,7 @@ class Stage extends EventDispatcher implements Destructible {
 	  */
 	public function render():Void {
 		//- Retrieve a drawing context
-		var ctx:Dynamic = canvas.getContext('2d');
+		var ctx = canvas.getContext('2d');
 
 		//- Iterate over all children
 		for (child in childNodes) {
@@ -183,7 +183,7 @@ class Stage extends EventDispatcher implements Destructible {
 		});
 		
 		//- Get a drawing context
-		var ctx:Dynamic = canvas.getContext('2d');
+		var ctx = canvas.getContext('2d');
 
 		//- Iterate over all children of [this] Stage
 		for (child in childNodes) {
@@ -198,8 +198,9 @@ class Stage extends EventDispatcher implements Destructible {
 	/**
 	  * Obtain a subset of [this]'s children using a descriptor-string
 	  */
-	public function get(sel : String):Selection {
-		return new Selection(sel, this);
+	public function get <T : Entity> (sel : String):Selection<T> {
+		
+		return (new Selection(sel, this));
 	}
 	
 	/**
