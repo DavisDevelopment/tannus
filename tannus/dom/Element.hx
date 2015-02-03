@@ -167,10 +167,41 @@ abstract Element (js.JQuery) {
 	private inline function get_element():JSElement {
 		return this.get(0);
 	}
-
+	
+	/**
+	  * Internal reference to [this] as an Element instance
+	  */
 	private var self(get, never):Element;
-	private inline function get_self():Element {
-		return new Element(untyped this.selector);
+	
+	//- getter for 'self'
+	private  function get_self():Element {
+		/**
+		  === CSS-Selector-Based Selection ===
+		*/
+		var s:Null<String> = (Reflect.getProperty(this, 'selector'));
+
+		if (s != null && s != "") {
+			//- Just return a new Element instance created from the same selector as [this]
+			return (new Element(s));
+		}
+
+		/**
+		  === Any Other Type of Selection ===
+		*/
+		else {
+			var sel:Element = new Element( null );
+			
+			//- Iterate over all Selected Items of [this]
+			var i:Int = 0;
+			while (i < this.length) {
+				var item:Dynamic = (this.get(0));
+				var itemEl:Element = Element.select( item );
+
+				sel += itemEl;
+			}
+
+			return sel;
+		}
 	}
 	
 	/**
@@ -254,7 +285,10 @@ abstract Element (js.JQuery) {
 	private inline function get_tag():String {
 		return (this.context.tagName);
 	}
-
+	
+	/**
+	  * Reference to the value of [this] Element
+	  */
 	public var val(get, set):String;
 	private inline function get_val():String {
 		return (this.val());
@@ -262,6 +296,18 @@ abstract Element (js.JQuery) {
 	private inline function set_val(v:String):String {
 		this.val(v);
 		return this.val();
+	}
+
+	/**
+	  * Reference to a EventMap for [this] Element
+	  */
+	public var events(get, never) : tannus.dom.EventMap;
+	private inline function get_events() : tannus.dom.EventMap {
+		//- Create reference to self
+		var ref:Element = (new Element(this.get( 0 )));
+		var pt:Ptr<Element> = Ptr.create( ref );
+		
+		return (new EventMap( pt ));
 	}
 
 	public static inline function bindValue(el:Element, v:Value<String>):Void {
@@ -293,6 +339,27 @@ abstract Element (js.JQuery) {
 			}
 		});
 	}
+
+/* === Operator Methods === */
+	
+	/**
+	  * Adds an Element to another Element
+	  */
+	@:op(A + B)
+	public inline function plusElement(other : Element):Element {
+		return (new Element(this.add( other )));
+	}
+
+	@:op(A + B)
+	public inline function plusAnythingElse(other : Dynamic):Element {
+		return (Element.select(
+			this.add(
+				Element.select(other)
+			)));
+	}
+
+
+/* === Type Casting Methods === */
 
 	@:to
 	public inline function toDOMElement():js.html.Element {
