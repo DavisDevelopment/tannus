@@ -17,6 +17,7 @@ class ByteInput extends Input {
 
 	public function new(data : ByteArray):Void {
 		this.source = data;
+		trace( source );
 		this.onComplete = new Signal();
 	}
 
@@ -26,6 +27,13 @@ class ByteInput extends Input {
 	public function next():Byte {
 		return (Byte.fromInt(readByte()));
 	}
+
+	/**
+	  * Forces [bit] back onto the Stack of Bytes
+	  */
+	public function back(bit : Byte):Void {
+		source.unshift( bit );
+	}
 	
 	/**
 	  * method to read next byte from [this] Input
@@ -33,11 +41,20 @@ class ByteInput extends Input {
 	override public function readByte():Int {
 		if (!source.empty) {
 			
-			var i:Int = (source.pop().toInt());
+			var i:Int = (source.shift().toInt());
 			return i;
 		} else {
-			
-			throw (new haxe.io.Eof());
+			onComplete.dispatch( this );
+
+			//throw (new haxe.io.Eof());
+			throw ( 'Eof' );
 		}
+	}
+
+	/**
+	  * Creates a ByteInput instance from a String
+	  */
+	public static inline function fromString(s : String):ByteInput {
+		return new ByteInput(ByteArray.fromString(s));
 	}
 }
