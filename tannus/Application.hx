@@ -8,6 +8,7 @@ import tannus.core.EventDispatcher;
 
 /* Tannus Utils Imports */
 import tannus.utils.CompileTime;
+import tannus.utils.TypeTools;
 
 /* Tannus IO Imports */
 import tannus.io.Ptr;
@@ -21,6 +22,9 @@ import tannus.events.KeyboardEvent;
 
 /* Tannus DOM Imports */
 import tannus.dom.Element;
+
+/* == Declare our List of Classes which we will be "using" == */
+using StringTools;
 
 /**
   * class tannus.Application - Class to represent a JavaScript-based Application (WebApp, Chrome App, Chrome Extension, PhoneGap, etc.)
@@ -94,20 +98,33 @@ class Application extends EventDispatcher {
 
 	/**
 	  * Create a new Route from [url] as the description
+	  * ----
+	  * @param handler : EitherType<Function, Class<Dynamic>>
 	  */
-	public function route(url : String, ?func:Dynamic, ?pageClass:Class<Page>):Void {
+	public function route(url:String, handler:Dynamic):Void {
 		var rout:Route = new Route(url);
-		if (pageClass != null) {
-			rout.page_class = pageClass;
+		
+		//- Determine the Type of [handler]
+		var handlerType:String = TypeTools.typename(handler);
+		
+		//- If [handler] is a SubClass of Page
+		if (handlerType.startsWith('Class')) {
+			var hier = TypeTools.getClassHierarchy(cast handler);
+			trace( hier );
+			
+			if (Lambda.has(hier, 'tannus.core.Page')) {
+				rout.page_class = handler;
+			}
 		}
 		
 		/**
 		  * If this Route is "taken"
 		  */
 		rout.on('take', function(pg:Page) {
-			//- First, invoke the callback, if provided
-			if (func != null) {
-				func(pg);
+			//- If [handler] is a Function
+			if (handlerType == 'Function') {
+				
+				handler( pg );
 			}
 
 			//- Secondly, invoke [pg]'s "open" method

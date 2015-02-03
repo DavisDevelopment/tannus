@@ -140,7 +140,7 @@ class TypeTools {
 				kl = Type.getSuperClass( kl );
 				name = Type.getClassName( kl );
 				hierarchy.push( name );
-			} catch (err : String) {
+			} catch (err : Dynamic) {
 				break;
 			}
 		}
