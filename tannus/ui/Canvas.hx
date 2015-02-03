@@ -22,6 +22,7 @@ import tannus.geom.Rectangle;
 
 //- Display Imports
 import tannus.display.PixelArray;
+import tannus.display.CanvasContext;
 
 
 //- JavaScript Standar Library Imports
@@ -192,8 +193,8 @@ class Canvas extends EventDispatcher {
 	/**
 	  * Create and return a new CanvasDrawingContext2D Instance
 	  */
-	public function getContext(type:String):Dynamic {
-		return component.getContext(type);
+	public function getContext(type:String):CanvasContext {
+		return (cast component.getContext(type));
 	}
 	
 	/**
