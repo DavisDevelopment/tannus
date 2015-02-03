@@ -37,6 +37,8 @@ class Request {
 		//- initialize the Signal which handles incoming updates to the status of [this] Request
 		readyStateChange = new Signal();
 
+		done = new Signal();
+
 		_prepare();
 	}
 
@@ -70,6 +72,12 @@ class Request {
 	  * Signal which fires when [this] Request's 'readyState' field changes
 	  */
 	public var readyStateChange : Signal<ReadyState>;
+
+	
+	/**
+	  * Signal which fires when [this] Request has declared itself "ready"
+	  */
+	public var done : Signal<Bool>;
 
 
 /* === Computed Instance Fields === */
@@ -147,6 +155,10 @@ class Request {
 			//- to [this] Request's readyStateChange Signal
 			readyStateChange.dispatch( this.readyState );
 		});
+
+		
+		req.onload = (function(e : Dynamic) done.dispatch( true ));
+		req.onerror = (function(e : Dynamic) done.dispatch( false ));
 	}
 
 
