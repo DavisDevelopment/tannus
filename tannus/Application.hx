@@ -17,6 +17,10 @@ import tannus.io.Memory;
 /* Tannus Event Imports */
 import tannus.events.Event;
 import tannus.events.MouseEvent;
+import tannus.events.KeyboardEvent;
+
+/* Tannus DOM Imports */
+import tannus.dom.Element;
 
 /**
   * class tannus.Application - Class to represent a JavaScript-based Application (WebApp, Chrome App, Chrome Extension, PhoneGap, etc.)
@@ -83,6 +87,9 @@ class Application extends EventDispatcher {
 	public function init():Void {
 		//- Add [this] Application instance to the list of instances
 		instances.push( this );
+
+		//- Initialize Application-Wide Event-Listeners
+		_initEvents();
 	}
 
 	/**
@@ -120,6 +127,272 @@ class Application extends EventDispatcher {
 
 		this.router.run(current);
 	}
+
+/* === Private Instance Methods === */
+
+	/**
+	  * Initialize Application-Wide Event-Listeners
+	  */
+	private function _initEvents():Void {
+		var win = js.Browser.window;
+		
+		trace( "Initializing event-listeners on the Application.." );
+		
+		//- Initialize Event Signals
+		_initEventSignals();
+
+		//- Initialize Mouse Events
+		_initMouseEvents();
+
+		//- Initialize Keyboard Events
+		_initKeyboardEvents();
+
+		//- Initalize Miscellaneous Events
+		_initMiscEvents();
+	}
+
+	/**
+	  * Initialize Mouse-Related Event-Listeners
+	  */
+	private function _initMouseEvents():Void {
+		//- Obtain reference to the Window Object
+		var win = js.Browser.window;
+
+		//- Obtain reference to the Window as an Element
+		var wel:Element = (new Element( win ));
+
+		//- Create an Array of event-names which we'll be binding
+		var events:Array<String> = ['mousedown', 'mouseup', 'mouseenter', 'mouseleave', 'mousemove', 'click'];
+
+		//- Get a reference to the EventMap object of [wel]
+		var wevents = wel.events;
+
+		//- Wrapper function around a jQuery event-handler
+		var mouse_wrapper = function(data : Dynamic):Void {
+			//- Create a MouseEvent instance from the JQuery Event
+			var event:MouseEvent = (MouseEvent.fromJqEvent( data ));
+			
+			//- Attempt to get the corresponding signal
+			var signal:Null<Signal<MouseEvent>> = (_mouse_signals.get( event.type ));
+			
+			//- If a signal was found
+			if (signal != null) {
+
+				//- Dispatch the MouseEvent on that signal
+				signal.dispatch( event );
+			}
+
+			//- if no signal was found
+			else {
+				//- Complain about it
+				throw 'ApplicationEventError: No Signal for Events of type "${event.type}"!';
+			}
+		};
+
+		//- Iterate over all event-names
+		for (eventName in events) {
+			//- Bind it to the Window
+			wevents[ eventName ] = (mouse_wrapper.bind(_));
+		}
+	}
+
+	/**
+	  * Initialize Keyboard-Related Event-Listeners
+	  */
+	private function _initKeyboardEvents():Void {
+		var win = js.Browser.window;
+
+		//- Element-Reference to the Window Object
+		var wel:Element = new Element( win );
+		
+		//- Reference to the Window-Object's Event-Map
+		var wev = wel.events;
+
+		/**
+		  * EventListener Wrapper to convert a JQuery-Event into a KeyboardEvent,
+		  * then dispatch it on the appropriate Signal attached to [this] Application
+		  */
+		function wrapper(jqev : Dynamic):Void {
+			//- Create a new KeyboardEvent from [jqev]
+			var kbe:KeyboardEvent = KeyboardEvent.fromJqEvent( jqev );
+
+			//- Get the appropriate Signal for [this] Event
+			var signal:Null<Signal<KeyboardEvent>> = _keyboard_signals.get(kbe.type);
+
+			//- If [signal] isn't null
+			if (signal != null) {
+				signal.dispatch( kbe );
+			}
+
+			//- If [signal] IS null
+			else {
+				throw 'ApplicationEventError: No Signal for Events of type "${kbe.type}"!';
+			}
+		}
+
+		//- List of event-names to bind with [wrapper]
+		var events:Array<String> = ['keydown', 'onkeyup', 'onkeypress'];
+
+		//- Iterate over all event-names
+		for (e in events) {
+
+			//- Bind them to Window
+			wev[ e ] = wrapper.bind(_);
+		}
+	}
+
+	/**
+	  * Creates, Binds, and Forwards Miscellaneous Event-Listeners
+	  */
+	private function _initMiscEvents():Void {
+		//- Get an Element-Reference to Window
+		var wel:Element = Element.select(js.Browser.window);
+
+		//- Get the Window's Events
+		var wev = wel.events;
+
+		/* == OnHashChange == */
+		wev['hashchange'] = function(evt : Dynamic):Void {
+			//- Create a new Event
+			var event:Event = new Event( 'hashchange' );
+			
+			hashchange.dispatch( event );
+		};
+
+		/* == OnBeforeUnload == */
+		wev['beforeunload'] = function(evt : Dynamic):Void {
+			//- Create new Event
+			var event:Event = new Event( 'beforeunload' );
+
+			beforeunload.dispatch( event );
+		};
+
+		/* == OnOffline == */
+		wev['offline'] = function(evt : Dynamic):Void {
+			var event:Event = new Event( 'offline' );
+
+			offline.dispatch( event );
+		};
+	}
+
+
+	/**
+	  * Initialize Signal Fields
+	  */
+	private function _initEventSignals():Void {
+
+		/* === Create Mouse-Event-Related Signals === */
+		
+		//- Create Map of Mouse-Related Signals
+		_mouse_signals = new Map();
+		//- Give it a sexy alias
+		var ms = _mouse_signals;
+
+		click = new Signal();
+		ms['click'] = click;
+
+		mousedown = new Signal();
+		ms['mousedown'] = mousedown;
+
+		mouseup = new Signal();
+		ms['mouseup'] = mouseup;
+
+		mouseenter = new Signal();
+		ms['mouseenter'] = mouseenter;
+
+		mouseleave = new Signal();
+		ms['mouseleave'] = mouseleave;
+
+		mousemove = new Signal();
+		ms['mousemove'] = mousemove;
+
+		/* Create Keyboard-Event Related Signals === */
+
+		//- Create Map of Mouse-Related Signals
+		_keyboard_signals = new Map();
+		var ks = _keyboard_signals;
+
+		keypress = new Signal();
+		ks['keypress'] = keypress;
+
+		keydown = new Signal();
+		ks['keydown'] = keydown;
+
+		keyup = new Signal();
+		ks['keyup'] = keyup;
+
+		/* Create Miscellaneous Signals */
+
+		//- Create Map of misc Signals
+		var _misc_signals = new Map();
+
+		//- Hash-Change
+		hashchange = new Signal();
+
+		//- Before-Unload
+		beforeunload = new Signal();
+
+		//- Network-Connectivity Status Changes
+		online = new Signal();
+
+		offline = new Signal();
+	}
+
+/* === Signal-Related Instance Fields === */
+	
+	/**
+	  * Map of all mouse-related signals and their names
+	  */
+	private var _mouse_signals : Map<String, Signal<MouseEvent>>;
+
+	/* === Mouse Event Signals === */
+
+	public var click : Signal<MouseEvent>;
+	
+	public var mousedown : Signal<MouseEvent>;
+
+	public var mouseup : Signal<MouseEvent>;
+
+	public var mouseenter : Signal<MouseEvent>;
+
+	public var mouseleave : Signal<MouseEvent>;
+
+	public var mousemove : Signal<MouseEvent>;
+
+	
+	/**
+	  * Map of all keyboard-related signals and their names
+	  */
+	private var _keyboard_signals : Map<String, Signal<KeyboardEvent>>;
+
+	/* === Keyboard Event Signals === */
+
+	public var keypress : Signal<KeyboardEvent>;
+
+	public var keydown : Signal<KeyboardEvent>;
+
+	public var keyup : Signal<KeyboardEvent>;
+
+
+	/**
+	  * Map of miscellaneous Signals and their names
+	  */
+	private var _misc_signals : Map<String, Signal<Event>>;
+
+	/* === Miscellaneous Event-Signals === */
+
+	//- Change in URL-Hash
+	public var hashchange : Signal<Event>;
+
+	//- Fires just before the Page gets unloaded
+	public var beforeunload : Signal<Event>;
+
+	//- Fires when the Application comes back online after being offline
+	public var online : Signal<Event>;
+
+	//- Fires when the Application goes offline
+	public var offline : Signal<Event>;
+
 
 /* === Class Methods === */
 
