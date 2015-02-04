@@ -171,7 +171,7 @@ abstract Element (js.JQuery) {
 	/**
 	  * Internal reference to [this] as an Element instance
 	  */
-	private var self(get, never):Element;
+	public var self(get, never):Element;
 	
 	//- getter for 'self'
 	private  function get_self():Element {
@@ -356,6 +356,11 @@ abstract Element (js.JQuery) {
 			this.add(
 				Element.select(other)
 			)));
+	}
+
+	@:op(A - B)
+	public inline function minusElement(other : Element):Element {
+		return (new Element(this.not(other)));
 	}
 
 
