@@ -39,6 +39,10 @@ class Request {
 
 		done = new Signal();
 
+		ready = new Signal();
+
+		failed = new Signal();
+
 		_prepare();
 	}
 
@@ -75,9 +79,19 @@ class Request {
 
 	
 	/**
-	  * Signal which fires when [this] Request has declared itself "ready"
+	  * Signal which fires when [this] Request has declared itself "complete" (this could be due to either success OR failure)
 	  */
 	public var done : Signal<Bool>;
+	
+	/**
+	  * Signal which fires when [this] Request has declared itself "ready" (it has successfully loaded it's content)
+	  */
+	public var ready : Signal<Dynamic>;
+
+	/**
+	  * Signal which fires when [this] Request has failed to load
+	  */
+	public var failed : Signal<Dynamic>;
 
 
 /* === Computed Instance Fields === */
@@ -157,8 +171,19 @@ class Request {
 		});
 
 		
-		req.onload = (function(e : Dynamic) done.dispatch( true ));
-		req.onerror = (function(e : Dynamic) done.dispatch( false ));
+		/* == Forward the Load and Error Events to our Done Event == */
+		req.onload = (function(e : Dynamic) {
+			done.dispatch( true );
+			
+			ready.dispatch(this.response);
+		});
+
+
+		req.onerror = (function(e : Dynamic) {
+			done.dispatch( false );
+
+			failed.dispatch( e );
+		});
 	}
 
 
