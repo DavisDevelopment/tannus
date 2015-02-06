@@ -16,6 +16,9 @@ import tannus.utils.Maybe;
 import tannus.utils.Buffer;
 import tannus.utils.Promise;
 
+/* Tannus AJAX Imports */
+import tannus.io.ajax.Tools;
+
 class Request {
 	/**
 	  * Constructor Function
@@ -148,9 +151,25 @@ class Request {
 		//- set [this] Request's 'data' field
 		data = (data != null ? sdata.or(data) : sdata);
 
+		data = Tools.toHttpSafe( data );
+
 		req.send( data );
 	}
 
+	/**
+	  * "abort" [this] Request
+	  */
+	public function abort():Void {
+		req.abort();
+	}
+	
+	/**
+	  * Retrieve all Http-Headers attached to the Response
+	  */
+	public function getAllResponseHeaders():String {
+		
+		return (req.getAllResponseHeaders());
+	}
 
 	/**
 	  * Initialization Method which prepares the interface to the native NReq instance
