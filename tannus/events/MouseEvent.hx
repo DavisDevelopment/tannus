@@ -36,14 +36,14 @@ class MouseEvent extends Event {
 		this.pos = pos;
 	}
 
-	public static inline function fromJqEvent(evt : Dynamic, ?cancelable:Maybe<Bool>):MouseEvent {
+	public static function fromJqEvent(evt : Dynamic, ?cancelable:Maybe<Bool>):MouseEvent {
 		//- utility for converting a Dynamic value to a string, then interpreting it as a Number, then rounding it to an Int
 		var num:Dynamic->Int = (function(x : Dynamic) return Math.round(Std.parseFloat(Std.string(x))));
 
 		//- utility for converting a Dynamic value to a Bool
 		var bewl:Dynamic->Bool = (function(x : Dynamic) return (Std.string(x) == 'true'));
 
-		return new MouseEvent(
+		var mevt = new MouseEvent(
 			(Std.string( evt.type )), //- [name]
 			(new Point(num(evt.clientX), num(evt.clientY))), //- [pos]
 			( cancelable ), //isDefaultPreventable
@@ -53,5 +53,11 @@ class MouseEvent extends Event {
 			(bewl( evt.metaKey )), //- [metaKey]
 			(num( evt.button )) //- [button]
 		);
+
+		mevt.onDefaultPrevented = (function() evt.preventDefault());
+		mevt.onPropogationStopped = (function() evt.stopPropogation());
+		mevt.onPropogationStoppedNow = (function() evt.stopImmediatePropogation());
+
+		return mevt;
 	}
 }
