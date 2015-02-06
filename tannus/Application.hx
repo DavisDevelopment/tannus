@@ -262,8 +262,11 @@ class Application extends EventDispatcher {
 	  * Creates, Binds, and Forwards Miscellaneous Event-Listeners
 	  */
 	private function _initMiscEvents():Void {
+		//- Get a convenient Reference to Window
+		var win = js.Browser.window;	
+
 		//- Get an Element-Reference to Window
-		var wel:Element = Element.select(js.Browser.window);
+		var wel:Element = Element.select( win );
 
 		//- Get the Window's Events
 		var wev = wel.events;
@@ -289,6 +292,12 @@ class Application extends EventDispatcher {
 			var event:Event = new Event( 'offline' );
 
 			offline.dispatch( event );
+		};
+
+		/* == When a Message is received == */
+		win.onmessage = function(data : Dynamic):Void {
+			
+			message.dispatch( data );
 		};
 	}
 
@@ -353,6 +362,9 @@ class Application extends EventDispatcher {
 		online = new Signal();
 
 		offline = new Signal();
+
+		//- Messages Received From Other Applications
+		message = new Signal();
 	}
 
 /* === Signal-Related Instance Fields === */
@@ -409,6 +421,9 @@ class Application extends EventDispatcher {
 
 	//- Fires when the Application goes offline
 	public var offline : Signal<Event>;
+
+	//- Fires when a "Message" is received from another Application
+	public var message : Signal<Dynamic>;
 
 
 /* === Class Methods === */
