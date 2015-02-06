@@ -13,6 +13,9 @@ class InputStream <T> {
 	/* == Private Field to Store Data which has not yet been handled == */
 	private __buffer : Array<T>;
 
+	/* == Indicates Whether [this] Stream is currently 'locked' == */
+	private __locked : Bool;
+
 	/**
 	  * Signal which fires once [this] Stream becomes readable
 	  */
@@ -47,6 +50,8 @@ class InputStream <T> {
 		//- Create our 'buffer' field
 		__buffer = new Array();
 
+		__locked = false;
+
 		//= Create all Event-Signals
 
 		onReadable = new Signal();
@@ -59,7 +64,7 @@ class InputStream <T> {
 	/**
 	  * Function which handles new data becoming available to [this] Stream
 	  */
-	private function giveChunk(item : T):Void {
+	public function __chunk(item : T):Void {
 		//- However, since so many different use cases may exists, it's best not to make any assumptions
 		throw 'Not implemented!';
 	}
