@@ -38,7 +38,7 @@ class FormData {
 		var nf:NativeForm = new NativeForm();
 		
 		//- Clone [this]'s Data onto [nf]
-		for (key in _values.key()) {
+		for (key in _values.keys()) {
 			nf.append(key, (get(key)), null);
 		}
 

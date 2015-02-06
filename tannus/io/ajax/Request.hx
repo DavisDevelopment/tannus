@@ -16,6 +16,9 @@ import tannus.utils.Maybe;
 import tannus.utils.Buffer;
 import tannus.utils.Promise;
 
+/* Tannus AJAX Imports */
+import tannus.io.ajax.Tools;
+
 class Request {
 	/**
 	  * Constructor Function
@@ -38,6 +41,10 @@ class Request {
 		readyStateChange = new Signal();
 
 		done = new Signal();
+
+		ready = new Signal();
+
+		failed = new Signal();
 
 		_prepare();
 	}
@@ -75,9 +82,19 @@ class Request {
 
 	
 	/**
-	  * Signal which fires when [this] Request has declared itself "ready"
+	  * Signal which fires when [this] Request has declared itself "complete" (this could be due to either success OR failure)
 	  */
 	public var done : Signal<Bool>;
+	
+	/**
+	  * Signal which fires when [this] Request has declared itself "ready" (it has successfully loaded it's content)
+	  */
+	public var ready : Signal<Dynamic>;
+
+	/**
+	  * Signal which fires when [this] Request has failed to load
+	  */
+	public var failed : Signal<Dynamic>;
 
 
 /* === Computed Instance Fields === */
@@ -134,9 +151,25 @@ class Request {
 		//- set [this] Request's 'data' field
 		data = (data != null ? sdata.or(data) : sdata);
 
+		data = Tools.toHttpSafe( data );
+
 		req.send( data );
 	}
 
+	/**
+	  * "abort" [this] Request
+	  */
+	public function abort():Void {
+		req.abort();
+	}
+	
+	/**
+	  * Retrieve all Http-Headers attached to the Response
+	  */
+	public function getAllResponseHeaders():String {
+		
+		return (req.getAllResponseHeaders());
+	}
 
 	/**
 	  * Initialization Method which prepares the interface to the native NReq instance
@@ -157,8 +190,19 @@ class Request {
 		});
 
 		
-		req.onload = (function(e : Dynamic) done.dispatch( true ));
-		req.onerror = (function(e : Dynamic) done.dispatch( false ));
+		/* == Forward the Load and Error Events to our Done Event == */
+		req.onload = (function(e : Dynamic) {
+			done.dispatch( true );
+			
+			ready.dispatch(this.response);
+		});
+
+
+		req.onerror = (function(e : Dynamic) {
+			done.dispatch( false );
+
+			failed.dispatch( e );
+		});
 	}
 
 

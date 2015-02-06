@@ -74,7 +74,7 @@ class KeyboardEvent extends Event {
 		var bewl:Dynamic->Bool = (function(x : Dynamic) return (Std.string(x) == 'true'));
 
 		//- Create and Return the actual KeyboardEvent Instance
-		return (new KeyboardEvent(
+		var kbe = (new KeyboardEvent(
 			(str(evt.type)),
 			(num(evt.which)),
 			( cancelable ),
@@ -82,5 +82,11 @@ class KeyboardEvent extends Event {
 			(bewl( evt.shiftKey )),
 			(bewl( evt.metaKey ))
 		));
+
+		kbe.onDefaultPrevented = (function() evt.preventDefault());
+		kbe.onPropogationStopped = (function() evt.stopPropogation());
+		kbe.onPropogationStoppedNow = (function() evt.onImmediatePropogation());
+
+		return kbe;
 	}
 }

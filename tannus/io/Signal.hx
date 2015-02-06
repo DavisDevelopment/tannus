@@ -39,6 +39,13 @@ class Signal<T> {
 	}
 
 	/**
+	  * Adds a listener to the list
+	  */
+	public inline function on(action : Callback<T>):Void {
+		listen( action );
+	}
+
+	/**
 	  * "fires" all handlers of [this] Signal
 	  */
 	public function dispatch(context : T):Void {

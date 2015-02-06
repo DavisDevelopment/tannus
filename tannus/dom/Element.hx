@@ -10,6 +10,18 @@ import tannus.utils.Maybe;
 import tannus.dom.StyleSet;
 import tannus.utils.HashWrap;
 
+import tannus.geom.Point;
+import tannus.geom.Rectangle;
+
+import tannus.geom.Point;
+import tannus.geom.Rectangle;
+
+import tannus.geom.Point;
+import tannus.geom.Rectangle;
+
+import tannus.geom.Point;
+import tannus.geom.Rectangle;
+
 
 @:forward(
 	selector,
@@ -308,6 +320,27 @@ abstract Element (js.JQuery) {
 		var pt:Ptr<Element> = Ptr.create( ref );
 		
 		return (new EventMap( pt ));
+	}
+
+
+	/**
+	  * Field-Reference to a Rectangle Representation of [this] Element's Dimensions and Position
+	  */
+	public var rectangle(get, never) : Rectangle;
+	private function get_rectangle():Rectangle {
+		var me:Null<js.html.Element> = (self.toDOMElement());
+		
+		if (me != null) {
+			
+			var crect = ((this.get(0)).getClientRects()[0]);
+
+			return (new Rectangle(crect.left, crect.top, crect.width, crect.height));
+		}
+
+		else {
+			
+			return new Rectangle();
+		}
 	}
 
 	public static inline function bindValue(el:Element, v:Value<String>):Void {
