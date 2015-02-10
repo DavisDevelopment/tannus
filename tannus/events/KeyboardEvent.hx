@@ -124,7 +124,7 @@ class KeyboardEvent extends Event {
 			case 91:
 				Key.Command;
 			case 92:
-				Key.
+				Key.Menu;
 			case 48:
 				Key.Number0;
 			case 49:
@@ -145,8 +145,22 @@ class KeyboardEvent extends Event {
 				Key.Number8;
 			case 57:
 				Key.Number9;
-			case 91:
+			case 192:
 				Key.Backquote;
+			case 189:
+				Key.Minus;
+			case 187:
+				Key.Equals;
+			case 219:
+				Key.RightBracket;
+			case 220:
+				Key.Backslash;
+			case 221:
+				Key.LeftBracket;
+			case 222:
+				Key.Comma;
+			case 186:
+				Key.Semicolon;
 
 
 			default:
