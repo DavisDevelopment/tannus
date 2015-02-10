@@ -71,8 +71,41 @@ class InputStream <T> {
 	  * Function which handles new data becoming available to [this] Stream
 	  */
 	public function __piece(item : T):Void {
-		//- However, since so many different use cases may exists, it's best not to make any assumptions
-		throw 'Not implemented!';
+		if (__locked) {
+			__piece_buffer( item );
+		}
+
+		else {
+			__piece_read( item );
+		}
+	}
+
+	/**
+	  * Buffers a piece of data
+	  */
+	private function __piece_buffer(item : T):Void {
+		__buffer.push( item );
+	}
+
+	/**
+	  * Reads a piece of data from [this] Input
+	  */
+	private function __piece_read(item : T):Void {
+		onData.dispatch( item );
+	}
+
+	/**
+	  * 'read's all buffered data
+	  */
+	public function flush():Void {
+		//- If the buffer is not empty
+		if (__buffer.length > 0) {
+			//- send all items in the buffer
+			for (item in __buffer) {
+
+				__piece_read( item );
+			}
+		}
 	}
 
 	/**

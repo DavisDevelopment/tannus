@@ -9,6 +9,7 @@ import tannus.utils.Maybe;
 
 /* Tannus Events Imports */
 import tannus.events.Event;
+import tannus.events.Key;
 
 /**
   * Class to represent a Keyboard-Event
@@ -26,6 +27,7 @@ class KeyboardEvent extends Event {
 		this.metaKey = metaKey.or( false );
 
 		this.key = Byte.fromInt( charcode );
+		this.keyType = _getKeyType();
 	}
 
 /* === Instance Fields === */
@@ -34,6 +36,11 @@ class KeyboardEvent extends Event {
 	  * 'key' field - the char-code of the key which was pressed, represented as a Byte
 	  */
 	public var key : Byte;
+
+	/**
+	  * type of key which was pressed
+	  */
+	public var keyType : Key;
 
 	/* == [MODIFIER KEYS] == */
 
@@ -53,10 +60,100 @@ class KeyboardEvent extends Event {
 /* === Instance Methods === */
 
 	/* == [PUBLIC] == */
-
 	
 
 	/* == [PRIVATE] == */
+
+	/**
+	  * resolves the type of key being pressed based on the Byte value
+	  */
+	private function _getKeyType():Key {
+		return (switch (key.toInt()) {
+			case 65: 
+				Key.A;
+			case 66:
+				Key.B;
+			case 67:
+				Key.C;
+			case 68:
+				Key.D;
+			case 69:
+				Key.E;
+			case 70:
+				Key.F;
+			case 71:
+				Key.G;
+			case 72:
+				Key.H;
+			case 73:
+				Key.I;
+			case 74:
+				Key.J;
+			case 75:
+				Key.K;
+			case 76:
+				Key.L;
+			case 77:
+				Key.M;
+			case 78:
+				Key.N;
+			case 79:
+				Key.O;
+			case 80:
+				Key.P;
+			case 81:
+				Key.Q;
+			case 82:
+				Key.R;
+			case 83:
+				Key.S;
+			case 84:
+				Key.T;
+			case 85:
+				Key.U;
+			case 86:
+				Key.V;
+			case 87:
+				Key.W;
+			case 88:
+				Key.X;
+			case 89:
+				Key.Y;
+			case 90:
+				Key.Z;
+			case 91:
+				Key.Command;
+			case 92:
+				Key.
+			case 48:
+				Key.Number0;
+			case 49:
+				Key.Number1;
+			case 50:
+				Key.Number2;
+			case 51:
+				Key.Number3;
+			case 52:
+				Key.Number4;
+			case 53:
+				Key.Number5;
+			case 54:
+				Key.Number6;
+			case 55:
+				Key.Number7;
+			case 56:
+				Key.Number8;
+			case 57:
+				Key.Number9;
+			case 91:
+				Key.Backquote;
+
+
+			default:
+				Key.Unknown(key.toInt());
+
+		});
+	}
 
 /* === Class Methods === */
 

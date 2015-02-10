@@ -13,9 +13,9 @@ class OutputStream <T> {
 		__locked = false;
 
 		onOpen = new Signal();
-		onClose
-		onEnd
-		onError
+		onClose = new Signal();
+		onEnd = new Signal();
+		onError = new Signal();
 	}
 
 /* === Instance Fields === */
