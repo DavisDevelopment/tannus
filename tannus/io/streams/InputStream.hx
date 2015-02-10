@@ -11,15 +11,15 @@ class InputStream <T> {
 /* === Instance Fields === */
 	
 	/* == Private Field to Store Data which has not yet been handled == */
-	private __buffer : Array<T>;
+	private var __buffer : Array<T>;
 
 	/* == Indicates Whether [this] Stream is currently 'locked' == */
-	private __locked : Bool;
+	private var __locked : Bool;
 
 	/**
 	  * Signal which fires once [this] Stream becomes readable
 	  */
-	public var onReadable : Signal<Dynamic>;
+	public var onOpen : Signal<Dynamic>;
 
 	/**
 	  * Signal which fires when a new bit of data becomes available to [this] Stream
@@ -44,6 +44,11 @@ class InputStream <T> {
 	public var onError : Signal<Dynamic>;
 
 	/**
+	  * Signal which fires if/when the lock-state of [this] Stream changes
+	  */
+	public var onLockStateChange : Signal<Bool>;
+
+	/**
 	  * Unimplemented Constructor
 	  */
 	public function new():Void {
@@ -54,18 +59,41 @@ class InputStream <T> {
 
 		//= Create all Event-Signals
 
-		onReadable = new Signal();
+		onOpen = new Signal();
 		onData = new Signal();
 		onEnd = new Signal();
 		onClose = new Signal();
 		onError = new Signal();
+		onLockStateChange = new Signal();
 	}
 
 	/**
 	  * Function which handles new data becoming available to [this] Stream
 	  */
-	public function __chunk(item : T):Void {
+	public function __piece(item : T):Void {
 		//- However, since so many different use cases may exists, it's best not to make any assumptions
 		throw 'Not implemented!';
+	}
+
+	/**
+	  * Lock [this] Stream from getting any more input
+	  */
+	public function lock():Void {
+		//- change the lock state
+		__locked = true;
+
+		//- fire the event
+		onLockStateChange.dispatch(__locked);
+	}
+
+	/**
+	  * Unlock [this] Stream, allowing it to receive input
+	  */
+	public function unlock():Void {
+		//- change dat lock state
+		__locked = false;
+
+		//- fire the event
+		onLockStateChange.dispatch(__locked);
 	}
 }
