@@ -23,6 +23,16 @@ abstract Percent (Float) from Float to Float {
 	private inline function set_value(nv : Float):Float {
 		return (this = nv);
 	}
+
+/* === Operators === */
+
+	/**
+	  * Add [this] Percent to another number
+	  */
+	@:op(A + B)
+	public inline function plus<T:Float>(other : T):Percent {
+		return (new Percent(other + value));
+	}
 	
 	/**
 	  * Retrieve [this] Percent "of" another number
