@@ -31,6 +31,13 @@ class Pane extends BaseWidget {
 	}
 
 	/**
+	  * Adds a class to [this] Pane
+	  */
+	public function addClass(name : String):Void {
+		el.addClass(name);
+	}
+
+	/**
 	  * The 'width' of [this] Pane
 	  */
 	public var width(get, set):Dynamic;
