@@ -1,6 +1,7 @@
 package tannus.display;
 
 //- Core Imports
+import tannus.Application;
 import tannus.core.EventDispatcher;
 import tannus.core.Destructible;
 
@@ -13,14 +14,21 @@ import tannus.math.TMath;
 
 //- Geometric Imports
 import tannus.geom.Point;
+import tannus.geom.Rectangle;
 
 //- IO Imports
 import tannus.io.Memory;
 import tannus.io.Ptr;
 import tannus.io.Signal;
+import tannus.io.Signals;
 
 //- UI Imports
 import tannus.ui.Canvas;
+import tannus.dom.Element;
+
+//- Events Imports
+import tannus.events.Event;
+import tannus.events.MouseEvent;
 
 //- JavaScript Standard Library Imports
 import js.html.CanvasElement;
@@ -50,9 +58,13 @@ class Stage extends EventDispatcher implements Destructible {
 
 	//- Signal to be fired for each frame
 	public var onFrame : Signal<Stage>;
+	public var beforeFrame : Signal<Stage>;
 
 	//- The unique-identifier of [this] Stage
 	public var id:Int;
+
+	//- Reference to the Application in which [this] resides
+	public var application:Application;
 	
 	/**
 	  * Constructor Function
@@ -76,9 +88,12 @@ class Stage extends EventDispatcher implements Destructible {
 		//- Initial frame-id is 0
 		this.frameId = 0;
 		this.onFrame = new Signal();
+		this.beforeFrame = new Signal();
 
 		//- Generate unique-id for [this] Stage
 		this.id = Memory.uniqueIdInt();
+
+		this.application = Application.active;
 		
 		//- Invoke the initialization function of [this] Stage
 		this.init();
@@ -139,6 +154,8 @@ class Stage extends EventDispatcher implements Destructible {
 	public function setRectangle(rect:tannus.geom.Rectangle):Void {
 		this.width = rect.width;
 		this.height = rect.height;
+		canvas.width = Math.round(rect.width);
+		canvas.height = Math.round(rect.height);
 	}
 
 	/**
@@ -215,6 +232,8 @@ class Stage extends EventDispatcher implements Destructible {
 		  * and queue up the next one
 		  */
 		function frame(n:Float):Bool {
+			beforeFrame.dispatch( this );
+
 			//- Update and Render [this] Stage
 			update();
 			render();
@@ -227,6 +246,39 @@ class Stage extends EventDispatcher implements Destructible {
 			return true;
 		};
 		this.frameId = win.requestAnimationFrame(frame);
+	}
+
+	/**
+	  * Make [this] Stage take up the full width and height of the Window
+	  */
+	public function fullScreen():Void {
+		var win = js.Browser.window;
+		var canel:Element = Element.select(this.canvas.component);
+		var cont:Element = Element.select('html, body');
+
+		var both = (canel + cont);
+		
+		both.cs('width', '100%');
+		both.cs('height', '100%');
+		both.cs('margin', '0');
+		both.cs('padding', '0');
+
+		var resizeme = function(e:Dynamic) {
+			var size:Rectangle = new Rectangle(0, 0, win.innerWidth, win.innerHeight);
+
+			this.setRectangle( size );
+		};
+
+		application.resize.on(resizeme.bind(_));
+		resizeme(null);
+	}
+
+	/**
+	  * Reset [this] Canvas
+	  */
+	public function erase():Void {
+		var c = canvas.component.getContext2d();
+		c.clearRect(0, 0, width, height);
 	}
 	
 	/**
@@ -298,6 +350,83 @@ class Stage extends EventDispatcher implements Destructible {
 				lastThingPressed.emit('mouseup', e);
 			}
 		});
+
+		this._initSignals();
+	}
+
+/* === Event Signal Fields === */
+
+
+	/* == Mouse Events == */
+
+	//- When Mouse Enters [this] Stage
+	public var onMouseEnter : Signal<MouseEvent>;
+
+	//- When Mouse Leaves [this] Stage
+	public var onMouseLeave : Signal<MouseEvent>;
+
+	//- When Mouse Moves inside [this] Stage
+	public var onMouseMove : Signal<MouseEvent>;
+
+	//- When Mouse Button is pressed down on [this] Stage
+	public var onMouseDown : Signal<MouseEvent>;
+
+	//- When a Mouse Button is released
+	public var onMouseUp : Signal<MouseEvent>;
+
+	//- When user begins touching [this] Stage
+	public var onTouchStart : Signal<TouchEvent>;
+
+/* === Event Signal Methods === */
+
+	/**
+	  * Methods which performs initialization of Event Signals
+	  */
+	private function _initSignals():Void {
+		//- Create Event-Signals
+		_createSignals();
+
+		//- Handle Event-Signals
+		_handleSignals();
+	}
+
+	/**
+	  * Method which creates Event-Signal Fields
+	  */
+	private function _createSignals():Void {
+
+	/* == Desktop Mouse Events == */
+		onMouseEnter = new Signal();
+		onMouseLeave = new Signal();
+		onMouseMove = new Signal();
+		onMouseDown = new Signal();
+		onMouseUp = new Signal();
+	}
+
+	/**
+	  * Method which registers Handlers on Event-Signals
+	  */
+	private function _handleSignals():Void {
+		var mevents:Signals<MouseEvent> = [onMouseEnter, onMouseLeave, onMouseMove, onMouseDown, onMouseUp];
+		var names:Array<String> = ['mouseenter', 'mouseleave', 'mousemove', 'mousedown', 'mouseup'];
+
+		function _handleMouseEvent(name:String, sig:Signal<MouseEvent>):Void {
+
+			on(name, function(mev : Dynamic):Void {
+				var event:MouseEvent = MouseEvent.fromJqEvent( mev );
+				event.pos = (cast mev.position);
+
+				sig.dispatch( event );
+			});
+		}
+
+		for (key in names) {
+			var i:Int = (names.indexOf(key));
+			var sig:Signal<MouseEvent> = mevents[i];
+
+			_handleMouseEvent(key, sig);
+
+		}
 	}
 
 /*
