@@ -189,4 +189,11 @@ class ProgressBar extends BaseWidget {
 	public function hasTrackClass(name : String):Bool {
 		return (el.hasClass(name));
 	}
+
+	/**
+	  * Returns whether [this] ProgressBar's Bar has the given class
+	  */
+	public function hasBarClass(name:String):Bool {
+		return (bar.hasClass(name));
+	}
 }
