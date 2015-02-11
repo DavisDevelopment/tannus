@@ -1,6 +1,9 @@
 package tannus.geom;
 
 import tannus.geom.Rectangle;
+import tannus.geom.Angle;
+
+import tannus.math.TMath;
 
 abstract Point (Array <Float>) from Array<Float> {
 	public inline function new(?x:Float=0, ?y:Float=0, ?z:Float=0):Void {
@@ -58,6 +61,12 @@ abstract Point (Array <Float>) from Array<Float> {
 	@:op(A / B)
 	public inline function quotient(other : Point):Point {
 		return apply(other, (function(a, b) return (a / b)));
+	}
+
+	@:op(A % B)
+	public inline function angleTo(other : Point):Angle {
+		var angl:Float = TMath.angleBetween(x, y, other.x, other.y);
+		return new Angle( angl );
 	}
 
 /*
