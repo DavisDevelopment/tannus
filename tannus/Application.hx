@@ -319,7 +319,7 @@ class Application extends EventDispatcher {
 		var on_boot = function(evt : Dynamic):Void {
 
 			if (count != 5) {
-				var event:Event = new Event('beforestart', true, (this.start.bind()));
+				var event:Event = new Event('beforestart', true);
 
 				beforeRun.dispatch( event );
 
