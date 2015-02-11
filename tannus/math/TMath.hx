@@ -35,6 +35,12 @@ class TMath {
         return radians * 180/PI;
     }
 
+    /** Determines and Returns the angle between two points */
+    #if !js @:generic #end
+    inline public static function angleBetween<T : Float> (x1:T, y1:T, x2:T, y2:T):Float {
+	return (toDegrees(Math.atan2(x2 - x1, y2 - y1)));	
+    }
+
     #if !js @:generic #end
     inline public static function max<T:Float> (a :T, b :T) :T
     {
