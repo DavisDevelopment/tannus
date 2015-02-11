@@ -143,6 +143,8 @@ class Application extends EventDispatcher {
 		var current:String = js.Browser.window.location.pathname;
 
 		this.router.run(current);
+
+		this.emit('started', null);
 	}
 
 /* === Private Instance Methods === */
@@ -294,6 +296,51 @@ class Application extends EventDispatcher {
 			offline.dispatch( event );
 		};
 
+		//- get a reference to the events of the Body
+		var bev = (Element.select( 'body' ).events);
+
+		/* == When the body scrolls == */
+		bev['scroll'] = function(evt : Dynamic):Void {
+			var event:Event = new Event( 'scroll' );
+
+			scroll.dispatch( event );
+		};
+
+		/* == When the window is resized == */
+		wev['resize'] = function(evt : Dynamic):Void {
+			var event:Event = new Event( 'resize' );
+
+			resize.dispatch( event );
+		};
+		
+
+		var count:Int = 0;
+
+		var on_boot = function(evt : Dynamic):Void {
+
+			if (count != 5) {
+				var event:Event = new Event('beforestart', true, (this.start.bind()));
+
+				beforeRun.dispatch( event );
+
+				event.complete();
+			}
+
+			count++;
+		};
+	
+		var doc = (Element.select(win.document).events);
+		
+		var device_ready:Bool = false;
+		var body_ready:Bool = false;
+
+		doc['deviceready'] = function(e) {
+			device_ready = true;
+		};
+
+		doc['ready'] = (on_boot.bind(_));
+		
+
 		/* == When a Message is received == */
 		win.onmessage = function(data : Dynamic):Void {
 			
@@ -354,6 +401,12 @@ class Application extends EventDispatcher {
 
 		//- Hash-Change
 		hashchange = new Signal();
+		
+		//- on scroll
+		scroll = new Signal();
+
+		//- on resize
+		resize = new Signal();
 
 		//- Before-Unload
 		beforeunload = new Signal();
@@ -362,6 +415,9 @@ class Application extends EventDispatcher {
 		online = new Signal();
 
 		offline = new Signal();
+
+		//- Before Run 
+		beforeRun = new Signal();
 
 		//- Messages Received From Other Applications
 		message = new Signal();
@@ -413,6 +469,12 @@ class Application extends EventDispatcher {
 	//- Change in URL-Hash
 	public var hashchange : Signal<Event>;
 
+	//- Fires when the window is scrolled
+	public var scroll : Signal<Event>;
+
+	//- Fires when the window is resized
+	public var resize : Signal<Event>;
+
 	//- Fires just before the Page gets unloaded
 	public var beforeunload : Signal<Event>;
 
@@ -421,6 +483,9 @@ class Application extends EventDispatcher {
 
 	//- Fires when the Application goes offline
 	public var offline : Signal<Event>;
+
+	//- Fires immediately before [this] Application starts
+	public var beforeRun : Signal<Event>;
 
 	//- Fires when a "Message" is received from another Application
 	public var message : Signal<Dynamic>;
