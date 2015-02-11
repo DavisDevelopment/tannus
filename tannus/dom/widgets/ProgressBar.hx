@@ -116,4 +116,16 @@ class ProgressBar extends BaseWidget {
 
 		return radius;
 	}
+
+	/**
+	  * The Color of the bar itself
+	  */
+	public var color(get, set) : String;
+	private function get_color() : String {
+		return (bar.cs( 'background-color' ));
+	}
+	private function set_color(col : String):String {
+		bar.cs('background-color', col);
+		return color;
+	}
 }
