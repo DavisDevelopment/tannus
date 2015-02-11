@@ -6,6 +6,8 @@ import tannus.dom.Element;
 import tannus.io.Signal;
 import tannus.io.Signals;
 
+import tannus.utils.TypeTools;
+
 import tannus.math.Percent;
 import tannus.math.TMath;
 
@@ -74,7 +76,7 @@ class ProgressBar extends BaseWidget {
 /* === Styling-Related Fields and Methods === */
 
 	/**
-	  * Whether [this] Progress Bar has rounded edges
+	  * Whether [this] Progress Bar has rounded sides
 	  */
 	public var round(get, set) : Bool;
 	private function get_round():Bool {
@@ -94,5 +96,24 @@ class ProgressBar extends BaseWidget {
 		}
 
 		return round;
+	}
+
+	/**
+	  * Whether [this] Progress Bar has rounded corners
+	  */
+	public var radius(get, set) : Bool;
+	private function get_radius():Bool {
+		return (el.is('.radius'));
+	}
+	private function set_radius(r : Bool):Bool {
+		if (r) {
+			if (!el.is('.radius')) {
+				el.addClass( 'radius' );
+			}
+		} else {
+			el.removeClass( 'radius' );
+		}
+
+		return radius;
 	}
 }
