@@ -172,5 +172,8 @@ class ProgressBar extends BaseWidget {
 	/**
 	  * Method to remove a class from [this] ProgressBar's Track
 	  */
+	public function removeBarClass(name : String):Void {
+		bar.removeClass( name );
+	}
 
 }
