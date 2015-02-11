@@ -45,6 +45,13 @@ class Pane extends BaseWidget {
 	}
 
 	/**
+	  * Checks for a given class on [this] Pane
+	  */
+	public function hasClass(name : String):Bool {
+		return (el.hasClass(name));
+	}
+
+	/**
 	  * The 'width' of [this] Pane
 	  */
 	public var width(get, set):Dynamic;
