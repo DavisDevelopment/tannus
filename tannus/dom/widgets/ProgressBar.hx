@@ -70,4 +70,29 @@ class ProgressBar extends BaseWidget {
 			complete.dispatch( null );
 		}
 	}
+
+/* === Styling-Related Fields and Methods === */
+
+	/**
+	  * Whether [this] Progress Bar has rounded edges
+	  */
+	public var round(get, set) : Bool;
+	private function get_round():Bool {
+		return (el.is('.round'));
+	}
+	private function set_round(r : Bool):Bool {
+		//- if we're making [this] 'round'
+		if (r) {
+			if (!el.is('.round')) {
+				el.addClass( 'round' );
+			}
+		}
+
+		//- if we're disabling roundness
+		else {
+			el.removeClass( 'round' );
+		}
+
+		return round;
+	}
 }
