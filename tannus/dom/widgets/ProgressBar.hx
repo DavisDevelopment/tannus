@@ -32,9 +32,9 @@ class ProgressBar extends BaseWidget {
 
 		bar.cs('width', '0%');
 
-		progress = new Percent( 0 );
-
 		complete = new Signal();
+		move = new Signal();
+		progress = new Percent( 0 );
 	}
 
 /* === Instance Fields === */
@@ -45,6 +45,9 @@ class ProgressBar extends BaseWidget {
 	//- Signal to fire when [this] reaches 100%
 	public var complete : Signal<Dynamic>;
 
+	//- Signal to fire when [this]'s progress changes at all
+	public var move : Signal<Percent>;
+
 	//- The status, or "percent completed" of [this] Progress Bar
 	private var status : Percent;
 
@@ -54,9 +57,19 @@ class ProgressBar extends BaseWidget {
 		return status;
 	}
 	private function set_progress(np : Percent):Percent {
+		//- Set [status] to either [np], or 100, depending on which is the lower number
 		status = (new Percent(TMath.min(np.value, 100)));
+
+		//- Change [bar]'s "width" property to reflect this change
 		bar.cs('width', ('$np'));
+
+		//- Perform [this]'s "update" operation
 		__update();
+
+		//- Fire our 'move' Signal
+		move.dispatch( status );
+
+		//- Return our new [status]
 		return status;
 	}
 
