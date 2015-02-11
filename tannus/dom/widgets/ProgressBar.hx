@@ -128,4 +128,16 @@ class ProgressBar extends BaseWidget {
 		bar.cs('background-color', col);
 		return color;
 	}
+
+	/**
+	  * The Color of the Track the Bar Slides Along
+	  */
+	public var background(get, set) : String;
+	private function get_background():String {
+		return (el.cs( 'background-color' ));
+	}
+	private function set_background(bg : String):String {
+		el.cs('background-color', bg);
+		return background;
+	}
 }
