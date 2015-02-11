@@ -153,4 +153,12 @@ class ProgressBar extends BaseWidget {
 		el.cs('background-color', bg);
 		return background;
 	}
+
+
+	/**
+	  * Method to apply a new class to [this] ProgressBar's Track
+	  */
+	public function addTrackClass(name : String):Void {
+		el.addClass( name );
+	}
 }
