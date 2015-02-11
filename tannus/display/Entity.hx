@@ -202,4 +202,21 @@ class Entity extends EventDispatcher implements Destructible {
 	public function removeAsset(asset:Destructible):Void {
 		this.assets = this.assets.filter(function(x:Destructible) return (x != asset));
 	}
+
+
+/* === Computed Instance Fields === */
+
+	/**
+	  * The current position of [this] Entity
+	  */
+	public var pos(get, set):Point;
+	private inline function get_pos():Point {
+		return (new Point(x, y, z));
+	}
+	private inline function set_pos(newpos : Point):Point {
+		x = newpos.x;
+		y = newpos.y;
+		z = newpos.z;
+		return (newpos.clone());
+	}
 }
