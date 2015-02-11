@@ -161,4 +161,16 @@ class ProgressBar extends BaseWidget {
 	public function addTrackClass(name : String):Void {
 		el.addClass( name );
 	}
+
+	/**
+	  * Method to apply a new class to [this] ProgressBar's Bar
+	  */
+	public function addBarClass(name : String):Void {
+		bar.addClass( name );
+	}
+
+	/**
+	  * Method to remove a class from [this] ProgressBar's Track
+	  */
+
 }
