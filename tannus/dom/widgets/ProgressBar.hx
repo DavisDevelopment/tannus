@@ -182,4 +182,11 @@ class ProgressBar extends BaseWidget {
 	public function removeBarClass(name : String):Void {
 		bar.removeClass( name );
 	}
+
+	/**
+	  * Returns whether [this] ProgressBar's Track has the given class
+	  */
+	public function hasTrackClass(name : String):Bool {
+		return (el.hasClass(name));
+	}
 }
