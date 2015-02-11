@@ -38,6 +38,13 @@ class Pane extends BaseWidget {
 	}
 
 	/**
+	  * Removes a class from [this] Pane
+	  */
+	public function removeClass(name : String):Void {
+		el.removeClass(name);
+	}
+
+	/**
 	  * The 'width' of [this] Pane
 	  */
 	public var width(get, set):Dynamic;
