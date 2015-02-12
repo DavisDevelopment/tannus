@@ -2,30 +2,12 @@ package tannus.display;
 
 import tannus.display.Stage;
 import tannus.display.Entity;
-import tannus.display.Subset;
 
 import tannus.nore.Selector;
 
 import tannus.core.Object;
 
 import tannus.core.Destructible;
-
-/**
-  * class to represent a subset of the children of Stage, selected with a Object Regular Expression
-
-class Selection<T : Entity> implements Destructible {
-	//- The Subset [this] Selection is using
-	public var sub : Subset<T>;
-
-	//- The Stage [this] Selection is from
-	public var stage : Stage;
-
-	public function new(sel:String, stage:Stage):Void {
-		this.sub = new Subset(sel, stage);
-		this.stage = stage;
-	}
-}
-*/
 
 //- Forward all fields and methods from CSelection
 @:forward(
