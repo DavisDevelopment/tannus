@@ -1,7 +1,7 @@
 package tannus.display;
 
-import js.html.CanvasRenderingContext2D;
+import tannus.display.CanvasContext;
 
 interface Drawable {
-	function draw(ctx : CanvasRenderingContext2D);
+	function draw(ctx : CanvasContext):Void;
 }
