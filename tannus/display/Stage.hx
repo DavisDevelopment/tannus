@@ -374,9 +374,6 @@ class Stage extends EventDispatcher implements Destructible {
 	//- When a Mouse Button is released
 	public var onMouseUp : Signal<MouseEvent>;
 
-	//- When user begins touching [this] Stage
-	public var onTouchStart : Signal<TouchEvent>;
-
 /* === Event Signal Methods === */
 
 	/**
