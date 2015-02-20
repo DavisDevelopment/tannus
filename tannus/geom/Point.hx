@@ -169,6 +169,17 @@ abstract Point (Array <Float>) from Array<Float> {
 	}
 
 	/**
+	  * 'y' field as an Int
+	  */
+	public var iy(get, set):Int;
+	private inline function get_iy():Int {
+		return (Std.int( y ));
+	}
+	private inline function set_iy(niy : Int):Int {
+		return Std.int(y = niy);
+	}
+
+	/**
 	  * Convert [this] Point to a human-readable String
 	  */
 	public inline function toString():String {
