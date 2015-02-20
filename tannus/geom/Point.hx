@@ -156,4 +156,11 @@ abstract Point (Array <Float>) from Array<Float> {
 	private inline function set_z(nz : Float):Float {
 		return (this[2] = nz);
 	}
+
+	/**
+	  * Convert [this] Point to a human-readable String
+	  */
+	public inline function toString():String {
+		return 'Point(${this[0]}, ${this[1]}, ${this[2]})';
+	}
 }
