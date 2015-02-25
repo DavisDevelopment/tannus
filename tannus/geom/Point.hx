@@ -156,4 +156,33 @@ abstract Point (Array <Float>) from Array<Float> {
 	private inline function set_z(nz : Float):Float {
 		return (this[2] = nz);
 	}
+
+	/**
+	  * 'x' field as an Int
+	  */
+	public var ix(get, set):Int;
+	private inline function get_ix():Int {
+		return (Std.int( x ));
+	}
+	private inline function set_ix(nix : Int):Int {
+		return Std.int(x = nix);
+	}
+
+	/**
+	  * 'y' field as an Int
+	  */
+	public var iy(get, set):Int;
+	private inline function get_iy():Int {
+		return (Std.int( y ));
+	}
+	private inline function set_iy(niy : Int):Int {
+		return Std.int(y = niy);
+	}
+
+	/**
+	  * Convert [this] Point to a human-readable String
+	  */
+	public inline function toString():String {
+		return 'Point(${this[0]}, ${this[1]}, ${this[2]})';
+	}
 }
