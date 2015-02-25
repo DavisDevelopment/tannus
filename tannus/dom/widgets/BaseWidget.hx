@@ -39,6 +39,13 @@ class BaseWidget extends EventDispatcher implements Destructible implements Upda
 
 		//- Create the 'onactivate' Signal
 		this.onactivate = new Signal();
+		this.onmouseenter = new Signal();
+		this.onmouseleave = new Signal();
+		this.onmousemove = new Signal();
+		this.onmousedown = new Signal();
+		this.onmouseup = new Signal();
+		this.onclick = new Signal();
+
 
 		/**
 		  * Register 'initializeSignals' to be invoked
@@ -58,19 +65,8 @@ class BaseWidget extends EventDispatcher implements Destructible implements Upda
 		//- Create the 'onupdate' signal
 		this.onupdate = new Signal();
 
-		/**
-		  * Create and initialize all mouse-event related signals
-		  */
-		this.onmouseenter = new Signal();
-		this.onmouseleave = new Signal();
-		this.onmousemove = new Signal();
-		this.onmousedown = new Signal();
-		this.onmouseup = new Signal();
-		this.onclick = new Signal();
-
 		function mouseHandler(e : Dynamic):Void {
 			var type:String = Std.string(e.type);
-			trace( type );
 			var event:MouseEvent = MouseEvent.fromJqEvent( e );
 
 			var signal:Maybe<Signal<MouseEvent>> = (switch (type) {
@@ -119,6 +115,9 @@ class BaseWidget extends EventDispatcher implements Destructible implements Upda
 		
 		//- Dispatch [this] Widget's "onactivate" Signal
 		onactivate.dispatch( this );
+	
+		//- Bind the Events and Shit to [this] Muthafucka
+		__bindEvents();
 
 		//- flag [this] as "activated"
 		this.activated = true;
@@ -165,7 +164,10 @@ class BaseWidget extends EventDispatcher implements Destructible implements Upda
 	public function append(child : BaseWidget):Void {
 		//- default behavior - will not usually be the desired one, however
 		ifel(function() {
-			child.ifel(function() el.append(child.el));
+			child.ifel(function() {
+				el.append(child.el);
+				activate();
+			});
 		});
 	}
 
@@ -174,6 +176,7 @@ class BaseWidget extends EventDispatcher implements Destructible implements Upda
 	  */
 	public function appendToElement(parent : Element):Void {
 		q(parent).append( el );
+		activate();
 	}
 
 /*
@@ -296,6 +299,16 @@ class BaseWidget extends EventDispatcher implements Destructible implements Upda
 		untyped {
 			doc.foundation(options);
 		};
+	}
+
+	/**
+	  * Bind all Event-Signals and Shit to [this] BaseWidget
+	  */
+	public function __bindEvents():Void {
+		el.bind('mouseenter mouseleave mousemove mousedown mouseup click', function(e : Dynamic):Void {
+			
+			emit((e.type + ''), e);
+		});
 	}
 
 	/**
