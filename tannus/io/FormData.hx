@@ -40,6 +40,7 @@ class FormData {
 		//- Clone [this]'s Data onto [nf]
 		for (key in _values.keys()) {
 			nf.append(key, (get(key)), null);
+			trace('"$key" => ${get(key)}');
 		}
 
 		return nf;
