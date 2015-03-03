@@ -39,8 +39,10 @@ abstract HashWrap (Dynamic) from Dynamic {
       * Whether [this] Object is empty
       */
     public var empty(get, never):Bool;
-    private inline function get_empty():Bool {
-	return (Reflect.fields(this).length == 0);
+    private function get_empty():Bool {
+    	var can_be_empty:Bool = !Lambda.has(['Bool', 'Number'], type);
+
+	return (can_be_empty && Reflect.fields(this).length == 0);
     }
 
 
