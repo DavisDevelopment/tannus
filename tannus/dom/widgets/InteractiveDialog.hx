@@ -37,13 +37,13 @@ class InteractiveDialog extends Dialog {
 		
 		buttonTray.append( btn );
 	
-		btn.onclick.on(function(e) {
-			trace( "YOU CLICKED A BUTTON!!!" );
-		});
-		btn.on('click', function(e) {
-			trace( "YOU (Legacy) CLICKED A BUTTON!!" );
-		});
-
 		return btn;
+	}
+
+	/**
+	  * Add some content to the Body Tray
+	  */
+	public function addContent(widget : BaseWidget):Void {
+		widget.appendTo( bodyTray );
 	}
 }
