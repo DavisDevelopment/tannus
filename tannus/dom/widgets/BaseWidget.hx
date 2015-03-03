@@ -166,6 +166,7 @@ class BaseWidget extends EventDispatcher implements Destructible implements Upda
 		ifel(function() {
 			child.ifel(function() {
 				el.append(child.el);
+				child.activate();
 				activate();
 			});
 		});
