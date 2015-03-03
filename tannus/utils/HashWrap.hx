@@ -66,7 +66,11 @@ abstract HashWrap (Dynamic) from Dynamic {
       */
     @:arrayAccess
     public inline function set <T> (key:String, value:T):T {
-        return untyped (Reflect.setProperty(this, key, value));
+    	    //- Perform the set operation
+            (Reflect.setProperty(this, key, value));
+
+            //- return the value after the set
+            return get(key);
     }
 
     /**
