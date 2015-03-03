@@ -1,5 +1,7 @@
 package tannus.utils;
 
+import tannus.utils.TypeTools;
+
 abstract HashWrap (Dynamic) from Dynamic {
     public inline function new(o : Dynamic):Void {
         this = o;
@@ -23,6 +25,22 @@ abstract HashWrap (Dynamic) from Dynamic {
         for (n in names) keyList.add( n );
         
         return keyList;
+    }
+
+    /**
+      * The type of [this] Object, as determined by tannus.nore
+      */
+    public var type(get, never):String;
+    private inline function get_type():String {
+	return TypeTools.typename( this );
+    }
+
+    /**
+      * Whether [this] Object is empty
+      */
+    public var empty(get, never):Bool;
+    private inline function get_empty():Bool {
+	return (Reflect.fields(this).length == 0);
     }
 
 
