@@ -35,8 +35,19 @@ class Accordion extends BaseWidget {
 	  * Initialize [this] Shit
 	  */
 	private inline function __Init():Void {
+		//- Create the Element for [this] Accordion
 		el = q('<dl class="accordion" data-accordion></dl>');
+
+		//- Bind [this] Accordion instance to the Element
 		el.data('klass', this);
+
+		var ele:Dynamic = (cast el);
+
+		//- Determine when one of [this] Accordion's Panes are opened or closed
+		ele.on('toggled', function(event:Dynamic, acc:Dynamic):Void {
+			
+			trace( acc );
+		});
 	}
 
 	/**
