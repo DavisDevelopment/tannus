@@ -30,6 +30,18 @@ class TextInput extends BaseWidget {
 /* == Computed Instance Fields == */
 
 	/**
+	  * String value of [this] Input
+	  */
+	public var value(get, set):String;
+	private inline function get_value():String {
+		return Std.string(el.val);
+	}
+	private inline function set_value(nv : String):String {
+		el.val = nv;
+		return el.val;
+	}
+
+	/**
 	  * Placeholder for [this] TextInput
 	  */
 	public var placeholder(get, set):String;
