@@ -52,4 +52,11 @@ abstract RegEx ( EReg ) from EReg {
 	public static inline function fromEReg(reg:EReg):RegEx {
 		return new RegEx(reg);
 	}
+
+	@:from
+	public static inline function fromString(reg : String):RegEx {
+		var r:EReg = new EReg(reg, '');
+
+		return new RegEx( r );
+	}
 }
