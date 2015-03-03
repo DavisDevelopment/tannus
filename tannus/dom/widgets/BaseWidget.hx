@@ -9,6 +9,7 @@ import tannus.dom.StyleSet;
 
 import tannus.events.Event;
 import tannus.events.MouseEvent;
+import tannus.events.KeyboardEvent;
 
 import tannus.utils.HashWrap;
 import tannus.utils.Maybe;
@@ -40,6 +41,8 @@ class BaseWidget extends EventDispatcher implements Destructible implements Upda
 
 		//- Create the 'onactivate' Signal
 		this.onactivate = new Signal();
+
+		/* == Mouse-Event Signals == */
 		this.onmouseenter = new Signal();
 		this.onmouseleave = new Signal();
 		this.onmousemove = new Signal();
@@ -47,6 +50,10 @@ class BaseWidget extends EventDispatcher implements Destructible implements Upda
 		this.onmouseup = new Signal();
 		this.onclick = new Signal();
 
+		/* == Keyboard-Event Signals == */
+		this.onkeydown = new Signal();
+		this.onkeyup = new Signal();
+		this.onkeypress = new Signal();
 
 		/**
 		  * Register 'initializeSignals' to be invoked
@@ -66,10 +73,17 @@ class BaseWidget extends EventDispatcher implements Destructible implements Upda
 		//- Create the 'onupdate' signal
 		this.onupdate = new Signal();
 
+		/* === Mouse Event Signals === */
+
+		//- Generic mouse-event handler
 		function mouseHandler(e : Dynamic):Void {
+			//- the type of the current event
 			var type:String = Std.string(e.type);
+
+			//- Convert the jQuery event to a Tannus event
 			var event:MouseEvent = MouseEvent.fromJqEvent( e );
 
+			//- Obtain a reference to the Signal
 			var signal:Maybe<Signal<MouseEvent>> = (switch (type) {
 				case 'mouseenter': onmouseenter;
 				case 'mouseleave': onmouseleave;
@@ -81,15 +95,55 @@ class BaseWidget extends EventDispatcher implements Destructible implements Upda
 				default: null;
 			});
 
+			//- if a reference was found
 			if (signal.exists) {
+				//- dispatch the event on that Signal
 				signal.value.dispatch( event );
 			}
 		}
 
-		var events:Array<String> = ['mouseenter', 'mouseleave', 'mousemove', 'mousedown', 'mouseup', 'click'];
-		for (event in events) {
+		//- Array of all mouse-event types to listen for
+		var mevents:Array<String> = ['mouseenter', 'mouseleave', 'mousemove', 'mousedown', 'mouseup', 'click'];
+
+		//- Bind them all to widget events
+		for (event in mevents) {
 
 			q( el ).on(event, mouseHandler.bind(_));
+		}
+
+
+		/* === Keyboard Event Signals === */
+
+		//- Generic Keyboard Event Signals
+		function keyHandler(e : Dynamic):Void {
+			//- the type of the current event
+			var type:String = Std.string(e.type);
+
+			//- Convert the jQuery event to a Tannus event
+			var event:KeyboardEvent = KeyboardEvent.fromJqEvent( e );
+
+			//- Obtains a reference to the Signal
+			var signal:Maybe<Signal<KeyboardEvent>> = (switch (type) {
+				case 'keydown' : onkeydown;
+				case 'keyup'   : onkeyup;
+				case 'keypress': onkeypress;
+
+				default: null;
+			});
+
+			//- if a reference was found
+			if (signal.exists) {
+				//- dispatch the event on that Signal
+				signal.value.dispatch( event );
+			}
+		}
+
+		//- Array of all key-events to listen for
+		var kevents:Array<String> = ['keydown', 'keyup', 'keypress'];
+
+		//- Bind them all to widget events
+		for (event in kevents) {
+			q( el ).on(event, keyHandler.bind(_));
 		}
 	}
 
@@ -349,6 +403,15 @@ class BaseWidget extends EventDispatcher implements Destructible implements Upda
 
 	//- Signal which fires when mouse-cursor clicks [this] widget
 	public var onclick : Signal<MouseEvent>;
+
+	//- Signal which fires when a key is pressed down on [this] widget
+	public var onkeydown : Signal<KeyboardEvent>;
+
+	//- Signal which fires when a key is released on [this] widget
+	public var onkeyup : Signal<KeyboardEvent>;
+
+	//- Signal which fires when a key is pressed, then released, in sequence, on [this] widget
+	public var onkeypress : Signal<KeyboardEvent>;
 
   /* == Boolean Fields == */
 
