@@ -13,6 +13,7 @@ import tannus.io.Byte;
 
 /* Utility Imports */
 import tannus.utils.RegEx;
+import tannus.utils.HashWrap;
 
 /* Stream Imports */
 import tannus.inputs.KeystrokeStream;
@@ -90,6 +91,43 @@ class TextInput extends BaseWidget {
 				return true;
 			}
 		}
+	}
+
+	/**
+	  * The caret (cursor) position of [this] Text Field
+	  */
+	public var cursor(get, never):Int;
+	private function get_cursor():Int {
+		//- variable to hold the position as it's determined
+		var pos:Int = 0;
+
+		//- Reference to the document as a HashWrap
+		var doc:HashWrap = js.Browser.document;
+
+		//- IE Support
+		if (doc.exists('selection')) {
+			//- document's "selection" field
+			var sel:Dynamic = (doc['selection']);
+
+			//- Shift focus to [this] Input
+			el.toDOMElement().focus();
+
+			//- Get empty selection range
+			var oSel:Dynamic = sel.createRange();
+
+			//- move selection start to index 0
+			oSel.moveStart('character', -value.length);
+
+			pos = Math.round(Std.parseInt(Std.string(oSel.text.length)));
+		}
+
+		var e:HashWrap = (el.toDOMElement());
+		//- Mozilla Support
+		if (e.exists('selectionStart') || e['selectionStart'] == '0') {
+			pos = Math.round(Std.parseInt(Std.string(e['selectionStart'])));
+		}
+
+		return pos;
 	}
 
 /* == Standard Instance Fields == */
