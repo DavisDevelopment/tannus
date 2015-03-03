@@ -9,6 +9,7 @@ import tannus.core.EventDispatcher;
 /* Tannus Utils Imports */
 import tannus.utils.CompileTime;
 import tannus.utils.TypeTools;
+import tannus.utils.Path;
 
 /* Tannus IO Imports */
 import tannus.io.Ptr;
@@ -29,7 +30,6 @@ using StringTools;
 /**
   * class tannus.Application - Class to represent a JavaScript-based Application (WebApp, Chrome App, Chrome Extension, PhoneGap, etc.)
   */
-@:expose
 class Application extends EventDispatcher {
 
 	//- The Router instance associated with [this] Application
@@ -40,6 +40,9 @@ class Application extends EventDispatcher {
 
 	//- Private Signal for dispatching events when the 'name' of [this] Application is changed
 	private var name_change : Signal<String>;
+
+	//- The Path [this] Application is currently on
+	public var path : Path;
 	
 	/**
 	  * Constructor Function
@@ -141,6 +144,8 @@ class Application extends EventDispatcher {
 	  */
 	public function start():Void {
 		var current:String = js.Browser.window.location.pathname;
+
+		path = current;
 
 		this.router.run(current);
 
