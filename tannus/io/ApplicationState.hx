@@ -2,8 +2,7 @@ package tannus.io;
 
 //- Tannus Imports
 import tannus.io.Ptr;
-import tannus.io.storage.Storage;
-import tannus.io.storage.LocalStorage;
+import tannus.io.AsyncStorage;
 
 //- Haxe Imports
 import haxe.Serializer;
@@ -14,13 +13,13 @@ class ApplicationState {
 	public var entries:Map<String, {v : Dynamic}>;
 
 	//- The Storage object we'll use to "save" [this] State
-	public var storage : Storage;
+	public var storage : AsyncStorage;
 
 	public function new():Void {
 		
 		entries = new Map();
 
-		storage = Type.createInstance(storageClass, []);
+		storage = getStore( storageClass );
 	}
 
 	/**
@@ -111,9 +110,18 @@ class ApplicationState {
 	}
 
 	/**
+	  * Creates an instance of whatever class [storageClass] is
+	  */
+	private static function getStore(pc : Class<AsyncStorage>):AsyncStorage {
+		var creator:Void->Storage = Reflect.getProperty(pc, 'create');
+
+		return Reflect.callMethod(pc, creator, []);
+	}
+
+	/**
 	  * The Class which will be used for storing application-states
 	  */
-	public static var storageClass:Class<Storage> = LocalStorage;
+	public static var storageClass:Class<AsyncStorage> = AsyncStorageWrapper;
 
 	/**
 	  * The Default Storage "key" to store our states under
