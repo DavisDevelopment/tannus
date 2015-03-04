@@ -1,167 +1,70 @@
 package tannus.dom;
 
-import js.html.CSSStyleDeclaration;
-import tannus.utils.Value;
+import tannus.dom.Element;
 import tannus.io.Ptr;
 import tannus.utils.Maybe;
-import tannus.dom.Element;
 
-
-abstract StyleSet (Dynamic) {
-	public inline function new(e : Dynamic):Void {
-		this = e;
+/**
+  * abstract class for array-access to the CSS styles of an Element
+  */
+abstract StyleSet (AccessFunc) {
+	/* Constructor Function */
+	public function new(func : AccessFunc):Void {
+		this = func;
 	}
-	
+
+/* === Instance Methods === */
 
 	/**
-	  * Internal Reference to [this] as a StyleSet object
+	  * Internal reference to [this] as a StyleSet instance
 	  */
 	private var self(get, never):StyleSet;
 	private inline function get_self():StyleSet {
-		return cast this;
+		return (new StyleSet(this));
 	}
 
+
 	/**
-	  * ArrayReading Accessor - usages:
-	  * - `this.get('color');`
-	  * -===============================
-	  * - `this['color'];`
+	  * Get the value of the given css-attribute
 	  */
 	@:arrayAccess
-	public inline function get(key : String):Null<String> {
-		return (this.css( key ));
+	public inline function get(key : String):String {
+		return (this( [key] ));
 	}
-	
+
 	/**
-	  * ArrayWriting Acessor - usages:
-	  * - `this.set('color', 'red');`
-	  * -============================
-	  * - `this['color'] = 'red';`
+	  * Assign the given css-attribute to the given value
 	  */
 	@:arrayAccess
-	public inline function set(key:String, value:String):Void {
-		this.css(key, value);
+	public inline function set(key:String, val:String):String {
+		return (this([key, val]));
 	}
 
-
-/*
- === "Instance" Methods ===
-*/
-
-	/*
-	 * Returns a [Ptr] reference to the given css-style
-	 */
-	public function reference(key : String):Ptr<String> {
-		//- create 'Pointer' object
-		var ref:Ptr<String> = Ptr.create( self[key] );
-
-		//- do stuff to it
-		null;
-
-		return ref;
-	}
-	
-	
 	/**
-	  * Object-Write Operator | Increment by HashMap
+	  * Obtain a Pointer to a particular css-attribute
+	  */
+	public inline function reference(key : String):Ptr<String> {
+		return new Ptr((function() {
+			
+			return get(key);
+		}), 
+		(function(val : String):String {
+			return set(key, val);
+		}));
+	}
+
+	/**
+	  * Increment a StyleSet by a Map
 	  */
 	@:op(A += B)
-	public static function incrementByMap(styles:StyleSet, hash : Map<String, Dynamic>):Void {
+	public static inline function incrementByMap(styles:StyleSet, hash:Map<String, String>):Void {
+		//- Iterate over all keys of [hash]
 		for (key in hash.keys()) {
-
+			
+			//- Merge [hash]'s data onto [styles]
 			styles[key] = hash[key];
 		}
 	}
-
-	/**
-	  * Returns an array from the contents of an iterator
-	  */
-	private static inline function all <T> (i : Iterator <T>) :Array<T> {
-		return [for (item in i) item];
-	}
 }
 
-
-/**
-
-================================
-  ==== OLD IMPLEMENTATION ====
-================================
-
-abstract StyleSet (CStyleSet) {
-	public inline function new(e : Element):Void {
-		this = new CStyleSet(e);
-	}
-	
-	public inline function iterator():Iterator<String> {
-		return (this.styleMap.keys());
-	}
-
-	@:arrayAccess
-	public inline function get(name : String):String {
-		return (this.getProperty(name));
-	}
-
-	@:arrayAccess
-	public inline function set(name:String, val:Dynamic):Void {
-		this.setProperty(name, val);
-	}
-}
-
-class CStyleSet {
-	public var e:Element;
-	public var styles:CSSStyleDeclaration;
-	public var styleMap:Map<String, String>;
-
-	public function new(e : Element):Void {
-		this.e = e;
-		this.styles = js.Browser.window.getComputedStyle(e.toDOMElement());
-
-		this.createMap();
-	}
-
-	public function createMap():Void {
-		styleMap = new Map();
-
-		for (i in 0...styles.length) {
-			var name:String = styles.item(i);
-			var value:String = styles.getPropertyValue(name);
-			styleMap[name] = value;
-		}
-	}
-
-	public inline function getProperty(name : String):String {
-		var result:Maybe<String> = styleMap[name];
-		return result.or('');
-	}
-	
-	public inline function setProperty(name:String, val:Dynamic):Void {
-		var map:Map<String, Dynamic> = new Map();
-		map[name] = val;
-		setProperties(map);
-	}
-
-	public function setProperties(ncss:Map<String, Dynamic>):Void {
-		var cssm:Maybe<String> = (e['style']);
-		var cssa:String = cssm.or('');
-		var cssMap:Map<String, String> = new Map();
-		if (cssa != '') {
-			var props = cssa.split(';').filter(function(x:String) return (x != ''));
-			for (prop in props) {
-				var pair = prop.split(':');
-				cssMap[pair[0]] = pair[1];
-			}
-		}
-		
-		var pairs:Array<String> = new Array();
-		for (key in ncss.keys()) {
-			var value:String = Std.string(ncss[key]);
-			cssMap[key] = value;
-			pairs.push('$key: $value');
-		}
-
-		e['style'] = (pairs.join(';'));
-	}
-}
-
-*/
+private typedef AccessFunc = Array<String> -> String;

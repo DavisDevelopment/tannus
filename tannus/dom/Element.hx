@@ -223,6 +223,23 @@ abstract Element (js.JQuery) {
 	private inline function get_exists():Bool {
 		return (this.get().length > 0);
 	}
+	
+	/**
+	  * Get the value of the given attribute of [this] Element
+	  */
+	@:arrayAccess
+	public inline function get(name : String):String {
+		return this.attr(name);
+	}
+	
+	/**
+	  * Set the value of the given attribute of [this] Element
+	  */
+	@:arrayAccess
+	public inline function set(name:String, val:String):String {
+		this.attr(name, val);
+		return this.attr(name);
+	}
 
 	/**
 	  * Alias of jQuery.fn.css() method
@@ -230,46 +247,29 @@ abstract Element (js.JQuery) {
 	public inline function cs(name:String, ?value:String):Null<String> {
 		if (value != null) {
 			this.css(name, value);
-			return null;
-		} else {
-			return this.css( name );
-		}
+			
+		} 
+		
+		return this.css( name );
 	}
 
-	@:arrayAccess
-	public inline function get(name : String):String {
-		return this.attr(name);
-	}
-
-	@:arrayAccess
-	public inline function set(name:String, val:String):String {
-		this.attr(name, val);
-		return this.attr(name);
+	/**
+	  * Private alias to the [cs] method, which takes an Array as it's argument
+	  */
+	private function _cs(args : Array<String>):String {
+		return cs(args[0], args[1]);
 	}
 
 	public var css(get, never):StyleSet;
 	private inline function get_css():StyleSet {
 
-		return (new StyleSet( self ));
+		return (new StyleSet(_cs.bind(_)));
 	}
 
 	public var hash(get, never):tannus.utils.HashWrap;
 	private inline function get_hash():tannus.utils.HashWrap {
 		return (new HashWrap(this.data()));
 	}
-
-/**
-	private inline function get_css():StyleSet {
-		var existing:Null<Dynamic> = this.data( '__styles__' );
-		if (existing != null && Std.is(existing, CStyleSet)) {
-			return cast(existing, StyleSet);
-		} else {
-			var yocss = new StyleSet(cast this);
-			this.data('__styles__', yocss);
-			return yocss;
-		}
-	}
-*/
 
 	public var text(get, set):String;
 	private inline function get_text():String {
