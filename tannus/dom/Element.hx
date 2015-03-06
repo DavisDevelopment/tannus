@@ -257,7 +257,8 @@ abstract Element (js.JQuery) {
 	  * Private alias to the [cs] method, which takes an Array as it's argument
 	  */
 	private function _cs(args : Array<String>):String {
-		return cs(args[0], args[1]);
+		var result:Maybe<String> = cs(args[0], args[1]);
+		return result.or( '' );
 	}
 
 	public var css(get, never):StyleSet;
