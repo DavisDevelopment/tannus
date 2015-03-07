@@ -1,27 +1,21 @@
 package tannus.dom;
 
+/* Core Imports */
 import tannus.core.EventDispatcher;
 import tannus.core.Destructible;
+
 import tannus.utils.Value;
-import tannus.io.Ptr;
+
 import tannus.utils.Pointer;
 import tannus.utils.Setter;
 import tannus.utils.Maybe;
+
 import tannus.dom.StyleSet;
 import tannus.utils.HashWrap;
+import tannus.io.Ptr;
 
 import tannus.geom.Point;
 import tannus.geom.Rectangle;
-
-import tannus.geom.Point;
-import tannus.geom.Rectangle;
-
-import tannus.geom.Point;
-import tannus.geom.Rectangle;
-
-import tannus.geom.Point;
-import tannus.geom.Rectangle;
-
 
 @:forward(
 	selector,
@@ -343,20 +337,7 @@ abstract Element (js.JQuery) {
 			return new Rectangle();
 		}
 	}
-
-	public static inline function bindValue(el:Element, v:Value<String>):Void {
-		var myval = Value.create(el.val);
-		var orig = v.v;
-
-		el.on('change keyup', function(event : Dynamic):Void {
-			if (myval.v != "" && myval.v != null) {
-				v &= myval;
-			} else {
-				v &= orig;
-			}
-		});
-	}
-
+	
 	public static inline function bindPtr(el:Element, v:Ptr<String>):Void {
 		var myval = Ptr.create(el.val);
 		var orig = v.v;
@@ -426,4 +407,8 @@ abstract Element (js.JQuery) {
 	}
 }
 
+//#if new_haxe
+//private typedef JSElement = js.html.HTMLElement;
+//#else
 private typedef JSElement = js.html.Element;
+//#end
