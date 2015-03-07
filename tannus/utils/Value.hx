@@ -88,14 +88,6 @@ abstract Value <T> (CValue <T>) {
 			return val;
 		}());
 	}
-
-	public static function all <T> (vals : Array<Value<T>>):Value<T> {
-		return new Value(Pointer.literal(vals[0]), cast function(s) {
-			for (x in vals) {
-				x.set(s);
-			}
-		});
-	}
 }
 
 class CValue <T> extends EventDispatcher {
