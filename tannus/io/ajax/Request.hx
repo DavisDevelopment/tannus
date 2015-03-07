@@ -188,9 +188,28 @@ class Request {
 			//- to [this] Request's readyStateChange Signal
 			readyStateChange.dispatch( this.readyState );
 		});
-
 		
 		/* == Forward the Load and Error Events to our Done Event == */
+
+		readyStateChange.on(function(state:ReadyState):Void {
+			switch (state) {
+				case ReadyState.Done:
+					if (req.status == 200) {
+						done.dispatch(true);
+						ready.dispatch(this.response);
+					} else {
+						done.dispatch(false);
+						failed.dispatch('Stuff');
+					}
+
+				default:
+					null;
+			}
+		});
+		
+		/**
+		  Maybe if I only use the readyStateChange event, I won't get a false positive
+
 		req.onload = (function(e : Dynamic) {
 			done.dispatch( true );
 			
@@ -203,6 +222,7 @@ class Request {
 
 			failed.dispatch( e );
 		});
+		*/
 	}
 
 
