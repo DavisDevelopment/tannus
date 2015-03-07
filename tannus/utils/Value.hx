@@ -127,4 +127,3 @@ class CValue <T> extends EventDispatcher {
 		return listener;
 	}
 }
->>>>>>> whoops
