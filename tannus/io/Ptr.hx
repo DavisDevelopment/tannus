@@ -137,24 +137,39 @@ abstract Ptr <T> (TwoTuple<Pointer<T>, Setter<T>>) {
 	  * Direct Value Assignment
 	  */
 	@:op(A &= B)
+<<<<<<< HEAD
 	public inline function setValue(val : T):T {
 		return (this.two.set(val));
+=======
+	public static inline function setValue<T> (self:Ptr<T>, val:T):Void {
+		self.set( val );
+>>>>>>> whoops
 	}
 	
 	/**
 	  * Value Assignment by Getter
 	  */
 	@:op(A &= B)
+<<<<<<< HEAD
 	public inline function setPointer(val : Pointer<T>):T {
 		return (this.two.set(val.get()));
+=======
+	public static inline function setPointer<T> (self:Ptr<T>, val:Pointer<T>):Void {
+		self.set( val.get() );
+>>>>>>> whoops
 	}
 	
 	/**
 	  * Value Assignment by Ptr
 	  */
 	@:op(A &= B)
+<<<<<<< HEAD
 	public inline function setPtr(val : Ptr<T>):T {
 		return (this.two.set(val.v));
+=======
+	public static inline function setPtr(self:Ptr<T>, val:Ptr<T>):Void {
+		self.set( val.v );
+>>>>>>> whoops
 	}
 
 /*
