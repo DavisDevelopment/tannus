@@ -153,7 +153,7 @@ abstract Ptr <T> (TwoTuple<Pointer<T>, Setter<T>>) {
 	  * Value Assignment by Ptr
 	  */
 	@:op(A &= B)
-	public static inline function setPtr(self:Ptr<T>, val:Ptr<T>):Void {
+	public static inline function setPtr<T> (self:Ptr<T>, val:Ptr<T>):Void {
 		self.set( val.v );
 	}
 
