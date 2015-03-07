@@ -6,9 +6,6 @@ import tannus.utils.Pointer;
 import tannus.utils.Setter;
 import tannus.io.Ptr;
 
-<<<<<<< HEAD
-typedef Value<T> = Ptr<T>;
-=======
 #if macro
 import haxe.macro.Expr;
 #end
