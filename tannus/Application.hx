@@ -4,12 +4,14 @@ package tannus;
 import tannus.core.Route;
 import tannus.core.Router;
 import tannus.core.Page;
+import tannus.core.Component;
 import tannus.core.EventDispatcher;
 
 /* Tannus Utils Imports */
 import tannus.utils.CompileTime;
 import tannus.utils.TypeTools;
 import tannus.utils.Path;
+import tannus.utils.tuples.TwoTuple;
 
 /* Tannus IO Imports */
 import tannus.io.Ptr;
@@ -43,6 +45,10 @@ class Application extends EventDispatcher {
 
 	//- The Path [this] Application is currently on
 	public var path : Path;
+
+	//- Component-Attachment Directives
+	private var rComponents : Array<TwoTuple<Route, Class<Component>>>;
+
 	
 	/**
 	  * Constructor Function
@@ -55,6 +61,9 @@ class Application extends EventDispatcher {
 
 		//- Create our 'name_change' signal
 		this.name_change = new Signal();
+
+		//- Stuff
+		this.rComponents = new Array();
 
 		//- Assign [this] Application a randomly-generated name
 		this.name = Memory.uniqueIdString('app-');
@@ -130,12 +139,59 @@ class Application extends EventDispatcher {
 				handler( pg );
 			}
 
+			//- When the Page has finished it's "open"ing actions,
+			//- attach all relevant Component's to it
+			pg.on('open', function(x) {
+				
+				_attachComponentsTo(cast x);
+			});
+
 			//- Secondly, invoke [pg]'s "open" method
 			pg.open();
 		});
 		
 		//- Register the Route with our "router"
 		this.router.add(rout);
+	}
+
+	/**
+	  * Register a Component to be attached to any/all Page instances
+	  * which 'open' on a URL which matches the given description
+	  */
+	public function attachTo(descriptor:String, component:Class<Component>):Void {
+		var tester:Route = new Route(descriptor);
+		var tup:TwoTuple<Route, Class<Component>> = new TwoTuple(tester, component);
+
+		rComponents.push( tup );
+	}
+
+	/**
+	  * Private method which actually attaches the registered Components
+	  */
+	private function _attachComponentsTo(page : Page):Void {
+		//- Array which will hold all Components that were selected to be 'attach'ed to the Page
+		var willAttach:Array<Class<Component>> = new Array();
+
+		//- The current URL
+		var current:String = js.Browser.window.location.pathname;
+		
+		//- Iterate over the pairs of Route/Components
+		for (pair in rComponents) {
+			//- if this Route validates successfully
+			if (pair.one.check(current)) {
+				//- add this Component to the Array of those which will be attached
+				willAttach.push( pair.two );
+			}
+		}
+
+		//- Iterate over all selected Components
+		for (klass in willAttach) {
+			//- Create an instance of the Component
+			var comp:Component = Type.createInstance(klass, [page]);
+
+			//- And attach each one of them
+			page.attach( comp );
+		}
 	}
 	
 	/**
