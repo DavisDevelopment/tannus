@@ -4,7 +4,6 @@ import tannus.math.TMath;
 import tannus.geom.Point;
 import tannus.geom.Rectangle;
 
-@:expose
 class Line {
 	public var start:Point;
 	public var end:Point;

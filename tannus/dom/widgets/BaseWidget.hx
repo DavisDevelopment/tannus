@@ -496,7 +496,7 @@ class BaseWidget extends EventDispatcher implements Destructible implements Upda
 	/**
 	  * Reference to the [css] field of [this]'s Element
 	  */
-	private var css(get, never):StyleSet;
+	public var css(get, never):StyleSet;
 	private inline function get_css():StyleSet {
 		if (el != null) {
 			return (el.css);
@@ -510,7 +510,9 @@ class BaseWidget extends EventDispatcher implements Destructible implements Upda
 	  */
 	public var pos(get, never):tannus.geom.Point;
 	private function get_pos():tannus.geom.Point {
+		//- Grab the 'offset' of [this] Element, according to jQuery
 		var offs = el.offset();
+
 		var z = Std.parseInt(css['z-index']);
 		if (Math.isNaN(z)) {
 			z = 0;

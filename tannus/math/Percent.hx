@@ -37,7 +37,7 @@ abstract Percent (Float) from Float to Float {
 	/**
 	  * Retrieve [this] Percent "of" another number
 	  */
-	public static macro function of(p:ExprOf<Percent>, other) {
+	public macro function of(p:ExprOf<Percent>, other) {
 		return macro ($other * ($p.value / 100));
 	}
 

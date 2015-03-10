@@ -4,6 +4,7 @@ import tannus.core.EventDispatcher;
 
 import tannus.utils.Pointer;
 import tannus.utils.Setter;
+import tannus.io.Ptr;
 
 #if macro
 import haxe.macro.Expr;
@@ -87,14 +88,6 @@ abstract Value <T> (CValue <T>) {
 			};
 			return val;
 		}());
-	}
-
-	public static function all <T> (vals : Array<Value<T>>):Value<T> {
-		return new Value(Pointer.literal(vals[0]), cast function(s) {
-			for (x in vals) {
-				x.set(s);
-			}
-		});
 	}
 }
 

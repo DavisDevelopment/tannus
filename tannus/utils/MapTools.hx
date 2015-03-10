@@ -14,25 +14,52 @@ package tannus.utils;
 
 import haxe.ds.StringMap;
 import haxe.ds.IntMap;
-import tannus.utils.Types;
+
+import tannus.utils.HashWrap;
+import tannus.utils.TypeTools;
 
 class MapTools {
+	/**
+	  * function which determines the 'type' of object [o]
+	  */
+	private static function tn(o : Dynamic):String {
+		return TypeTools.typename(o);
+	}
+
+	/**
+	  * Create a Map<String, Dynamic> from an arbitrary object
+	  */
 	public static function fromDynamic( dyn:Dynamic ):StringMap<Dynamic> {
-		if (Types.basictype(dyn) == "StringMap") return cast(dyn, StringMap<Dynamic>);
+		//- if [dyn] IS already a Map
+		if (tn(dyn) == "haxe.ds.StringMap") {
+			//- return it as such
+			return cast(dyn, StringMap<Dynamic>);
+		}
+
+		//- Otherwise, just go through the standard cloning process
 		var keys:Array<String> = Reflect.fields(dyn);
 		var result:StringMap<Dynamic> = new StringMap();
+
 		for (key in keys) {
 			result.set(key, Reflect.getProperty(dyn, key));
 		}
 		return result;
 	}
-	public static function toDynamic( map:StringMap<Dynamic> ):Dynamic {
-		var result:Dynamic = {};
+
+	/**
+	  * Convert a Map to an anonymous object
+	  */
+	public static function toDynamic <K, V> (map : Map<K, V>):Dynamic {
+		//- create new empty Hash to store our cloned data
+		var result:HashWrap = {};
+
 		for (key in map.keys()) {
-			Reflect.setProperty(result, key, map.get(key));
+			result[cast(key, String)] = map[key];
 		}
-		return result;
+
+		return cast result;
 	}
+
 	public static function toPairs(map:StringMap<Dynamic>):Array<Array<Dynamic>> {
 		var pairs:Array<Array<Dynamic>> = [];
 		var keys = map.keys();

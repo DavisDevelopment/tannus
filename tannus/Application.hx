@@ -458,7 +458,7 @@ class Application extends EventDispatcher {
 		/* Create Miscellaneous Signals */
 
 		//- Create Map of misc Signals
-		var _misc_signals = new Map();
+		var _misc_signals:Map<String, Dynamic> = new Map();
 
 		//- Hash-Change
 		hashchange = new Signal();
