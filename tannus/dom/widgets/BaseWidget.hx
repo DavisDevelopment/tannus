@@ -30,6 +30,7 @@ class BaseWidget extends EventDispatcher implements Destructible implements Upda
 		this.el = null;
 		
 		this._intialize();
+		this.assets = new Array();
 	}
 
 	/**
@@ -41,6 +42,7 @@ class BaseWidget extends EventDispatcher implements Destructible implements Upda
 
 		//- Create the 'onactivate' Signal
 		this.onactivate = new Signal();
+		this.onload = new Signal();
 
 		/* == Mouse-Event Signals == */
 		this.onmouseenter = new Signal();
@@ -72,6 +74,13 @@ class BaseWidget extends EventDispatcher implements Destructible implements Upda
 	public function initializeSignals(self : BaseWidget):Void {
 		//- Create the 'onupdate' signal
 		this.onupdate = new Signal();
+
+		onactivate.on(function(x) {
+			
+			el.on('load', function(x):Void {
+				onload.dispatch( this );
+			});
+		});
 
 		/* === Mouse Event Signals === */
 
@@ -153,6 +162,9 @@ class BaseWidget extends EventDispatcher implements Destructible implements Upda
 	public function destroy():Void {
 		//- if el isn't null, remove el
 		whenEl(this, function() el.remove());
+		for (asset in assets) {
+			asset.destroy();
+		}
 	}
 
 	/**
@@ -219,9 +231,18 @@ class BaseWidget extends EventDispatcher implements Destructible implements Upda
 	public function append(child : BaseWidget):Void {
 		//- default behavior - will not usually be the desired one, however
 		ifel(function() {
+			//- if 'child' has an Element associated with it
 			child.ifel(function() {
+				//- append that Element to ours
 				el.append(child.el);
+
+				//- activate the child
 				child.activate();
+
+				//- add the child as an asset
+				assets.push( child );
+
+				//- ensure that [this] Widget is activated	
 				activate();
 			});
 		});
@@ -377,6 +398,9 @@ class BaseWidget extends EventDispatcher implements Destructible implements Upda
  == Instance Fields ==
 */
 
+	//- Array of Destructibles attached to [this] Widget
+	private var assets : Array<Destructible>;
+
   /* == Signal Fields == */
 
 	
@@ -385,6 +409,8 @@ class BaseWidget extends EventDispatcher implements Destructible implements Upda
 
 	//- Signal which fires when [this] widget is 'appended' to something
 	public var onactivate : Signal<BaseWidget>;
+
+	public var onload : Signal<BaseWidget>;
 
 	//- Signal which fires when mouse-cursor enters [this] widget
 	public var onmouseenter : Signal<MouseEvent>;
