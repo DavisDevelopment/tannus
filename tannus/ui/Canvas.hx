@@ -146,12 +146,6 @@ class Canvas extends EventDispatcher {
 				(event.pageY - offset.top)
 			);
 
-			//- For debugging purposes, show a small black square on [this] Canvas under the mouse
-			#if debug
-				var c = getContext('2d');
-				c.fillRect(pt.x, pt.y, 10, 10);
-			#end
-
 			return pt;
 		}
 
