@@ -10,6 +10,9 @@ class TMath {
     public static inline var SQRT1_2 = 0.7071067811865476;
     public static inline var SQRT2 = 1.4142135623730951;
 
+    /* Global variable which Tannus uses to approximate Ellipses */
+    public static var KAPPA:Float = {(4 * (Math.sqrt(2) - 1) / 3);};
+
     // Haxe doesn't specify the size of an int or float, in practice it's 32 bits
     /** The lowest integer value in Flash and JS. */
     public static inline var INT_MIN :Int = -2147483648;
@@ -51,6 +54,10 @@ class TMath {
     inline public static function min<T:Float> (a :T, b :T) :T
     {
         return (a < b) ? a : b;
+    }
+
+    public static inline function lerp<T:Float> (a:T, b:T, x:Float):Float {
+	return a + x * (b - a);
     }
 
     #if !js @:generic #end
