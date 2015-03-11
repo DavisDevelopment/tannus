@@ -43,8 +43,6 @@ class AlertBox extends Pane {
 		this.onactivate.once(function(x) {
 			foundation();
 		});
-
-		instances.push( this );
 	}
 
 	/**
