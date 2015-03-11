@@ -42,6 +42,13 @@ abstract Percent (Float) from Float to Float {
 	}
 
 	/**
+	  * Get what percent [what] is of [of]
+	  */
+	public static function percent(what:Float, of:Float):Percent {
+		return new Percent((what/of)*100);
+	}
+
+	/**
 	  * Cast [this] to a String
 	  */
 	public inline function toString():String {
