@@ -3,13 +3,8 @@ package tannus.geom;
 import tannus.geom.Point;
 import tannus.geom.Line;
 
-@:expose
 class Rectangle {
-	public var x:Float;
-	public var y:Float;
-	public var width:Float;
-	public var height:Float;
-
+	/* Constructor Function */
 	public function new(?x:Float=0, ?y:Float=0, ?width:Float=0, ?height:Float=0):Void {
 		this.x = x;
 		this.y = y;
@@ -17,14 +12,23 @@ class Rectangle {
 		this.height = height;
 	}
 
+	/**
+	  * Creates and returns a 'clone' of [this] Rectangle
+	  */
 	public function clone():Rectangle {
 		return new Rectangle(this.x, this.y, this.width, this.height);
 	}
 
+	/**
+	  * Calculates and returns the area of [this] Rectangle
+	  */
 	public function area():Float {
 		return (this.width * this.height);
 	}
 
+	/**
+	  * Tests whether [this] Rectangle is the same as [other] Rectangle
+	  */
 	public function equals(other:Rectangle):Bool {
 		return (
 			(this.x == other.x) &&
@@ -34,6 +38,9 @@ class Rectangle {
 		);
 	}
 
+	/**
+	  * Returns an array of points representing all four corners of [this] Rectangle
+	  */
 	public function corners():Array<Point> {
 		var points:Array<Point> = new Array();
 		
@@ -45,22 +52,37 @@ class Rectangle {
 		return points;
 	}
 
+	/**
+	  * The top-left corner of [this] Rectangle
+	  */
 	public function topLeft():Point {
 		return new Point(this.x, this.y);
 	}
 
+	/**
+	  * The top-right corner of [this] Rectangle
+	  */
 	public function topRight():Point {
 		return new Point((this.x + this.width), this.y);
 	}
 
+	/**
+	  * The bottom-left corner of [this] Rectangle
+	  */
 	public function bottomLeft():Point {
 		return new Point(this.x, (this.y + this.height));
 	}
 
+	/**
+	  * The bottom-right corner of [this] Rectangle
+	  */
 	public function bottomRight():Point {
 		return new Point((this.x + this.width), (this.y + this.height));
 	}
 
+	/**
+	  * Whether [this] Rectangle contains the Point described by [cx] and [cy]
+	  */
 	public function contains(cx:Float, cy:Float):Bool {
 		return (
 			(cx > x && cx < (x + width)) &&
@@ -68,10 +90,16 @@ class Rectangle {
 		);
 	}
 
+	/**
+	  * Whether [this] Rectangle contains [point]
+	  */
 	public function containsPoint(point:Point):Bool {
 		return contains(point.x, point.y);
 	}
 
+	/**
+	  * Whether [this] Rectangle contains all of the corners of [other] Rectangle
+	  */
 	public function containsRect(rect:Rectangle):Bool {
 		var pts:Array<Point> = this.corners();
 		for (pt in pts) {
@@ -81,6 +109,9 @@ class Rectangle {
 		return true;
 	}
 
+	/**
+	  * Whether [this] Rectangle contains any of the corners of [other] Rectangle
+	  */
 	public function intersects(other:Rectangle):Bool {
 		var pts:Array<Point> = other.corners();
 		for (pt in pts) {
@@ -144,4 +175,20 @@ class Rectangle {
 			(rect.height * vect.height)
 		);
 	}
+
+/* === Instance Fields === */
+
+	//- The 'x' coordinate
+	public var x:Float;
+
+	//- The 'y' coordinate
+	public var y:Float;
+
+	//- The 'width' coordinate
+	public var width:Float;
+
+	//- The 'height' coordinate
+	public var height:Float;
+
+/* === Computed Fields === */
 }
