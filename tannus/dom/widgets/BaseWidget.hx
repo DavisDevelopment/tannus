@@ -449,12 +449,12 @@ class BaseWidget extends EventDispatcher implements Destructible implements Upda
 
   	//- The Text of [this]'s Element
   	public var text(get, set) : String;
-  	private inline function get_text():String {
+  	private function get_text():String {
 		var res:String = '';
 		ifel(function() res = el.text);
 		return res;
 	}
-	private inline function set_text(ntxt : String):String {
+	private function set_text(ntxt : String):String {
 		ifel(function() {
 			
 			el.text = ntxt;
