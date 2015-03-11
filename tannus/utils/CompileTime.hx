@@ -43,6 +43,12 @@ class CompileTime
         return toExpr(loadFileAsString(path));
     }
 
+    /** Obtains a List of all files in a directory, and inserts that Array into your code **/
+    macro public static function readDirectory(path : String):ExprOf<Array<String>> {
+	var entries = readDirectoryAsArray( path );
+	return toExpr(entries);
+    }
+
     /** Reads a file at compile time, and inserts the contents into your code as an interpolated string, similar to using 'single $quotes'.  */
     macro public static function interpolateFile(path:String):ExprOf<String> {
         return Format.format( toExpr(loadFileAsString(path)) );
@@ -142,6 +148,16 @@ class CompileTime
                 return haxe.macro.Context.error('Failed to load file $path: $e', Context.currentPos());
             }
         }
+
+        static function readDirectoryAsArray(path : String) {
+		try {
+			var p:String = Context.resolvePath(path);
+			return sys.FileSystem.readDirectory( p );
+		}
+		catch (e : Dynamic) {
+			return haxe.macro.Context.error('Could not read directory $path: $e', Context.currentPos());
+		}
+	}
 
         static function isSameClass(a:ClassType, b:ClassType):Bool {
             return (
