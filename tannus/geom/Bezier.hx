@@ -110,6 +110,23 @@ class Bezier {
 		return new Point(getPointX(t), getPointY(t));
 	}
 
+	/**
+	  * Creates and returns a list of all Points along [this] Bezier
+	  */
+	public inline function getPoints(?prec:Int):Array<Point> {
+		var results:Array<Point> = new Array();
+		var precision:Int = (prec != null ? prec : PRECISION);
+		var i:Int = 0;
+
+		while (i < precision) {
+			var pt:Point = getPoint((i / precision) * 100);
+			results.push( pt );
+			i++;
+		}
+
+		return results;
+	}
+
 /* === Instance Fields === */
 
 	//- The starting position of [this] Bezier
@@ -125,4 +142,6 @@ class Bezier {
 	public var end:Point;
 
 /* === Class Methods === */
+
+	public static var PRECISION:Int = 100;
 }
