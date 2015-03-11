@@ -7,9 +7,20 @@ abstract Angle ( Float ) from Float to Float {
         this = angl;
     }
     
+    /**
+      *
+      */
     @:op(A + B)
     public inline function plus(num : Float):Angle {
         return (this + num);
+    }
+
+    /**
+      * Subtract Angle [B] from Angle [A], and return the result
+      */
+    @:op(A - B)
+    public static inline function minus(one:Angle, two:Angle):Angle {
+	return Angle.fromDegrees(one.degrees - two.degrees);
     }
 
     /**
