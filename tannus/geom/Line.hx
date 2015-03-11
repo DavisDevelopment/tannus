@@ -22,6 +22,16 @@ class Line {
 		this.end = end;
 	}
 
+/* === Computed Fields === */
+
+	/**
+	  * The length of [this] Line
+	  */
+	public var length(get, never):Float;
+	private inline function get_length():Float {
+		return start.distanceTo(end);
+	}
+
 /* === Instance Methods === */
 
 	/**
