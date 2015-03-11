@@ -75,10 +75,4 @@ class AlertBox extends Pane {
 
 	//- The Signal which fires when [this] AlertBox is dismissed
 	public var dismissal:Signal<AlertBox>;
-
-/* === Class Fields === */
-
-	//- An Array of all instances of this Class
-	private static var instances:Array<AlertBox> = {new Array();};
-
 }
