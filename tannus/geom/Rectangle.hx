@@ -191,4 +191,12 @@ class Rectangle {
 	public var height:Float;
 
 /* === Computed Fields === */
+
+	/**
+	  * A Point describing the 'center' of [this] Rectangle
+	  */
+	public var center(get, never):Point;
+	private inline function get_center():Point {
+		return new Point(x + (width / 2), y + (height / 2));
+	}
 }
