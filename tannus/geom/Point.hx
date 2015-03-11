@@ -41,6 +41,13 @@ abstract Point (Array <Float>) from Array<Float> {
 	}
 
 	/**
+	  * Calculates the distance between [this] and [other]
+	  */
+	public inline function distanceTo(other : Point):Float {
+		return Math.sqrt(Math.pow(Math.abs(x-other.x), 2) + Math.pow(Math.abs(y-other.y), 2));
+	}
+
+	/**
 	  * Creates and returns a new Point which is the 'sum' of [this] and [other]
 	  */
 	@:op(A + B)
