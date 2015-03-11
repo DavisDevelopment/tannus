@@ -36,6 +36,13 @@ abstract Angle ( Float ) from Float to Float {
     private inline function get_radians():Float {
         return (this * (TMath.PI / 180));
     }
+
+    /**
+      * Converts [this] Angle to a human-readble String
+      */
+    public inline function toString():String {
+	return (degrees + '\u00B0');
+    }
     
     public static inline function fromDegrees(fl : Float):Angle {
         return new Angle(fl);
