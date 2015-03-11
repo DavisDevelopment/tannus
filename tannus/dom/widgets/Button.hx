@@ -126,9 +126,15 @@ class Button extends BaseWidget {
 		return size;
 	}
 	
-/*
- === Utility Methods ===
-*/
+/* === Class Methods === */
 
-
+	/**
+	  * Create a Button instance from an existing Button element
+	  */
+	public static function fromElement(e : Element):Button {
+		var btn:Button = new Button('');
+		btn.el = e;
+		btn.activate();
+		return btn;
+	}
 }
