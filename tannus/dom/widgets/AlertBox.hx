@@ -42,7 +42,6 @@ class AlertBox extends Pane {
 
 		this.onactivate.once(function(x) {
 			foundation();
-			initClass();
 		});
 
 		instances.push( this );
@@ -82,24 +81,4 @@ class AlertBox extends Pane {
 	//- An Array of all instances of this Class
 	private static var instances:Array<AlertBox> = {new Array();};
 
-/* === Class Methods === */
-
-	/**
-	  * Function invoked when the first instance of this Class is created
-	  */
-	private static function initClass():Void {
-		var doc = Element.select(js.Browser.document);
-		
-		doc.on('close.fndtn.alert', function(event) {
-			trace('Event Received');
-			var el:Element = Element.select(event.target);
-			var dinstance:Null<Dynamic> = el.hash['__tannus_widget'];
-			trace(dinstance);
-			if (dinstance != null && Std.is(dinstance, AlertBox)) {
-				var box:AlertBox = (cast dinstance);
-				
-				box.dismissal.dispatch( box );
-			}
-		});
-	}
 }
