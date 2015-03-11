@@ -3,6 +3,7 @@ package tannus.geom;
 import tannus.math.TMath;
 import tannus.geom.Point;
 import tannus.geom.Rectangle;
+import tannus.geom.Angle;
 
 import tannus.math.Percent;
 
@@ -44,5 +45,19 @@ class Line {
 		var height:Float = (Math.max(start.y, end.y) - y);
 
 		return new Rectangle(x, y, width, height);
+	}
+
+	/**
+	  * Find a given point between [start] and [end]
+	  */
+	public function getPoint(pt : Percent):Point {
+		var mag:Float = pt.of(length);
+		var ang:Angle = start.angleTo(end);
+		trace(ang);
+
+		var px:Float = (mag * Math.cos(ang.radians) + start.x);
+		var py:Float = (mag * Math.sin(ang.radians) + start.y);
+		
+		return new Point(px, py);
 	}
 }
