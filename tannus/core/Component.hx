@@ -4,6 +4,7 @@ import tannus.core.Page;
 import tannus.core.EventDispatcher;
 
 import tannus.io.Ptr;
+import tannus.io.Signal;
 
 /**
   * Page Component class - an Object used to represent a chunk of behaviour that may be "attached"
@@ -14,8 +15,13 @@ class Component extends EventDispatcher {
 	//- The Page object we're currently attached to
 	public var page : Null<Page>;
 
+	//- Signal which fires when [this] Component's action is triggered
+	public var onAction : Signal<Dynamic>;
+
 	public function new(?p : Page):Void {
 		super();
+
+		onAction = new Signal();
 		
 		if (p != null) {
 			page = p;
@@ -29,6 +35,7 @@ class Component extends EventDispatcher {
 		assertAttached();
 
 		emit('action', create_action_signal());
+		onAction.dispatch( null );
 	}
 
 	/**
