@@ -35,11 +35,12 @@ class FormData {
 	  */
 	public function toFormData():NativeForm {
 		//- Create a new FormData Object
-		var nf:NativeForm = new NativeForm();
+		var nf:Dynamic = cast (new NativeForm());
 		
 		//- Clone [this]'s Data onto [nf]
 		for (key in _values.keys()) {
-			nf.append(key, (get(key)), null);
+			untyped nf.append(key, (get(key)));
+		
 			trace('"$key" => ${get(key)}');
 		}
 
