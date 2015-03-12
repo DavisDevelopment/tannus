@@ -11,10 +11,14 @@ class GeneratedPage extends Page implements Destructible implements Destructible
 	//- The "root" element of [this] Page
 	public var base : Element;
 
-	public function new(route : Route):Void {
-		super( route );
+	//- An Array of Destructibles to destroy when [this] is destroyed
+	public var assets : Array<Destructible>;
+
+	public function new():Void {
+		super(new Route('*'));
 
 		this.base = body;
+		this.assets = new Array();
 	}
 
 /*
@@ -43,8 +47,13 @@ class GeneratedPage extends Page implements Destructible implements Destructible
 	  * method to "destroy" [this] Page's content
 	  */
 	public function destroy():Void {
-		
+		//- Emit our 'destroy' event
 		emit('destroy', this);
+
+		//- Destroy all of our assets
+		for (item in assets) {
+			item.destroy();
+		}
 	}
 
 /*
