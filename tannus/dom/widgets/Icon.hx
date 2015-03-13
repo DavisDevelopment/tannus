@@ -38,7 +38,10 @@ class Icon extends BaseWidget {
 		});
 		return 'fi'+chars.join('');
 	}
-
+	
+	/**
+	  * The style of Icon that [this] is
+	  */
 	public var type(get, set):IconType;
 	private function get_type():IconType {
 		var klass:String = el['class'].split(' ').filter(function(x) return x.startsWith('fi-'))[0];
@@ -57,5 +60,16 @@ class Icon extends BaseWidget {
 		
 		el.addClass(iconName(t));
 		return t;
+	}
+
+	/**
+	  * The Color of the Icon
+	  */
+	public var color(get, set):String;
+	private function get_color():String {
+		return (el.css['color'] + '');
+	}
+	private function set_color(nc:String):String {
+		return (el.css['color'] = (nc+''));
 	}
 }
