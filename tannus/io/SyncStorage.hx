@@ -6,7 +6,7 @@ import tannus.io.Memory;
 /**
   * tannus.io.SyncStorage class - meant solely to be used as a base-class, as it does nothing on it's own
   */
-class SyncStorage {
+class SyncStorage<T> {
 	
 	/**
 	  * Checks for the existence of [key] in [this]'s registry
@@ -33,15 +33,15 @@ class SyncStorage {
 	/**
 	  * Retrieves the value of [key] in [this]'s registry
 	  */
-	public function get(key : String):Null<String> {
+	public function get(key : String):Null<T> {
 		unimp();
-		return '';
+		return null;
 	}
 
 	/**
 	  * Adds [value] to the registry under the name [key]
 	  */
-	public function set(key:String, value:String):Void {
+	public function set(key:String, value:T):Void {
 		unimp();
 	}
 
