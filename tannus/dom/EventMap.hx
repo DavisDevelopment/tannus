@@ -55,6 +55,13 @@ abstract EventMap (Ptr<Element>) {
 
 		return (get( key ));
 	}
+
+	/**
+	  * Create a pointer to the event referred to by [key]
+	  */
+	public function reference(key:String):Ptr<EventListener> {
+		return Ptr.create(self.events[key]);
+	}
 }
 
 /**
