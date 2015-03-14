@@ -289,8 +289,8 @@ abstract Element (js.JQuery) {
 	}
 	
 	public var tag(get, never):String;
-	private inline function get_tag():String {
-		return (this.context.tagName);
+	private function get_tag():String {
+		return (toDOMElement().tagName);
 	}
 	
 	/**
