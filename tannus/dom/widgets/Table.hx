@@ -78,6 +78,8 @@ class Table extends BaseWidget {
 
 	/**
 	  * Add a Column to [this] Table
+	  * @param [name] {String} The key under which the relevant data will be stored in the Hash
+	  * @param [colname] {String} The title of the column
 	  */
 	public function addColumn(name:String, colname:String):Element {
 		 var col:Element = q('<th></th>');
@@ -85,10 +87,10 @@ class Table extends BaseWidget {
 		 col.text = colname;
 
 		 var tup:TwoTuple<Int, Element> = new TwoTuple(colcount, col);
-
+		 trace(tup);
 		 colcount++;
 
-		 columns[name] = tup;
+		 columns.set(name, tup);
 		 foundation();
 		 return col;
 	}
