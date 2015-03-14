@@ -33,6 +33,22 @@ abstract Percent (Float) from Float to Float {
 	public inline function plus<T:Float>(other : T):Percent {
 		return (new Percent(other + value));
 	}
+
+	/**
+	  * Increment [this] Percent
+	  */
+	@:op(A++)
+	public inline function increment():Percent {
+		this++;
+		return cast this;
+	}
+	
+	@:op(A--)
+	@:op(--A)
+	public inline function decrement():Percent {
+		this--;
+		return cast this;
+	}
 	
 	/**
 	  * Retrieve [this] Percent "of" another number
