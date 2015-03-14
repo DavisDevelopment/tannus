@@ -12,7 +12,7 @@ import tannus.dom.BoundComponent;
 
 class Model extends EventDispatcher {
 	//- Storage that [this] Model uses for storing it's records
-	public var store : SyncStorage;
+	public var store : SyncStorage<String>;
 	
 	//- ModelStorage instance that [this] Model has bound to it
 	public var records : ModelStorage;
