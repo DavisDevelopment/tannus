@@ -16,9 +16,26 @@ class Signal<T> {
 	}
 
 	/**
+	  * Determines whether [action] is already registered as a listener
+	  */
+	private function hasListener(action:Callback<T>):Bool {
+		for (h in listeners) {
+			if (h.action == action || Reflect.compareMethods(h.action, action)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
 	  * Adds a listener to the list
 	  */
 	public function listen(action:Callback<T>, once:Bool=false):Void {
+		//- Only add [action] as a listener if we haven't already
+		if (hasListener(action)) {
+			return;
+		}
+
 		var handler:Handler<T> = new Handler(action, once);
 
 		listeners.add( handler );
