@@ -17,6 +17,9 @@ import tannus.utils.tuples.TwoTuple;
 import tannus.io.Ptr;
 import tannus.io.Signal;
 import tannus.io.Memory;
+import tannus.io.SyncStorage;
+import tannus.io.storage.SyncStorageWrapper;
+import tannus.io.storage.ObjectStorage;
 
 /* Tannus Event Imports */
 import tannus.events.Event;
@@ -550,6 +553,23 @@ class Application extends EventDispatcher {
 
 	//- Fires when a "Message" is received from another Application
 	public var message : Signal<Dynamic>;
+
+
+	/**
+	  * ObjectStorage wrapped around localStorage
+	  */
+	private var _ls:SyncStorageWrapper = {new SyncStorageWrapper(js.Browser.getLocalStorage());};
+	private var _sess:SyncStorageWrapper = {new SyncStorageWrapper(js.Browser.getSessionStorage());};
+
+	public var ls(get, never):ObjectStorage;
+	private function get_ls():ObjectStorage {
+		return (new ObjectStorage(_ls));
+	}
+
+	public var sess(get, never):ObjectStorage;
+	private function get_sess():ObjectStorage {
+		return (new ObjectStorage(_sess));
+	}
 
 
 /* === Class Methods === */
