@@ -2,7 +2,7 @@ package tannus.io.storage;
 
 import tannus.io.SyncStorage;
 
-class SyncStorageWrapper extends SyncStorage {
+class SyncStorageWrapper extends SyncStorage<String> {
 	//- the [js.html.Storage] object [this] operates on
 	private var store : NStorage;
 
