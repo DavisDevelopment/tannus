@@ -60,4 +60,22 @@ class Line {
 		
 		return new Point(px, py);
 	}
+
+	/**
+	  * Get an Array of all Points along [this] Line
+	  */
+	public function getPoints():Array<Point> {
+		var points:Array<Point> = new Array();
+		var steps:Int = 100;
+		var i:Int = 0;
+
+		while (i < steps) {
+			var pt:Point = getPoint(Percent.percent(i, steps));
+
+			points.push( pt );
+
+			i++;
+		}
+		return points;
+	}
 }
