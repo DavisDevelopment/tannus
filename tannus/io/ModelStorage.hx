@@ -71,8 +71,8 @@ abstract ModelStorage ( TwoTuple<Model, Map<String, String>> ) {
 	/**
 	  * Shorthand reference to [this]'s Storage Medium
 	  */
-	private var store(get, never):SyncStorage;
-	private inline function get_store():SyncStorage {
+	private var store(get, never):SyncStorage<String>;
+	private inline function get_store():SyncStorage<String> {
 		return (this.one.store);
 	}
 
